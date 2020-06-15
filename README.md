@@ -1,2 +1,2 @@
-# stgq
+# STG-Q
 STG Constraint Quantification
