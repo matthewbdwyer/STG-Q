@@ -1,0 +1,7 @@
+// Dictionary
+[ 
+F1 : float = 3.14
+]
+
+// Expr
+(slt (fptosi i32 F1) (i32 17))

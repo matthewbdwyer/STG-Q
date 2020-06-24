@@ -1,0 +1,109 @@
+// Dictionary
+[ 
+B2 : i1 = 1, 
+D1 : double = 3.14159, 
+F1 : float = 3.14, 
+I0 : i8 = 7, 
+I1 : i16 = 13,
+I3 : i32 = 42,
+I5 : i64 = -19
+]
+
+// Expr
+(land
+  (eq B2 (slt (fptosi i32 F1) (trunc i32 (i64 17))))
+  (land
+    (lnot 
+      (sge 
+        (add I0 (fptosi i8 (fsub F1 (fptrunc float (double 1.750000))))) 
+        (i8 0)
+      ) 
+    )
+    (lor
+      (sle (sub I0 (add I3 (mul I0 (sdiv I3 (i8 1))))) (add I3 I3))
+      (land
+        (ne 
+          (udiv (urem I5 (i64 4)) (sext i64 (i1 1)))
+          (fdiv 
+            (fneg
+              (frem 
+                (fadd (fptrunc float (fpext double (float 2.000000))) (float 4.100000)) 
+                (sitofp float (zext i64 (i16 1)))
+              )
+            )
+            (fmul 
+              (uitofp float
+                (and 
+                  (shl (fptoui i32 (float 4.000000)) (i8 2))   
+                  (or
+                    (xor 
+                      (lshr (bitcast i32 (i32 4)) (i8 1))
+                      (ashr (i32 4) (i8 1))
+                    )
+                    (srem (i8 8) (i1 1))
+                  )
+                )
+              ) 
+              (float 2.500000)
+            )
+          )
+        )
+        (lor
+          (ult (i32 2) (i32 4))
+          (land
+            (ule (i32 2) (i32 4))
+            (lor
+              (ugt (i32 2) (i32 4))
+              (land
+                (uge (i32 2) (i32 4))
+                (lor
+                  (slt (i32 2) (i32 4))
+                  (land
+                    (sgt (i32 2) (i32 4))
+                    (lor
+                      (oeq (float 2.000000) (float 4.000000))
+                      (land
+                        (one (float 2.000000) (float 4.000000))
+                        (lor
+                          (olt (float 2.000000) (float 4.000000))
+                          (land
+                            (ole (float 2.000000) (float 4.000000))
+                            (lor
+                              (ogt (float 2.000000) (float 4.000000))
+                              (land
+                                (oge (float 2.000000) (float 4.000000))
+                                (lor
+                                  (ord (float 2.000000) (float 4.000000))
+                                  (land
+                                    (fueq (float 2.000000) (float 4.000000))
+                                    (lor
+                                      (fune (float 2.000000) (float 4.000000))
+                                      (land
+                                        (fult (float 2.000000) (float 4.000000))
+                                        (lor
+                                          (fugt (float 2.000000) (float 4.000000))
+                                          (land
+                                            (fuge (float 2.000000) (float 4.000000))
+                                            (funo (float 2.000000) (float 4.000000))
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+)

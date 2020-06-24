@@ -1,0 +1,13 @@
+// Dictionary
+[ 
+B2 : i1 = 1, 
+F1 : float = 3.14, 
+I0 : i16 = 7, 
+I3 : i16 = 42
+]
+
+// Expr
+(land
+  (eq B2 (slt (fptosi i16 F1) (i16 17)))
+  B2
+)
