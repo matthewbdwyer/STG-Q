@@ -59,9 +59,9 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraint> c) {
     num--;
     if(c->symbolType(n)[0] == 'i'){
       if(c->symbolType(n) == "i1")
-        os << id << " UNIFORM_INT -1 1\t" << c->symbolValue(n);
+        os << id << " UNIFORM_INT -1 1";
       else if(c->symbolType(n) == "i8")
-        os << id << " UNIFORM_INT -129 127\t" << c->symbolValue(n);
+        os << id << " UNIFORM_INT -129 127";
       else if(c->symbolType(n) == "i16")
         os << id << " UNIFORM_INT -32769 32767";
       else if(c->symbolType(n) == "i32")
