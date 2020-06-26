@@ -44,8 +44,12 @@ do
   fi 
 done
 
-echo -n $((numtests - numfailures)) 
-echo -n " of "
-echo -n ${numtests}
-echo " tests passed with no differences"
+if [ ${numfailures} -eq "0" ]; 
+then
+  echo "pass"
+else
+  echo -n "fail : "
+  echo -n ${numfailures}/${numtests}
+  echo " tests failed"
+fi
   

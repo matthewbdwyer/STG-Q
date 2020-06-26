@@ -29,7 +29,7 @@ To build the libraries and executable:
 NB: You may see warnings related to ignored type attribute ATN that are due to some
 type gymnastics in the current implementation of the ANTLR4 CPP Visitor implementation.
 
-This will produce three executables:
+This will produce two executables:
 - `build/stgpp` : takes the name of a `.stg` file, parses it, and pretty print its contents to stdout.
 - `build/stg2qc` : takes the name of an `.stg` file, parses it, and prints the constraint in a form that can be accepted by the `qCoral` counter.
 
@@ -54,6 +54,12 @@ subtyping `ConstraintVisitor`, defined in `ConstraintVisitor.h`.
 `ConstraintPrinter.{h,cpp}` is one such visitor that pretty prints 
 a constraint.  `QCoralPrinter.{h.cpp}` for the [qcoral](target/qcoral) target
 is another example of a constraint visitor.
+
+## STG Tools
+There are several scripts that are useful for simplifying sets of constraints.
+`src/tools/stgred.sh` accepts the name of a directory and prints the names of redundant `.stg` files.  It does this by performing some preprocessing, e.g., dropping the dictionary, and then diffing the constraints; implemented in `src/tools/stgdiff.sh`.
+
+These tools should be installed in a directory and the shell variable `STGINSTALL` should be set to that directory's path.  This is how these STG scripting tools reference one another.
 
 ## Testing
 Tests for the library itself are run using the script `run.sh` in [test/lib](tests/lib).

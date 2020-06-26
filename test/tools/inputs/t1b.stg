@@ -1,0 +1,9 @@
+// Dictionary
+[ 
+  S0:i32 = 4 
+]
+
+// Expr
+(slt S0 
+  (i32 10)
+)
