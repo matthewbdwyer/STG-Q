@@ -66,12 +66,20 @@ protected:
   Op op;
   std::shared_ptr<Type> type;
 
+  /* 
+   * Constraint initializes constraint back reference during create() calls.
+   * This is a write-once read-many field, so we don't bother with a shared ptr.
+   */
+  friend class Constraint;
+  Constraint *constraint;
+
 public:
   virtual ~Expr() = default;
 
   void setType(std::shared_ptr<Type> t) { type = t; }
   std::shared_ptr<Type> getType() { return type; }
   Op getOp() const { return op; }
+ Constraint* getConstraint() { return constraint; }
 
   // Delegated visitor hook
   virtual void accept(ConstraintVisitor * visitor) = 0;
@@ -153,6 +161,9 @@ public:
 
 /*
  * A constraint is a dictionary of symbols and Boolean expression.
+ *
+ * TBD: The visibility of these methods should be controlled better.
+ * Perhaps use protected and friends for exposing intra-lib API.
  */
 class Constraint {
   std::map<std::string, std::string> symbolTypes;

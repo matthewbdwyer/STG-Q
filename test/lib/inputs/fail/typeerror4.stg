@@ -1,0 +1,2 @@
+[ F1 : float = 3.14 ] 
+(slt (fptosi i32 F1) F1))

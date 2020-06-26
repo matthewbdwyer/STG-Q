@@ -31,6 +31,16 @@ set(ANTLR_EXECUTABLE /home/matthewbdwyer/lib/antlr-4.8-complete.jar)
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
+######## LLVM rules ###########
+
+# Executables use LLVM commandline parsing support
+find_package(LLVM 10 REQUIRED CONFIG)
+
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+######## STG rules ###########
+
 # STG constraint library
 add_subdirectory(src)
 include_directories(include)

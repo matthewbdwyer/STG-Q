@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STGPP=../../build/src/driver/stgpp
+STGPP=../../build/src/tools/stgpp
 
 numtests=0
 numfailures=0
@@ -36,9 +36,10 @@ do
 
   ${STGPP} $i >$i.out 2>/dev/null
 
-  if ! cat $i.out | grep -q "parse error";
+  # This catches "Parse error" or "Type error"
+  if ! cat $i.out | grep -q "error";
   then
-    echo -n "Expected parse failure for : " 
+    echo -n "Expected failure for : " 
     echo $i
     ((numfailures++))
   fi 

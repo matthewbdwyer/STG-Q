@@ -2,4 +2,4 @@
 [ I0:i32 = 7, I1:i8 = 12 ]
 
 // Expr
-(slt I0 I1)
+(slt I0 (sext i32 I1))

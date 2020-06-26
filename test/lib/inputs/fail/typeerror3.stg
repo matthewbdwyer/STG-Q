@@ -11,6 +11,6 @@ I3 : i32 = 42
   (eq B2 (slt (fptosi i32 F1) (i32 17)))
   (land
     (sge (add I0 (fptosi i8 (fsub F1 (fptrunc float (double 1.750000))))) (i8 0)) 
-    (sge (sub (zext i32 I0) (add I3 (zext i32 (mul I0 (sdiv (trunc i8 I3) (i8 1)))))) (add I3 I3))
+    (sge (sub I0 (add I3 (mul I0 (sdiv I3 (i8 1))))) (add I3 I3))
   )
 )

@@ -324,37 +324,52 @@ std::shared_ptr<Symbol> Constraint::create(std::string n, std::shared_ptr<Type> 
     return sym;
   } else {
     auto sym = std::make_shared<Symbol>(n, t);
+    sym->constraint = this;
     internSymbol.insert(std::pair<std::string, std::shared_ptr<Symbol>>(n,sym));
     return sym;
   }
 }
 
 std::shared_ptr<IntConstant> Constraint::create(int v, std::shared_ptr<Type> t) {
-  return std::make_shared<IntConstant>(v, t);
+  auto n = std::make_shared<IntConstant>(v, t);
+  n->constraint = this;
+  return n;
 }
 
 std::shared_ptr<LongConstant> Constraint::create(long v, std::shared_ptr<Type> t) {
-  return std::make_shared<LongConstant>(v, t);
+  auto n = std::make_shared<LongConstant>(v, t);
+  n->constraint = this;
+  return n;
 }
 
 std::shared_ptr<FloatConstant> Constraint::create(float v, std::shared_ptr<Type> t) {
-  return std::make_shared<FloatConstant>(v, t);
+  auto n = std::make_shared<FloatConstant>(v, t);
+  n->constraint = this;
+  return n;
 }
 
 std::shared_ptr<DoubleConstant> Constraint::create(double v, std::shared_ptr<Type> t) {
-  return std::make_shared<DoubleConstant>(v, t);
+  auto n = std::make_shared<DoubleConstant>(v, t);
+  n->constraint = this;
+  return n;
 }
 
 std::shared_ptr<UnaryExpr> Constraint::create(std::shared_ptr<Expr> c, Expr::Op o) { 
-  return std::make_shared<UnaryExpr>(c,o);
+  auto n = std::make_shared<UnaryExpr>(c,o);
+  n->constraint = this;
+  return n;
 }
 
 std::shared_ptr<UnaryExpr> Constraint::create(std::shared_ptr<Expr> c, Expr::Op o, std::shared_ptr<Type> t) { 
-  return std::make_shared<UnaryExpr>(c,o,t);
+  auto n = std::make_shared<UnaryExpr>(c,o,t);
+  n->constraint = this;
+  return n;
 }
 
 std::shared_ptr<BinaryExpr> Constraint::create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o) {
-  return std::make_shared<BinaryExpr>(c1,c2,o);
+  auto n = std::make_shared<BinaryExpr>(c1,c2,o);
+  n->constraint = this;
+  return n;
 }
 
 }
