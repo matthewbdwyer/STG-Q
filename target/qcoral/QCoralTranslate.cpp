@@ -16,7 +16,7 @@ int main(int argc, const char *argv[]) {
 
   auto constraint = Constraint::parse(stream);
 
-  if (auto constraint = Constraint::parse(stream); constraint) {
+  if (constraint) {
     QCoralPrinter qcp(std::cout, 2);
     qcp.print(constraint.value());
   } else {
