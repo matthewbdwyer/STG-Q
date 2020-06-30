@@ -85,7 +85,8 @@ These tools should be installed in a directory and the shell variable `STGINSTAL
 
 ## Testing
 Tests for the library itself are run using the script `run.sh` in [test/lib](tests/lib).
-There are 6 test inputs which cover all of the STG operators and many of their combinations; the grammar is rather simple so this ends up being a decent initial test suite.  There are also tests which are expected to produce parse errors.  
+Tests for the STG tools are run using the script `run.sh` in [test/tools](tests/tools).
+These test provide a non-trivial degree of coverage, but they are incomplete.
 
 Each target is expected to provide its own `run.sh` script to test its translator and associated tools.
 
