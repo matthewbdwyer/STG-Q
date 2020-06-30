@@ -18,12 +18,12 @@ We follow the `cmake` build model for the [ANTLR4 Cpp target](https://github.com
 
 You will need to adjust the path to the jar file that ANTLR4 uses (`antlr-4.8-complete.jar`) which is hardcoded in `CMakeLists.txt`.   Note that if the normal install of `antlr4` doesn't provide you with this file, then you can download it from the [ANTLR4 download site](https://www.antlr.org/download/antlr-4.8-complete.jar) and place it wherever you like, e.g., `$HOME/lib`, and then point to it from `CMakeLists.txt`.
 
-You need to create a `build` directory within which you will build the library.  To get started you should create that, empty, build directory if it doesn't exist.  All of the generated runtime files for ANTLR4 will be built the first time and stored in the build directory; this may take some time.
+You need to create a `build` directory at the top-level of this project, i.e., `.../STG-Q/build`, within which you will build the project.  To get started you should create that, empty, build directory if it doesn't exist.  All of the generated runtime files for ANTLR4 will be built the first time and stored in the build directory; this may take some time.
 
 To build the libraries and executable:
   1. `mkdir build`
   2. `cd build`
-  3. `cmake ../src`
+  3. `cmake ..`
   4. `make`
 
 NB: You may see warnings related to ignored type attribute ATN that are due to some
