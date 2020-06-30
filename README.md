@@ -33,6 +33,28 @@ This will produce two executables:
 - `build/stgpp` : takes the name of a `.stg` file, parses it, and pretty print its contents to stdout.
 - `build/stg2qc` : takes the name of an `.stg` file, parses it, and prints the constraint in a form that can be accepted by the `qCoral` counter.
 
+`stgpp` supports pretty printing, type checking, and constant folding by default.  The latter features can be disabled with command line options:
+```
+OVERVIEW: stgpp - STG constraint pretty printer with type checking and constant folding
+
+USAGE: stgpp [options] <stg source file>
+
+OPTIONS:
+
+Generic Options:
+
+  --help                - Display available options (--help-hidden for more)
+  --help-list           - Display list of available options (--help-list-hidden for more)
+  --version             - Display the version of this program
+
+stgpp Options:
+Options for controlling STG constraint pretty printing.
+
+  --no-constant-folding - disable constant folding
+  --no-type-checking    - disable type checking
+  --verbose             - verbose mode
+```
+
 ## Repository and library structure and components
 The [include](include) directory stores the header files needed by translators and other constraint manipulating tools.  The library [source](source/lib) has the source code for the library components including the grammar file, `ConstraintGrammar.g4`.   Generating a parser from this file produces a number of ANTLR4 generated files.  These are not under configuration management and are stored in the `build` directory once generated.
 
@@ -85,13 +107,6 @@ the translated expressions.
 
 
 ## Improvement and Extensions
-
-### Type Checking
-It would be nice to build a simple type checking pass using the visitor.
-It would also allow us to perform type checking after constraint transformation.
-
-### Constraint Transformation
-Build a constant folding transformation.
 
 ## qCORAL target :
 
