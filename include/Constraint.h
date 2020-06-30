@@ -101,22 +101,13 @@ public:
 
 class Constant : public Expr { };                                                 
 
-// TBD: consider using a template class for these
 class IntConstant : public Constant {
-  int v;
-public:
-  IntConstant(int v, std::shared_ptr<Type> t) : v(v) 
-      { type = t; op = Expr::Op::None; }
-  int getValue() { return v; }           
-  void accept(ConstraintVisitor * visitor) override; 
-};
-
-class LongConstant : public Constant {
   long v;
 public:
-  LongConstant(long v, std::shared_ptr<Type> t) : v(v) 
+  IntConstant(long v, std::shared_ptr<Type> t) : v(v) 
       { type = t; op = Expr::Op::None; }
   long getValue() { return v; }           
+  void setValue(long val) { v = val; }           
   void accept(ConstraintVisitor * visitor) override; 
 };
 
@@ -126,6 +117,7 @@ public:
   FloatConstant(float v, std::shared_ptr<Type> t) : v(v) 
       { type = t; op = Expr::Op::None; }
   float getValue() { return v; }           
+  void setValue(float val) { v = val; }           
   void accept(ConstraintVisitor * visitor) override; 
 };
 
@@ -135,6 +127,7 @@ public:
   DoubleConstant(double v, std::shared_ptr<Type> t) : v(v) 
       { type = t; op = Expr::Op::None; }
   double getValue() { return v; }           
+  void setValue(double val) { v = val; }           
   void accept(ConstraintVisitor * visitor) override; 
 };
 
@@ -146,6 +139,7 @@ public:
   UnaryExpr(std::shared_ptr<Expr> c, Expr::Op o, std::shared_ptr<Type> t) 
       { op = o; type = t; child[0] = c; }
   std::shared_ptr<Expr> getChild(int i) { return child[i]; }
+  void setChild(int i, std::shared_ptr<Expr> c) { child[i] = c; }
   void accept(ConstraintVisitor * visitor) override;
 };
 
@@ -156,6 +150,7 @@ public:
   BinaryExpr(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o)
       { op = o; child[0] = c1; child[1] = c2; }
   std::shared_ptr<Expr> getChild(int i) { return child[i]; }
+  void setChild(int i, std::shared_ptr<Expr> c) { child[i] = c; }
   void accept(ConstraintVisitor * visitor) override;
 };
 
@@ -187,8 +182,7 @@ public:
   std::shared_ptr<Type> create(Type::Base b, int w);
 
   std::shared_ptr<Symbol> create(std::string name, std::shared_ptr<Type> t);
-  std::shared_ptr<IntConstant> create(int v, std::shared_ptr<Type> t);
-  std::shared_ptr<LongConstant> create(long v, std::shared_ptr<Type> t);
+  std::shared_ptr<IntConstant> create(long v, std::shared_ptr<Type> t);
   std::shared_ptr<FloatConstant> create(float v, std::shared_ptr<Type> t);
   std::shared_ptr<DoubleConstant> create(double v, std::shared_ptr<Type> t);
   std::shared_ptr<UnaryExpr> create(std::shared_ptr<Expr> c, Expr::Op o);

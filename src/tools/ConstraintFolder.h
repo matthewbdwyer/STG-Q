@@ -1,15 +1,17 @@
 #pragma once
 
+#include "ConstraintVisitor.h"
+#include "ConstraintPrinter.h"
+
 #include <string>
 #include <vector>
+#include <optional>
 
-#include "ConstraintVisitor.h"
-
-class ConstraintTypeChecker: public ConstraintVisitor {
+class ConstraintFolder: public ConstraintVisitor {
 public:
-  ConstraintTypeChecker() {}
+  ConstraintFolder() {}
 
-  bool check(std::shared_ptr<Constraint::Constraint> constraint, bool verbose);
+  void fold(std::shared_ptr<Constraint::Constraint> constraint, bool verbose);
 
   /* 
    * This visitor visits the entire expression, customizing the  
@@ -23,15 +25,13 @@ public:
   void endVisit(BinaryExpr * element) override;
 
 private:
-  // Type checking result for constraint
-  bool result = true;
-
   bool verbose = false;
 
-  /* 
-   * Records the types produced by visiting sub-expressions.
-   * There are at most two, since expressions are at most binary.
-   * Keep track of current child with index.
-   */
-  std::vector<std::shared_ptr<Constraint::Type>> visitResults;
+  void createBooleanConstant(bool b);
+
+  ConstraintPrinter cp;
+  Constraint::Constraint* constraint;
+
+  // vector holds a new expression to be spliced in or std::nullopt
+  std::vector<std::optional<std::shared_ptr<Expr>>> visitResults;
 };

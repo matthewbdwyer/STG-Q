@@ -6,7 +6,7 @@
 #include "Constraint.h"
 #include "ConstraintPrinter.h"
 #include "ConstraintTypeChecker.h"
-//#include "ConstraintFolder.h"
+#include "ConstraintFolder.h"
 
 #include "llvm/Support/CommandLine.h"
 
@@ -40,6 +40,7 @@ int main(int argc, const char *argv[]) {
     auto constraint = maybeConstraint.value();
 
     if (!notc) {
+      if (verbose) cout << "STG type checking\n";
       ConstraintTypeChecker ctc;
       if (!ctc.check(constraint, verbose)) {
         cout << "STG type error\n";
@@ -47,12 +48,11 @@ int main(int argc, const char *argv[]) {
       }
     }
 
-/*
     if (!nocf) {
+      if (verbose) cout << "STG constant folding\n";
       ConstraintFolder cf;
-      cf.fold(constraint);
+      cf.fold(constraint, verbose);
     }
-*/
 
     ConstraintPrinter cp(std::cout, 2);
     cp.print(constraint);

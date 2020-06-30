@@ -133,10 +133,10 @@ std::map<std::string, Expr::Op> soMap = {
   {"ord", Expr::Op::FOrd},
   {"fueq", Expr::Op::FUEq},
   {"fune", Expr::Op::FUNe},
-  {"fult", Expr::Op::FUgt},
-  {"fule", Expr::Op::FUge},
-  {"fugt", Expr::Op::FUlt},
-  {"fuge", Expr::Op::FUle},
+  {"fult", Expr::Op::FUlt},
+  {"fule", Expr::Op::FUle},
+  {"fugt", Expr::Op::FUgt},
+  {"fuge", Expr::Op::FUge},
   {"funo", Expr::Op::FUno},
   {"land", Expr::Op::LAnd},
   {"lor", Expr::Op::LOr}
@@ -192,10 +192,10 @@ std::map<Expr::Op, std::string> osMap = {
   {Expr::Op::FOrd, "ord"}, 
   {Expr::Op::FUEq, "fueq"}, 
   {Expr::Op::FUNe, "fune"}, 
-  {Expr::Op::FUgt, "fult"}, 
-  {Expr::Op::FUge, "fule"}, 
-  {Expr::Op::FUlt, "fugt"}, 
-  {Expr::Op::FUle, "fuge"}, 
+  {Expr::Op::FUgt, "fugt"}, 
+  {Expr::Op::FUge, "fuge"}, 
+  {Expr::Op::FUlt, "fult"}, 
+  {Expr::Op::FUle, "fule"}, 
   {Expr::Op::FUno, "funo"}, 
   {Expr::Op::LAnd, "land"}, 
   {Expr::Op::LOr, "lor"}
@@ -236,11 +236,6 @@ void Symbol::accept(ConstraintVisitor* visitor) {
 }    
 
 void IntConstant::accept(ConstraintVisitor* visitor) {
-  bool b = visitor->visit(this); 
-  visitor->endVisit(this);
-}    
-
-void LongConstant::accept(ConstraintVisitor* visitor) {
   bool b = visitor->visit(this); 
   visitor->endVisit(this);
 }    
@@ -330,14 +325,8 @@ std::shared_ptr<Symbol> Constraint::create(std::string n, std::shared_ptr<Type> 
   }
 }
 
-std::shared_ptr<IntConstant> Constraint::create(int v, std::shared_ptr<Type> t) {
+std::shared_ptr<IntConstant> Constraint::create(long v, std::shared_ptr<Type> t) {
   auto n = std::make_shared<IntConstant>(v, t);
-  n->constraint = this;
-  return n;
-}
-
-std::shared_ptr<LongConstant> Constraint::create(long v, std::shared_ptr<Type> t) {
-  auto n = std::make_shared<LongConstant>(v, t);
   n->constraint = this;
   return n;
 }

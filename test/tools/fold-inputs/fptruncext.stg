@@ -1,0 +1,8 @@
+// Dictionary
+[ S0:i1 = 0 ]
+
+// Expr
+(fueq 
+  (fpext double (fptrunc float (fpext double (float 3.14159))))
+  (fpext double (float 3.14159))
+)

@@ -4,7 +4,6 @@
 using namespace Constraint;
 
 void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraint> c) {
-  theConstraint = c;
   os << "// Dictionary\n[\n";
   indentLevel++;
   int num = c->symbols.size();
@@ -26,30 +25,31 @@ void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraint> c) {
   os.flush();
 }
 
+std::string ConstraintPrinter::print(Constraint::Expr* e) {
+  e->accept(this); 
+  std::string s = visitResults.back();
+  visitResults.pop_back();
+  return s;
+}
+
 void ConstraintPrinter::endVisit(Symbol * element) {
   visitResults.push_back(indent() + element->getName());
 }
 
 void ConstraintPrinter::endVisit(IntConstant * element) {
-  std::string result = indent() + "(" + theConstraint->type2str(element->getType());
-  result += " " + std::to_string(element->getValue()) + ")";
-  visitResults.push_back(result);
-}
-
-void ConstraintPrinter::endVisit(LongConstant * element) {
-  std::string result = indent() + "(" + theConstraint->type2str(element->getType());
+  std::string result = indent() + "(" + element->getConstraint()->type2str(element->getType());
   result += " " + std::to_string(element->getValue()) + ")";
   visitResults.push_back(result);
 }
 
 void ConstraintPrinter::endVisit(FloatConstant * element) {
-  std::string result = indent() + "(" + theConstraint->type2str(element->getType());
+  std::string result = indent() + "(" + element->getConstraint()->type2str(element->getType());
   result += " " + std::to_string(element->getValue()) + ")";
   visitResults.push_back(result);
 }
 
 void ConstraintPrinter::endVisit(DoubleConstant * element) {
-  std::string result = indent() + "(" + theConstraint->type2str(element->getType());
+  std::string result = indent() + "(" + element->getConstraint()->type2str(element->getType());
   result += " " + std::to_string(element->getValue()) + ")";
   visitResults.push_back(result);
 }
@@ -67,9 +67,9 @@ void ConstraintPrinter::endVisit(UnaryExpr * element) {
 
   indentLevel--;
   std::string result = indent() + "(";
-  result += theConstraint->op2str(op) + " ";
+  result += element->getConstraint()->op2str(op) + " ";
   if (op >= Constraint::Expr::Op::FirstCast && op <= Constraint::Expr::Op::LastCast) {
-    result += theConstraint->type2str(element->getType());
+    result += element->getConstraint()->type2str(element->getType());
   }
   result += "\n";
   result += result1 + "\n";
@@ -90,7 +90,7 @@ void ConstraintPrinter::endVisit(BinaryExpr * element) {
 
   indentLevel--;
   std::string result = indent() + "(";
-  result += theConstraint->op2str(element->getOp()) + "\n";
+  result += element->getConstraint()->op2str(element->getOp()) + "\n";
   result += result1 + "\n";
   result += result2 + "\n";
   result += indent() + ")";

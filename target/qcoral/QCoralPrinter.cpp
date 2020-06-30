@@ -148,12 +148,6 @@ void QCoralPrinter::endVisit(IntConstant * element) {
   visitResults.push_back(result);
 }
 
-void QCoralPrinter::endVisit(LongConstant * element) {
-
-  std::string result = "ICONST(" + std::to_string(element->getValue()) + ")"; 
-  visitResults.push_back(result);
-}
-
 void QCoralPrinter::endVisit(FloatConstant * element) {
 
   std::string result = "DCONST(" + std::to_string(element->getValue()) + ")"; 

@@ -4,7 +4,9 @@ STGPP=../../build/src/tools/stgpp
 
 numtests=0
 numfailures=0
-for i in inputs/pass/*.stg
+
+# Parser passing tests
+for i in parsetype-inputs/pass/*.stg
 do
   base="$(basename -- $i)"
   ((numtests++))
@@ -14,8 +16,8 @@ do
   # its own line, and to ensure the file ends with a newline
   grep -v '//' $i | tr '\n' ' ' | sed 's/]/]\n/g' | sed 's/(/(\n/g' | sed 's/)/\n)/g' | sed -e '$a\' >/tmp/$base
 
-  ${STGPP} $i >$i.out
-  grep -v '//' $i.out | tr '\n' ' ' | sed 's/]/]\n/g' | sed 's/(/(\n/g' | sed 's/)/\n)/g' | sed -e '$a\' >/tmp/$base.out
+  ${STGPP} -no-constant-folding $i >$i.out
+  grep -v '//' $i.out | tr '\n' ' ' | sed 's/]/]\n/g' | sed 's/(/(\n/g' | sed 's/)/\n)/g' >/tmp/$base.out
 
   # ignore whitespace in diffing the files
   diff -b -w /tmp/$base /tmp/$base.out >/tmp/$base.diff
@@ -29,12 +31,13 @@ do
   fi 
 done
 
-for i in inputs/fail/*.stg
+# Parser and type checker failing tests
+for i in parsetype-inputs/fail/*.stg
 do
   base="$(basename -- $i)"
   ((numtests++))
 
-  ${STGPP} $i >$i.out 2>/dev/null
+  ${STGPP} -no-constant-folding $i >$i.out 2>/dev/null
 
   # This catches "Parse error" or "Type error"
   if ! cat $i.out | grep -q "error";

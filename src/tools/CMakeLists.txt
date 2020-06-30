@@ -1,4 +1,4 @@
-add_executable(stgpp stgpp.cpp ConstraintTypeChecker.cpp)
+add_executable(stgpp stgpp.cpp ConstraintTypeChecker.cpp ConstraintFolder.cpp)
 
 # Make the LLVM definitions visible so that we can include support
 # for commandline parsing.

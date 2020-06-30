@@ -55,8 +55,6 @@ Any ConstraintBuilder::visitConstantExpr(ConstraintGrammarParser::ConstantExprCo
     case 8:
     case 16:
     case 32:
-      visitedExpr = theConstraint->create(std::stoi(val), type);
-      break;
     case 64:
       visitedExpr = theConstraint->create(std::stol(val), type);
       break;

@@ -13,6 +13,7 @@ public:
       os(os), indentSize(indentSize) {}
 
   void print(std::shared_ptr<Constraint::Constraint> constraint);
+  std::string print(Constraint::Expr* e);
 
   /* 
    * This visitor visits the entire expression, customizing the  
@@ -20,7 +21,6 @@ public:
    */
   void endVisit(Symbol * element) override;
   void endVisit(IntConstant * element) override;
-  void endVisit(LongConstant * element) override;
   void endVisit(DoubleConstant * element) override;
   void endVisit(FloatConstant * element) override;
   bool visit(UnaryExpr * element) override;
@@ -34,7 +34,6 @@ private:
   int indentSize = 2;
 
   std::ostream &os;
-  std::shared_ptr<Constraint::Constraint> theConstraint;
 
   /* 
    * Records the strings produced by visiting sub-expressions.

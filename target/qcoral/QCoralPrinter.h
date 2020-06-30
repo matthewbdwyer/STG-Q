@@ -20,7 +20,6 @@ public:
    */
   void endVisit(Symbol * element) override;
   void endVisit(IntConstant * element) override;
-  void endVisit(LongConstant * element) override;
   void endVisit(DoubleConstant * element) override;
   void endVisit(FloatConstant * element) override;
   bool visit(UnaryExpr * element) override;

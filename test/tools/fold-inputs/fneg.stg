@@ -1,0 +1,5 @@
+// Dictionary
+[ S0:i1 = 0 ]
+
+// Expr
+(fult (fneg (fneg (fneg (float 9.799)))) (float 0.0))

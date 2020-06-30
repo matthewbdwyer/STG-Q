@@ -1,0 +1,8 @@
+// Dictionary
+[ S0:i1 = 0 ]
+
+// Expr
+(slt
+  (fptosi i16 (sitofp double (fptosi i1 (sitofp float (i64 17)))))
+  (fptosi i16 (sitofp double (fptosi i8 (sitofp float (i64 127)))))
+)

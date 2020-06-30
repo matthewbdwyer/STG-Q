@@ -38,12 +38,6 @@ void ConstraintTypeChecker::endVisit(IntConstant * element) {
     cerr << "Type Checker : constant of type "+element->getConstraint()->type2str(element->getType())+"\n";
 }
 
-void ConstraintTypeChecker::endVisit(LongConstant * element) {
-  visitResults.push_back(element->getType());
-  if (verbose)
-    cerr << "Type Checker : constant of type "+element->getConstraint()->type2str(element->getType())+"\n";
-}
-
 void ConstraintTypeChecker::endVisit(FloatConstant * element) {
   visitResults.push_back(element->getType());
   if (verbose)
