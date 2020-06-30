@@ -84,8 +84,8 @@ There are several scripts that are useful for simplifying sets of constraints.
 These tools should be installed in a directory and the shell variable `STGINSTALL` should be set to that directory's path.  This is how these STG scripting tools reference one another.
 
 ## Testing
-Tests for the library itself are run using the script `run.sh` in [test/lib](tests/lib).
-Tests for the STG tools are run using the script `run.sh` in [test/tools](tests/tools).
+Tests for the library itself are run using the script `run.sh` in [test/lib](test/lib).
+Tests for the STG tools are run using the script `run.sh` in [test/tools](test/tools).
 These test provide a non-trivial degree of coverage, but they are incomplete.
 
 Each target is expected to provide its own `run.sh` script to test its translator and associated tools.
