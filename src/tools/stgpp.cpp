@@ -40,7 +40,7 @@ int main(int argc, const char *argv[]) {
     auto constraint = maybeConstraint.value();
 
     if (!notc) {
-      if (verbose) cout << "STG type checking\n";
+      if (verbose) cerr << "STG type checking\n";
       ConstraintTypeChecker ctc;
       if (!ctc.check(constraint, verbose)) {
         cout << "STG type error\n";
@@ -49,7 +49,7 @@ int main(int argc, const char *argv[]) {
     }
 
     if (!nocf) {
-      if (verbose) cout << "STG constant folding\n";
+      if (verbose) cerr << "STG constant folding\n";
       ConstraintFolder cf;
       cf.fold(constraint, verbose);
     }
