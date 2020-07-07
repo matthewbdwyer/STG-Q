@@ -1,0 +1,9 @@
+[
+A : i32 = 38,
+B : i32 = 78
+]
+
+//Test: passed
+
+(sgt (add (i32 10) A) (sub (i32 10) B))
+

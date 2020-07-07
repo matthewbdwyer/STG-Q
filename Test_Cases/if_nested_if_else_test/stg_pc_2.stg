@@ -1,0 +1,13 @@
+[
+X : i32 = 5,
+Y : i32 = 38,
+Z : i32 = 58
+]
+
+//Test: failed
+
+(land
+  (lnot(sgt X Y))
+  (lnot(sgt Y Z))
+)
+

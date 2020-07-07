@@ -1,0 +1,39 @@
+[
+S0 : float = 20.3,
+S1 : float = 4.5,
+S2 : float = 50.7,
+S3 : float = 8,
+S4 : float = 8.2
+]
+
+//Test: passed
+
+(land
+  (lnot(olt (fpext double (float 1.000000)) (double 0.100000)))
+  (land
+    (slt (i32 0) (i32 5))
+    (land
+      (lnot(ogt S0 (float 50.000000)))
+      (land
+        (lnot(olt S0 (float 0.000000)))
+        (land
+          (slt (add (i32 0) (i32 1)) (i32 5))
+          (land
+            (lnot(ogt S1 (float 50.000000)))
+            (land
+              (lnot(olt S1 (float 0.000000)))
+              (land
+                (slt (add (add (i32 0) (i32 1)) (i32 1)) (i32 5))
+                (land
+                  (ogt S2 (float 50.000000))
+                  (lnot(eq (add (add (i32 0) (i32 1)) (i32 1)) (i32 5)))
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+)
+

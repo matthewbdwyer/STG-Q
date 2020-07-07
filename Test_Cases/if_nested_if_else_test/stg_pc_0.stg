@@ -1,0 +1,13 @@
+[
+X : i32 = 550,
+Y : i32 = 38,
+Z : i32 = 58
+]
+
+//Test: passed
+
+(land
+  (sgt X Y)
+  (sgt X Z)
+)
+

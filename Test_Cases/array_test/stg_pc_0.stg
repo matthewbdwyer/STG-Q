@@ -1,0 +1,8 @@
+[
+S : i32 = 1
+]
+
+//Test: passed
+
+(lnot(sgt S (i32 2)))
+

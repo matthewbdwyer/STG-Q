@@ -1,0 +1,12 @@
+[
+X : i32 = 0,
+Y : i32 = 38
+]
+
+//Test: failed
+
+(land
+  (lnot(eq X Y))
+  (lnot(sgt X Y))
+)
+

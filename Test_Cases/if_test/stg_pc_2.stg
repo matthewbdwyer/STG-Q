@@ -1,0 +1,13 @@
+[
+A : i32 = 1,
+B : i32 = 1,
+C : i32 = 1
+]
+
+//Test: passed
+
+(land
+  (lnot(slt A B))
+  (lnot(slt B C))
+)
+

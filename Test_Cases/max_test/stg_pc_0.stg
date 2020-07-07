@@ -1,0 +1,13 @@
+[
+A : i32 = 38,
+B : i32 = 78,
+C : i32 = 78
+]
+
+//Test: passed
+
+(land
+  (slt A B)
+  (slt A C)
+)
+
