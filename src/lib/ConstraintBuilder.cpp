@@ -5,8 +5,6 @@
 
 using namespace antlrcpp;
 
-using namespace Constraint;
-
 ConstraintBuilder::ConstraintBuilder(ConstraintGrammarParser *p) : parser{p} {}
 
 static std::shared_ptr<Constraint::Expr> visitedExpr;
@@ -94,7 +92,7 @@ Any ConstraintBuilder::visitCastExpr(ConstraintGrammarParser::CastExprContext *c
 Any ConstraintBuilder::visitBinaryExpr(ConstraintGrammarParser::BinaryExprContext *ctx) {
   auto op = theConstraint->str2op(ctx->BINOP()->getText());
   visit(ctx->expr(0));
-  std::shared_ptr<Expr> c1 = visitedExpr;
+  std::shared_ptr<Constraint::Expr> c1 = visitedExpr;
   visit(ctx->expr(1));
   visitedExpr = theConstraint->create(c1, visitedExpr, op);
   return "";
