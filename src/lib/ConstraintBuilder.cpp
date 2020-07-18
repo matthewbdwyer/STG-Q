@@ -8,11 +8,11 @@ using namespace antlrcpp;
 ConstraintBuilder::ConstraintBuilder(ConstraintGrammarParser *p) : parser{p} {}
 
 static std::shared_ptr<Constraint::Expr> visitedExpr;
-static std::shared_ptr<Constraint::Constraint> theConstraint;
+static std::shared_ptr<Constraint::Constraints> theConstraint;
 
-std::shared_ptr<Constraint::Constraint>
+std::shared_ptr<Constraint::Constraints>
 ConstraintBuilder::build(ConstraintGrammarParser::ConstraintContext *ctx) {
-  theConstraint = std::make_shared<Constraint::Constraint>();
+  theConstraint = std::make_shared<Constraint::Constraints>();
 
   // Visit the dictionary entries and define them in theConstraint
   for (auto sd : ctx->symbolDef()) {
@@ -26,12 +26,21 @@ ConstraintBuilder::build(ConstraintGrammarParser::ConstraintContext *ctx) {
   return theConstraint;
 }
 
-Any ConstraintBuilder::visitSymbolDef(
-      ConstraintGrammarParser::SymbolDefContext *ctx) {
+Any ConstraintBuilder::visitSymbolDef(  //changed by SBH
+
+  ConstraintGrammarParser::SymbolDefContext *ctx) {
   std::string name = ctx->IDENTIFIER()->getText();
   std::string type = ctx->TYPE()->getText();
-  std::string val = ctx->NUMBER()->getText();
-  theConstraint->defineSymbol(name, type, val);
+
+
+//changed by SBH
+  std::vector numbers = ctx->NUMBER() ;
+
+  std::string val = numbers[0]->getText();
+  std::string min_range = numbers[1]->getText();
+  std::string max_range = numbers[2]->getText();
+
+  theConstraint->defineSymbol(name, type, val, min_range, max_range);  //, min, mix);
   return "";
 }
 
@@ -89,6 +98,7 @@ Any ConstraintBuilder::visitCastExpr(ConstraintGrammarParser::CastExprContext *c
   return "";
 }
 
+
 Any ConstraintBuilder::visitBinaryExpr(ConstraintGrammarParser::BinaryExprContext *ctx) {
   auto op = theConstraint->str2op(ctx->BINOP()->getText());
   visit(ctx->expr(0));
@@ -97,3 +107,24 @@ Any ConstraintBuilder::visitBinaryExpr(ConstraintGrammarParser::BinaryExprContex
   visitedExpr = theConstraint->create(c1, visitedExpr, op);
   return "";
 }
+
+
+//added by SBH
+Any ConstraintBuilder::visitUnIntrExpr(ConstraintGrammarParser::UnIntrExprContext *ctx) {
+  auto op = theConstraint->str2op(ctx->UNINTRFUN()->getText());
+  visit(ctx->expr());
+  auto type = theConstraint->str2type(ctx->TYPE()->getText());
+  visitedExpr = theConstraint->create(visitedExpr, op, type);
+  return "";
+}
+
+//added by SBH
+Any ConstraintBuilder::visitBinIntrExpr(ConstraintGrammarParser::BinIntrExprContext *ctx) {
+  auto op = theConstraint->str2op(ctx->BININTRFUN()->getText());
+  visit(ctx->expr(0));
+  std::shared_ptr<Constraint::Expr> c1 = visitedExpr;
+  visit(ctx->expr(1));
+  visitedExpr = theConstraint->create(c1, visitedExpr, op);
+  return "";
+}
+

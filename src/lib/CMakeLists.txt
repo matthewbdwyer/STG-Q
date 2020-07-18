@@ -17,4 +17,3 @@ target_include_directories(stg PRIVATE
             ${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(stg antlr4_static)
-

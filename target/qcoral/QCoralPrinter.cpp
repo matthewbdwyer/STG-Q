@@ -50,7 +50,7 @@ std::map<std::string, std::string> mapping = {
 {"lnot", "BNOT("}
 };
 
-void QCoralPrinter::print(std::shared_ptr<Constraint::Constraint> c) {
+void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
   theConstraint = c;
   os << ":Variables:\n";
   indentLevel++;

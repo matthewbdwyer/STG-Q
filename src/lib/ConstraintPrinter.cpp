@@ -3,7 +3,7 @@
 
 using namespace Constraint;
 
-void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraint> c) {
+void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
   os << "// Dictionary\n[\n";
   indentLevel++;
   int num = c->symbols.size();
@@ -11,6 +11,7 @@ void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraint> c) {
     num--;
     os << indent() << n << " : ";
     os << c->symbolType(n) << " = " << c->symbolValue(n);
+    os << ", R:[" << c->symbolValueMin(n) <<","<< c->symbolValueMax(n)<<"]";  // added by SBH //printed range
     os << ((num>0) ? ",\n" : "\n");
   }
   indentLevel--;
@@ -70,6 +71,9 @@ void ConstraintPrinter::endVisit(UnaryExpr * element) {
   result += element->getConstraint()->op2str(op) + " ";
   if (op >= Constraint::Expr::Op::FirstCast && op <= Constraint::Expr::Op::LastCast) {
     result += element->getConstraint()->type2str(element->getType());
+  }else if(op >= Constraint::Expr::Op::FirstUnaryIntr && op <= Constraint::Expr::Op::LastUnaryIntr)
+  {
+     result += element->getConstraint()->type2str(element->getType());
   }
   result += "\n";
   result += result1 + "\n";

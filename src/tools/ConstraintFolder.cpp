@@ -9,7 +9,7 @@
 using namespace Constraint;
 using namespace std;
 
-void ConstraintFolder::fold(std::shared_ptr<Constraint::Constraint> c, bool v) {
+void ConstraintFolder::fold(std::shared_ptr<Constraint::Constraints> c, bool v) {
   // Enable verbose mode for folder
   verbose = v;
   constraint = c.get();

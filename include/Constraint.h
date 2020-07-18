@@ -8,7 +8,7 @@ class ConstraintVisitor;
 
 namespace Constraint {
 
-class Constraint;
+class Constraints;
 
 /*
  * Representation of types for constraint constants, symbols, and 
@@ -57,9 +57,35 @@ public:
     FUEq, FUNe, FUlt, FUle, FUgt, FUge, FUno, 	     // float comparison
     LAnd, LOr, 					     // logical
 
+    //added by SBH
+
+   Sinf32, Sinf64, Sinf80, Sinf128, Sinppcf128,
+   Cosf32, Cosf64, Cosf80, Cosf128, Cosppcf128,
+   Expf32, Expf64, Expf80, Expf128, Expppcf128,
+   Exp2f32, Exp2f64, Exp2f80, Exp2f128, Exp2ppcf128,
+   Logf32, Logf64, Logf80, Logf128, Logppcf128,
+
+   Log2f32, Log2f64, Log2f80, Log2f128, Log2ppcf128,
+
+   Log10f32, Log10f64, Log10f80, Log10f128, Log10ppcf128,
+
+   Fabsf32, Fabsf64, Fabsf80, Fabsf128, Fabsppcf128,
+
+
+   Sqrtf32, Sqrtf64, Sqrtf80, Sqrtf128,Sqrtppcf128,
+   Floorf32, Floorf64, Floorf80, Floorf128, Floorppcf128,
+   Ceilf32, Ceilf64, Ceilf80, Ceilf128, Ceilppcf128,
+
+
+    //added by SBH
+
     FirstUnary = Trunc, LastUnary = FNeg,
     FirstCast = Trunc, LastCast = BitCast,
-    FirstBinary = Add, LastBinary = LOr
+    FirstBinary = Add, LastBinary = LOr,
+    FirstUnaryIntr = Sinf32, LastUnaryIntr = Ceilppcf128      //added by SBH
+
+
+
   };
 
 protected:
@@ -70,8 +96,8 @@ protected:
    * Constraint initializes constraint back reference during create() calls.
    * This is a write-once read-many field, so we don't bother with a shared ptr.
    */
-  friend class Constraint;
-  Constraint *constraint;
+  friend class Constraints;
+  Constraints *constraint;
 
 public:
   virtual ~Expr() = default;
@@ -79,7 +105,7 @@ public:
   void setType(std::shared_ptr<Type> t) { type = t; }
   std::shared_ptr<Type> getType() { return type; }
   Op getOp() const { return op; }
- Constraint* getConstraint() { return constraint; }
+ Constraints* getConstraint() { return constraint; }
 
   // Delegated visitor hook
   virtual void accept(ConstraintVisitor * visitor) = 0;
@@ -160,9 +186,12 @@ public:
  * TBD: The visibility of these methods should be controlled better.
  * Perhaps use protected and friends for exposing intra-lib API.
  */
-class Constraint {
+class Constraints {
   std::map<std::string, std::string> symbolTypes;
   std::map<std::string, std::string> symbolValues;
+
+  std::map<std::string, std::string> symbolValueMins; // added by SBH
+  std::map<std::string, std::string> symbolValueMaxs; // added by SBH
   std::shared_ptr<Expr> expr = nullptr;
 
   // Recording of interned sub-expressions to reduce redundancy
@@ -170,10 +199,19 @@ class Constraint {
   std::map<std::string, std::shared_ptr<Symbol>> internSymbol;
 public:
   std::set<std::string> symbols;
-  void defineSymbol(std::string n, std::string t, std::string v);
+
+
+  void defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max);  //change this method to read a vector of size three // added by SBH
+
+
+
+
   bool isDefined(std::string n);
   std::string symbolType(std::string n) { return symbolTypes.find(n)->second; }
   std::string symbolValue(std::string n) { return symbolValues.find(n)->second; }
+
+  std::string symbolValueMin(std::string n) { return symbolValueMins.find(n)->second; }   // added by SBH
+  std::string symbolValueMax(std::string n) { return symbolValueMaxs.find(n)->second; }   // added by SBH
 
   void setExpr(std::shared_ptr<Expr> e) { expr = e; }
   std::shared_ptr<Expr> getExpr() { return expr; }
@@ -196,7 +234,7 @@ public:
   std::string op2str(Expr::Op o);
 };
 
-std::optional<std::shared_ptr<Constraint>> parse(std::istream& stream);
+std::optional<std::shared_ptr<Constraints>> parse(std::istream& stream);
 
 
 }

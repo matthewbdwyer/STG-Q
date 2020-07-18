@@ -6,7 +6,7 @@
 using namespace Constraint;
 using namespace std;
 
-bool ConstraintTypeChecker::check(std::shared_ptr<Constraint::Constraint> c, bool v) {
+bool ConstraintTypeChecker::check(std::shared_ptr<Constraint::Constraints> c, bool v) {
   // Enable verbose mode for type checker
   verbose = v;
   

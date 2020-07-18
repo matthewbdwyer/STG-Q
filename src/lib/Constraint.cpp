@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "Constraint.h"
+#include "ConstraintPrinter.h"
 #include "ConstraintVisitor.h"
 #include "ConstraintGrammarLexer.h"
 #include "ConstraintGrammarParser.h"
@@ -28,7 +29,7 @@ public:
   }
 };
 
-std::optional<std::shared_ptr<Constraint>> parse(std::istream& stream) {
+std::optional<std::shared_ptr<Constraints>> parse(std::istream& stream) {
   ANTLRInputStream input(stream);
   ConstraintGrammarLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
@@ -40,19 +41,36 @@ std::optional<std::shared_ptr<Constraint>> parse(std::istream& stream) {
   lexer.addErrorListener(&errorListener);
   parser.addErrorListener(&errorListener);
 
+
+  std::cout<<"here we are, yoooooooo\n";
+
   auto parsetree = parser.constraint();
 
   if (*parseError) {  
     return std::nullopt;
   }
 
+  std::cout<<"here we are\n";
   ConstraintBuilder cb(&parser);
-  return std::make_optional<std::shared_ptr<Constraint>>(cb.build(parsetree));
+
+
+  auto de = cb.build(parsetree);
+  ConstraintPrinter cp(std::cout, 2);
+  cp.print(de);
+
+
+  //auto de = cb.build(parsetree);
+
+  //ConstraintPrinter cp(std::cout, 2);
+  //cp.print(de);
+
+
+  return std::make_optional<std::shared_ptr<Constraints>>(cb.build(parsetree));
 }
 
 /****************** Constraint Type and Operator Conversions ************/
 
-std::shared_ptr<Type> Constraint::str2type(std::string s) {
+std::shared_ptr<Type> Constraints::str2type(std::string s) {
   if (s[0] == 'i') {
     int width = std::stoi(s.substr(1,s.length()-1));
     return create(Type::Base::Int, width);
@@ -64,7 +82,7 @@ std::shared_ptr<Type> Constraint::str2type(std::string s) {
   assert(false && "Invalid Constraint::Type for string");
 }
 
-std::string Constraint::type2str(std::shared_ptr<Type> t) {
+std::string Constraints::type2str(std::shared_ptr<Type> t) {
   if (t->getBase() == Type::Base::Int) {
     return "i" + std::to_string(t->getWidth());
   } else if (t->getBase() == Type::Base::Float) {
@@ -139,7 +157,75 @@ std::map<std::string, Expr::Op> soMap = {
   {"fuge", Expr::Op::FUge},
   {"funo", Expr::Op::FUno},
   {"land", Expr::Op::LAnd},
-  {"lor", Expr::Op::LOr}
+  {"lor", Expr::Op::LOr},
+  //added by SBH
+
+   {"llvm.sin.f32",Expr::Op::Sinf32},
+   {"llvm.sin.f64",Expr::Op::Sinf64},
+   {"llvm.sin.f80",Expr::Op::Sinf80},
+   {"llvm.sin.f128",Expr::Op::Sinf128},
+   {"llvm.sin.ppcf128",Expr::Op::Sinppcf128},
+
+   {"llvm.cos.f32",Expr::Op::Cosf32},
+   {"llvm.cos.f64",Expr::Op::Cosf64},
+   {"llvm.cos.f80",Expr::Op::Cosf80},
+   {"llvm.cos.f128",Expr::Op::Cosf128},
+   {"llvm.cos.ppcf128",Expr::Op::Cosppcf128},
+
+   {"llvm.exp.f32",Expr::Op::Expf32},
+   {"llvm.exp.f64",Expr::Op::Expf64},
+   {"llvm.exp.f80",Expr::Op::Expf80},
+   {"llvm.exp.f128",Expr::Op::Expf128},
+   {"llvm.exp.ppcf128",Expr::Op::Expppcf128},
+
+   {"llvm.exp2.f32",Expr::Op::Exp2f32,},
+   {"llvm.exp2.f64",Expr::Op::Exp2f64},
+   {"llvm.exp2.f80",Expr::Op::Exp2f80},
+   {"llvm.exp2.f128",Expr::Op::Exp2f128},
+   {"llvm.exp2.ppcf128",Expr::Op::Exp2ppcf128},
+
+
+   {"llvm.log.f32",Expr::Op::Logf32},
+   {"llvm.log.f64",Expr::Op::Logf64},
+   {"llvm.log.f80",Expr::Op::Logf80},
+   {"llvm.log.f128",Expr::Op::Logf128},
+   {"llvm.log.ppcf128",Expr::Op::Logppcf128},
+
+   {"llvm.log2.f32",Expr::Op::Log2f32},
+   {"llvm.log2.f64",Expr::Op::Log2f64},
+   {"llvm.log2.f80",Expr::Op::Log2f80},
+   {"llvm.log2.f128",Expr::Op::Log2f128},
+   {"llvm.log2.ppcf128",Expr::Op::Log2ppcf128},
+
+   {"llvm.log10.f32",Expr::Op::Log10f32},
+   {"llvm.log10.f64",Expr::Op::Log10f64},
+   {"llvm.log10.f80",Expr::Op::Log10f80},
+   {"llvm.log10.f128",Expr::Op::Log10f128},
+   {"llvm.log10.ppcf128",Expr::Op::Log10ppcf128},
+
+   {"llvm.fabs.f32",Expr::Op::Fabsf32},
+   {"llvm.fabs.f64",Expr::Op::Fabsf64},
+   {"llvm.fabs.f80",Expr::Op::Fabsf80},
+   {"llvm.fabs.f128",Expr::Op::Fabsf128},
+   {"llvm.fabs.ppcf128",Expr::Op::Fabsppcf128},
+
+   {"llvm.sqrt.f32",Expr::Op::Sqrtf32},
+   {"llvm.sqrt.f64",Expr::Op::Sqrtf64},
+   {"llvm.sqrt.f80",Expr::Op::Sqrtf80},
+   {"llvm.sqrt.f128",Expr::Op::Sqrtf128},
+   {"llvm.sqrt.ppcf128",Expr::Op::Sqrtppcf128},
+
+   {"llvm.floor.f32",Expr::Op::Floorf32},
+   {"llvm.floor.f64",Expr::Op::Floorf64},
+   {"llvm.floor.f80",Expr::Op::Floorf80},
+   {"llvm.floor.f128",Expr::Op::Floorf128},
+   {"llvm.floor.ppcf128",Expr::Op::Floorppcf128},
+
+   {"llvm.ceil.f32",Expr::Op::Ceilf32},
+   {"llvm.ceil.f64",Expr::Op::Ceilf64},
+   {"llvm.ceil.f80",Expr::Op::Ceilf80},
+   {"llvm.ceil.f128",Expr::Op::Ceilf128},
+   {"llvm.ceil.ppcf128",Expr::Op::Ceilppcf128}
 };
 
 std::map<Expr::Op, std::string> osMap = {
@@ -198,10 +284,80 @@ std::map<Expr::Op, std::string> osMap = {
   {Expr::Op::FUle, "fule"}, 
   {Expr::Op::FUno, "funo"}, 
   {Expr::Op::LAnd, "land"}, 
-  {Expr::Op::LOr, "lor"}
+  {Expr::Op::LOr, "lor"},
+
+
+  //added by SBH
+
+  {Expr::Op::Sinf32,"llvm.sin.f32"},
+  {Expr::Op::Sinf64,"llvm.sin.f64"},
+  {Expr::Op::Sinf80,"llvm.sin.f80"},
+  {Expr::Op::Sinf128,"llvm.sin.f128"},
+  {Expr::Op::Sinppcf128,"llvm.sin.ppcf128"},
+
+  {Expr::Op::Cosf32,"llvm.cos.f32"},
+  {Expr::Op::Cosf64,"llvm.cos.f64"},
+  {Expr::Op::Cosf80,"llvm.cos.f80"},
+  {Expr::Op::Cosf128,"llvm.cos.f128"},
+  {Expr::Op::Cosppcf128,"llvm.cos.ppcf128"},
+
+  {Expr::Op::Expf32,"llvm.exp.f32"},
+  {Expr::Op::Expf64,"llvm.exp.f64"},
+  {Expr::Op::Expf80,"llvm.exp.f80"},
+  {Expr::Op::Expf128,"llvm.exp.f128"},
+  {Expr::Op::Expppcf128,"llvm.exp.ppcf128"},
+
+  {Expr::Op::Exp2f32,"llvm.exp2.f32"},
+  {Expr::Op::Exp2f64,"llvm.exp2.f64"},
+  {Expr::Op::Exp2f80,"llvm.exp2.f80"},
+  {Expr::Op::Exp2f128,"llvm.exp2.f128"},
+  {Expr::Op::Exp2ppcf128,"llvm.exp2.ppcf128"},
+
+  {Expr::Op::Logf32,"llvm.log.f32"},
+  {Expr::Op::Logf64,"llvm.log.f64"},
+  {Expr::Op::Logf80,"llvm.log.f80"},
+  {Expr::Op::Logf128,"llvm.log.f128"},
+  {Expr::Op::Logppcf128,"llvm.log.ppcf128"},
+
+  {Expr::Op::Log2f32,"llvm.log2.f32"},
+  {Expr::Op::Log2f64,"llvm.log2.f64"},
+  {Expr::Op::Log2f80,"llvm.log2.f80"},
+  {Expr::Op::Log2f128,"llvm.log2.f128"},
+  {Expr::Op::Log2ppcf128,"llvm.log2.ppcf128"},
+
+  {Expr::Op::Log10f32,"llvm.log10.f32"},
+  {Expr::Op::Log10f64,"llvm.log10.f64"},
+  {Expr::Op::Log10f80,"llvm.log10.f80"},
+  {Expr::Op::Log10f128,"llvm.log10.f128"},
+  {Expr::Op::Log10ppcf128,"llvm.log10.ppcf128"},
+
+  {Expr::Op::Fabsf32,"llvm.fabs.f32"},
+  {Expr::Op::Fabsf64,"llvm.fabs.f64"},
+  {Expr::Op::Fabsf80,"llvm.fabs.f80"},
+  {Expr::Op::Fabsf128,"llvm.fabs.f128"},
+  {Expr::Op::Fabsppcf128,"llvm.fabs.ppcf128"},
+
+  {Expr::Op::Sqrtf32,"llvm.sqrt.f32"},
+  {Expr::Op::Sqrtf64,"llvm.sqrt.f64"},
+  {Expr::Op::Sqrtf80,"llvm.sqrt.f80"},
+  {Expr::Op::Sqrtf128,"llvm.sqrt.f128"},
+  {Expr::Op::Sqrtppcf128,"llvm.sqrt.ppcf128"},
+
+  {Expr::Op::Floorf32,"llvm.floor.f32"},
+  {Expr::Op::Floorf64,"llvm.floor.f64"},
+  {Expr::Op::Floorf80,"llvm.floor.f80"},
+  {Expr::Op::Floorf128,"llvm.floor.f128"},
+  {Expr::Op::Floorppcf128,"llvm.floor.ppcf128"},
+
+  {Expr::Op::Ceilf32,"llvm.ceil.f32"},
+  {Expr::Op::Ceilf64,"llvm.ceil.f64"},
+  {Expr::Op::Ceilf80,"llvm.ceil.f80"},
+  {Expr::Op::Ceilf128,"llvm.ceil.f128"},
+  {Expr::Op::Ceilppcf128,"llvm.ceil.ppcf128"}
+
 }; 
 
-Expr::Op Constraint::str2op(std::string s) {
+Expr::Op Constraints::str2op(std::string s) {
   std::map<std::string, Expr::Op>::iterator it;
   it = soMap.find(s);
   if (it == soMap.end()) {
@@ -210,7 +366,7 @@ Expr::Op Constraint::str2op(std::string s) {
   return it->second;
 }
 
-std::string Constraint::op2str(Expr::Op o) {
+std::string Constraints::op2str(Expr::Op o) {
   std::map<Expr::Op, std::string>::iterator it;
   it = osMap.find(o);
   if (it == osMap.end()) {
@@ -219,7 +375,7 @@ std::string Constraint::op2str(Expr::Op o) {
   return it->second;
 }
 
-bool Constraint::isDefined(std::string n) {
+bool Constraints::isDefined(std::string n) {
    return symbols.find(n) != symbols.end();
 }
 
@@ -269,10 +425,13 @@ void BinaryExpr::accept(ConstraintVisitor* visitor) {
  * Constraint symbol definition and sub-expression create routines
  */
 
-void Constraint::defineSymbol(std::string n, std::string t, std::string v) {
+void Constraints::defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max) {  // changed  by SBH
   symbols.insert(n);
   symbolTypes.insert(std::pair<std::string, std::string>(n, t));
   symbolValues.insert(std::pair<std::string, std::string>(n, v));
+  symbolValueMins.insert(std::pair<std::string, std::string>(n, min));  // added by SBH
+  symbolValueMaxs.insert(std::pair<std::string, std::string>(n, max)); // added by SBH
+
 }
 
 /*
@@ -280,7 +439,7 @@ void Constraint::defineSymbol(std::string n, std::string t, std::string v) {
  * Symbols and types are interned to save space and make equality tests fast.
  */
 
-std::shared_ptr<Type> Constraint::create(Type::Base b, int w) {
+std::shared_ptr<Type> Constraints::create(Type::Base b, int w) {
   std::map<Type::Base, std::map<int, std::shared_ptr<Type>>>::iterator it;
   it = internType.find(b);
   if (it != internType.end()) {
@@ -310,7 +469,7 @@ std::shared_ptr<Type> Constraint::create(Type::Base b, int w) {
   }
 }
 
-std::shared_ptr<Symbol> Constraint::create(std::string n, std::shared_ptr<Type> t) {
+std::shared_ptr<Symbol> Constraints::create(std::string n, std::shared_ptr<Type> t) {
   std::map<std::string, std::shared_ptr<Symbol>>::iterator it;
   it = internSymbol.find(n);
   if (it != internSymbol.end()) {
@@ -325,37 +484,37 @@ std::shared_ptr<Symbol> Constraint::create(std::string n, std::shared_ptr<Type> 
   }
 }
 
-std::shared_ptr<IntConstant> Constraint::create(long v, std::shared_ptr<Type> t) {
+std::shared_ptr<IntConstant> Constraints::create(long v, std::shared_ptr<Type> t) {
   auto n = std::make_shared<IntConstant>(v, t);
   n->constraint = this;
   return n;
 }
 
-std::shared_ptr<FloatConstant> Constraint::create(float v, std::shared_ptr<Type> t) {
+std::shared_ptr<FloatConstant> Constraints::create(float v, std::shared_ptr<Type> t) {
   auto n = std::make_shared<FloatConstant>(v, t);
   n->constraint = this;
   return n;
 }
 
-std::shared_ptr<DoubleConstant> Constraint::create(double v, std::shared_ptr<Type> t) {
+std::shared_ptr<DoubleConstant> Constraints::create(double v, std::shared_ptr<Type> t) {
   auto n = std::make_shared<DoubleConstant>(v, t);
   n->constraint = this;
   return n;
 }
 
-std::shared_ptr<UnaryExpr> Constraint::create(std::shared_ptr<Expr> c, Expr::Op o) { 
+std::shared_ptr<UnaryExpr> Constraints::create(std::shared_ptr<Expr> c, Expr::Op o) {
   auto n = std::make_shared<UnaryExpr>(c,o);
   n->constraint = this;
   return n;
 }
 
-std::shared_ptr<UnaryExpr> Constraint::create(std::shared_ptr<Expr> c, Expr::Op o, std::shared_ptr<Type> t) { 
+std::shared_ptr<UnaryExpr> Constraints::create(std::shared_ptr<Expr> c, Expr::Op o, std::shared_ptr<Type> t) {
   auto n = std::make_shared<UnaryExpr>(c,o,t);
   n->constraint = this;
   return n;
 }
 
-std::shared_ptr<BinaryExpr> Constraint::create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o) {
+std::shared_ptr<BinaryExpr> Constraints::create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o) {
   auto n = std::make_shared<BinaryExpr>(c1,c2,o);
   n->constraint = this;
   return n;

@@ -2,7 +2,7 @@ grammar ConstraintGrammar;
 
 /* 
  * Simple grammar for STG constraint
- *  - begins with symbol dictionary which defines type and value for symbol
+ *  - begins with symbol dictionary which defines type, value and min, max range for symbol
  *  - then consists of a single logical expression
  *
  * Rule labels are introduced for the visitor pattern.
@@ -16,12 +16,14 @@ grammar ConstraintGrammar;
 
 constraint : '[' (symbolDef (',' symbolDef)* )? ']' expr ;
 
-symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ;
+symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ', R:[' NUMBER ',' NUMBER']';
 
 expr : leafExpr
      | '(' unaryExpr ')'
      | '(' castExpr ')'
+     | '(' unIntrExpr ')'     // unary intrinsic expression
      | '(' binaryExpr ')'
+     | '(' binIntrExpr ')'   // binary intrinsic expression
 ;
 
 leafExpr : constantExpr | symbolExpr ;
@@ -35,6 +37,111 @@ castExpr : CASTOP TYPE expr ;
 unaryExpr : UNOP expr ;
 
 binaryExpr : BINOP expr expr ;
+
+// changed by SBH
+
+binIntrExpr : BININTRFUN expr expr ;
+unIntrExpr : UNINTRFUN TYPE expr ;   //the type is necessary because no way we can predict the return type of the call seeing the parameters type
+
+
+UNINTRFUN : 'llvm.sin.f32'
+          | 'llvm.sin.f64'
+          | 'llvm.sin.f80'
+          | 'llvm.sin.f128'
+          | 'llvm.sin.ppcf128'
+          | 'llvm.cos.f32'
+          | 'llvm.cos.f64'
+          | 'llvm.cos.f80'
+          | 'llvm.cos.f128'
+          | 'llvm.cos.ppcf128'
+          | 'llvm.exp.f32'
+          | 'llvm.exp.f64'
+          | 'llvm.exp.f80'
+          | 'llvm.exp.f128'
+          | 'llvm.exp.ppcf128'
+          | 'llvm.exp2.f32'
+          | 'llvm.exp2.f64'
+          | 'llvm.exp2.f80'
+          | 'llvm.exp2.f128'
+          | 'llvm.exp2.ppcf128'
+          | 'llvm.log.f32'
+          | 'llvm.log.f64'
+          | 'llvm.log.f80'
+          | 'llvm.log.f128'
+          | 'llvm.log.ppcf128'
+          | 'llvm.log10.f32'
+          | 'llvm.log10.f64'
+          | 'llvm.log10.f80'
+          | 'llvm.log10.f128'
+          | 'llvm.log10.ppcf128'
+          | 'llvm.log2.f32'
+          | 'llvm.log2.f64'
+          | 'llvm.log2.f80'
+          | 'llvm.log2.f128'
+          | 'llvm.log2.ppcf128'
+          | 'llvm.fabs.f32'
+          | 'llvm.fabs.f64'
+          | 'llvm.fabs.f80'
+          | 'llvm.fabs.f128'
+          | 'llvm.fabs.ppcf128'
+          | 'llvm.sqrt.f32'
+          | 'llvm.sqrt.f64'
+          | 'llvm.sqrt.f80'
+          | 'llvm.sqrt.f128'
+          | 'llvm.sqrt.ppcf128'
+          | 'llvm.floor.f32'
+          | 'llvm.floor.f64'
+          | 'llvm.floor.f80'
+          | 'llvm.floor.f128'
+          | 'llvm.floor.ppcf128'
+          | 'llvm.ceil.f32'
+          | 'llvm.ceil.f64'
+          | 'llvm.ceil.f80'
+          | 'llvm.ceil.f128'
+          | 'llvm.ceil.ppcf128'
+;
+
+BININTRFUN : 'llvm.pow.f32'
+           | 'llvm.pow.f64'
+           | 'llvm.pow.f80'
+           | 'llvm.pow.f128'
+           | 'llvm.pow.ppcf128'
+           | 'llvm.powi.f32'
+           | 'llvm.powi.f64'
+           | 'llvm.powi.f80'
+           | 'llvm.powi.f128'
+           | 'llvm.powi.ppcf128'
+           | 'llvm.fma.f32'
+           | 'llvm.fma.f64'
+           | 'llvm.fma.f80'
+           | 'llvm.fma.f128'
+           | 'llvm.fma.ppcf128'
+           | 'llvm.minnum.f32'
+           | 'llvm.minnum.f64'
+           | 'llvm.minnum.f80'
+           | 'llvm.minnum.f128'
+           | 'llvm.minnum.ppcf128'
+           | 'llvm.maxnum.f32'
+           | 'llvm.maxnum.f64'
+           | 'llvm.maxnum.f80'
+           | 'llvm.maxnum.f128'
+           | 'llvm.maxnum.ppcf128'
+           | 'llvm.minimum.f32'
+           | 'llvm.minimum.f64'
+           | 'llvm.minimum.f80'
+           | 'llvm.minimum.f128'
+           | 'llvm.minimum.ppcf128'
+           | 'llvm.maximum.f32'
+           | 'llvm.maximum.f64'
+           | 'llvm.maximum.f80'
+           | 'llvm.maximum.f128'
+           | 'llvm.maximum.ppcf128'
+           | 'llvm.copysign.f32'
+           | 'llvm.copysign.f64'
+           | 'llvm.copysign.f80'
+           | 'llvm.copysign.f128'
+           | 'llvm.copysign.ppcf128'
+;
 
 // Lexical elements are capitalized
 
@@ -81,11 +188,11 @@ BINOP : 'add'
       | 'fuge' 
       | 'funo' 
       | 'land' 
-      | 'lor' 
+      | 'lor'
 ;
 
 UNOP : 'lnot' 
-     | 'fneg' 
+     | 'fneg'
 ;
 
 CASTOP : 'trunc' 
