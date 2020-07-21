@@ -25,5 +25,4 @@ public:
   virtual void endVisit(UnaryExpr * element) {}
   virtual bool visit(BinaryExpr * element) { return true; }
   virtual void endVisit(BinaryExpr * element) {}
-
 };

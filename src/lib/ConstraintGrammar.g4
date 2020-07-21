@@ -40,7 +40,7 @@ binaryExpr : BINOP expr expr ;
 
 // changed by SBH
 
-binIntrExpr : BININTRFUN expr expr ;
+binIntrExpr : BININTRFUN TYPE expr expr ;
 unIntrExpr : UNINTRFUN TYPE expr ;   //the type is necessary because no way we can predict the return type of the call seeing the parameters type
 
 

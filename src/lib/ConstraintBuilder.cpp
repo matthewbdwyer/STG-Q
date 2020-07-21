@@ -1,5 +1,4 @@
 #include "ConstraintBuilder.h"
-
 #include <vector>
 #include <cassert>
 
@@ -10,13 +9,13 @@ ConstraintBuilder::ConstraintBuilder(ConstraintGrammarParser *p) : parser{p} {}
 static std::shared_ptr<Constraint::Expr> visitedExpr;
 static std::shared_ptr<Constraint::Constraints> theConstraint;
 
-std::shared_ptr<Constraint::Constraints>
-ConstraintBuilder::build(ConstraintGrammarParser::ConstraintContext *ctx) {
+std::shared_ptr<Constraint::Constraints> ConstraintBuilder::build(ConstraintGrammarParser::ConstraintContext *ctx) {
+
   theConstraint = std::make_shared<Constraint::Constraints>();
 
   // Visit the dictionary entries and define them in theConstraint
-  for (auto sd : ctx->symbolDef()) {
-    visit(sd);
+  for (auto sd : ctx->symbolDef()) {   //getting all symbolic definitions
+    visit(sd);   //where is this visit method????
   }
 
   // Visit the expression
@@ -26,14 +25,13 @@ ConstraintBuilder::build(ConstraintGrammarParser::ConstraintContext *ctx) {
   return theConstraint;
 }
 
-Any ConstraintBuilder::visitSymbolDef(  //changed by SBH
+//changed by SBH
 
-  ConstraintGrammarParser::SymbolDefContext *ctx) {
+Any ConstraintBuilder::visitSymbolDef(ConstraintGrammarParser::SymbolDefContext *ctx) {
+
   std::string name = ctx->IDENTIFIER()->getText();
   std::string type = ctx->TYPE()->getText();
-
-
-//changed by SBH
+  //changed by SBH
   std::vector numbers = ctx->NUMBER() ;
 
   std::string val = numbers[0]->getText();
@@ -44,11 +42,9 @@ Any ConstraintBuilder::visitSymbolDef(  //changed by SBH
   return "";
 }
 
-Any ConstraintBuilder::visitSymbolExpr(
-      ConstraintGrammarParser::SymbolExprContext *ctx) {
+Any ConstraintBuilder::visitSymbolExpr( ConstraintGrammarParser::SymbolExprContext *ctx) {
   std::string name = ctx->IDENTIFIER()->getText();
-  assert(theConstraint->isDefined(name) &&
-         "Use of symbol that is not in the dictionary");
+  assert(theConstraint->isDefined(name) && "Use of symbol that is not in the dictionary");
   visitedExpr = theConstraint->create(name, theConstraint->str2type(theConstraint->symbolType(name)));
   return "";
 }
@@ -108,8 +104,7 @@ Any ConstraintBuilder::visitBinaryExpr(ConstraintGrammarParser::BinaryExprContex
   return "";
 }
 
-
-//added by SBH
+//start: added by SBH
 Any ConstraintBuilder::visitUnIntrExpr(ConstraintGrammarParser::UnIntrExprContext *ctx) {
   auto op = theConstraint->str2op(ctx->UNINTRFUN()->getText());
   visit(ctx->expr());
@@ -118,13 +113,17 @@ Any ConstraintBuilder::visitUnIntrExpr(ConstraintGrammarParser::UnIntrExprContex
   return "";
 }
 
-//added by SBH
 Any ConstraintBuilder::visitBinIntrExpr(ConstraintGrammarParser::BinIntrExprContext *ctx) {
+
+
+  //std::cout<<"visitor called.........\n";
   auto op = theConstraint->str2op(ctx->BININTRFUN()->getText());
+  auto type = theConstraint->str2type(ctx->TYPE()->getText());
   visit(ctx->expr(0));
   std::shared_ptr<Constraint::Expr> c1 = visitedExpr;
   visit(ctx->expr(1));
-  visitedExpr = theConstraint->create(c1, visitedExpr, op);
+  visitedExpr = theConstraint->create(c1, visitedExpr, op,type );
   return "";
 }
 
+//start: added by SBH

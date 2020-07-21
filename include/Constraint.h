@@ -57,7 +57,7 @@ public:
     FUEq, FUNe, FUlt, FUle, FUgt, FUge, FUno, 	     // float comparison
     LAnd, LOr, 					     // logical
 
-    //added by SBH
+   //added by SBH for unary llvm intrinsics
 
    Sinf32, Sinf64, Sinf80, Sinf128, Sinppcf128,
    Cosf32, Cosf64, Cosf80, Cosf128, Cosppcf128,
@@ -72,19 +72,29 @@ public:
    Fabsf32, Fabsf64, Fabsf80, Fabsf128, Fabsppcf128,
 
 
-   Sqrtf32, Sqrtf64, Sqrtf80, Sqrtf128,Sqrtppcf128,
+   Sqrtf32, Sqrtf64, Sqrtf80, Sqrtf128, Sqrtppcf128,
    Floorf32, Floorf64, Floorf80, Floorf128, Floorppcf128,
    Ceilf32, Ceilf64, Ceilf80, Ceilf128, Ceilppcf128,
 
-
-    //added by SBH
-
-    FirstUnary = Trunc, LastUnary = FNeg,
-    FirstCast = Trunc, LastCast = BitCast,
-    FirstBinary = Add, LastBinary = LOr,
-    FirstUnaryIntr = Sinf32, LastUnaryIntr = Ceilppcf128      //added by SBH
+  //added by SBH for binary llvm intrinsics
 
 
+   Powf32, Powf64, Powf80, Powf128, Powppcf128,
+   Powif32, Powif64, Powif80, Powif128, Powippcf128,
+   Fmaf32, Fmaf64, Fmaf80, Fmaf128, Fmappcf128,
+
+   Minnumf32, Minnumf64, Minnumf80, Minnumf128, Minnumppcf128,
+   Maxnumf32, Maxnumf64, Maxnumf80, Maxnumf128, Maxnumppcf128,
+   Minimumf32, Minimumf64, Minimumf80, Minimumf128, Minimumppcf128,
+   Maximumf32, Maximumf64, Maximumf80, Maximumf128, Maximumppcf128,
+   Copysignf32, Copysignf64, Copysignf80, Copysignf128, Copysignppcf128,
+
+
+   FirstUnary = Trunc, LastUnary = FNeg,
+   FirstCast = Trunc, LastCast = BitCast,
+   FirstBinary = Add, LastBinary = LOr,
+   FirstUnaryIntr = Sinf32, LastUnaryIntr = Ceilppcf128,     //added by SBH
+   FirstBinaryIntr = Powf32, LastBinaryIntr = Copysignppcf128      //added by SBH
 
   };
 
@@ -105,7 +115,7 @@ public:
   void setType(std::shared_ptr<Type> t) { type = t; }
   std::shared_ptr<Type> getType() { return type; }
   Op getOp() const { return op; }
- Constraints* getConstraint() { return constraint; }
+  Constraints* getConstraint() { return constraint; }
 
   // Delegated visitor hook
   virtual void accept(ConstraintVisitor * visitor) = 0;
@@ -173,8 +183,9 @@ public:
 class BinaryExpr : public Expr {
   std::shared_ptr<Expr> child[2];
 public:
-  BinaryExpr(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o)
-      { op = o; child[0] = c1; child[1] = c2; }
+  BinaryExpr(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o) { op = o; child[0] = c1; child[1] = c2; }
+  BinaryExpr(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o, std::shared_ptr<Type> t)   // added for binary intrinsic
+            { op = o; child[0] = c1; child[1] = c2; type = t; }
   std::shared_ptr<Expr> getChild(int i) { return child[i]; }
   void setChild(int i, std::shared_ptr<Expr> c) { child[i] = c; }
   void accept(ConstraintVisitor * visitor) override;
@@ -217,6 +228,8 @@ public:
   std::shared_ptr<Expr> getExpr() { return expr; }
 
   // Create methods for constraint sub-expressions
+
+
   std::shared_ptr<Type> create(Type::Base b, int w);
 
   std::shared_ptr<Symbol> create(std::string name, std::shared_ptr<Type> t);
@@ -226,6 +239,12 @@ public:
   std::shared_ptr<UnaryExpr> create(std::shared_ptr<Expr> c, Expr::Op o);
   std::shared_ptr<UnaryExpr> create(std::shared_ptr<Expr> c, Expr::Op o, std::shared_ptr<Type> t);
   std::shared_ptr<BinaryExpr> create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o);
+  std::shared_ptr<BinaryExpr> create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o, std::shared_ptr<Type> t);  // for Binary Intrinsic Expr
+
+  //added by SBH
+
+  //std::shared_ptr<UnIntrExpr> create(std::shared_ptr<Expr> c, Expr::Op o, std::shared_ptr<Type> t);
+  //std::shared_ptr<BinIntrExpr> create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o, std::shared_ptr<Type> t);
 
   // Translation methods for external and internal representations
   std::shared_ptr<Type> str2type(std::string s);

@@ -71,10 +71,14 @@ void ConstraintPrinter::endVisit(UnaryExpr * element) {
   result += element->getConstraint()->op2str(op) + " ";
   if (op >= Constraint::Expr::Op::FirstCast && op <= Constraint::Expr::Op::LastCast) {
     result += element->getConstraint()->type2str(element->getType());
-  }else if(op >= Constraint::Expr::Op::FirstUnaryIntr && op <= Constraint::Expr::Op::LastUnaryIntr)
+  }
+    //start: changed by SBH to print type of llvm unary intrinsic
+
+  else if(op >= Constraint::Expr::Op::FirstUnaryIntr && op <= Constraint::Expr::Op::LastUnaryIntr)
   {
      result += element->getConstraint()->type2str(element->getType());
   }
+  //end
   result += "\n";
   result += result1 + "\n";
   result += indent() + ")";
@@ -91,15 +95,30 @@ void ConstraintPrinter::endVisit(BinaryExpr * element) {
   visitResults.pop_back();
   std::string result1 = visitResults.back();
   visitResults.pop_back();
+  auto op = element->getOp();
 
   indentLevel--;
   std::string result = indent() + "(";
-  result += element->getConstraint()->op2str(element->getOp()) + "\n";
+
+
+  //start: changed by SBH to print type of llvm binary intrinsic
+
+  result += element->getConstraint()->op2str(op) + " ";
+
+  if(op >= Constraint::Expr::Op::FirstBinaryIntr && op <= Constraint::Expr::Op::LastBinaryIntr)
+  {
+    result += element->getConstraint()->type2str(element->getType()) + "\n";
+    std::cout<< element->getConstraint()->type2str(element->getType())<<"\n";
+    std::cout<<"got binary intrinsic "<<element->getConstraint()->op2str(op)<<"\n";
+  }
+  else result += "\n";
+
+  //end
   result += result1 + "\n";
   result += result2 + "\n";
   result += indent() + ")";
   visitResults.push_back(result);
-}   									\
+}
 
 std::string ConstraintPrinter::indent() const {
   return std::string(indentLevel*indentSize, ' ');

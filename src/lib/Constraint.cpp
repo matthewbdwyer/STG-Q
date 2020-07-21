@@ -41,29 +41,16 @@ std::optional<std::shared_ptr<Constraints>> parse(std::istream& stream) {
   lexer.addErrorListener(&errorListener);
   parser.addErrorListener(&errorListener);
 
-
-  std::cout<<"here we are, yoooooooo\n";
-
-  auto parsetree = parser.constraint();
+  auto parsetree = parser.constraint();  //return type constraint context
 
   if (*parseError) {  
     return std::nullopt;
   }
 
-  std::cout<<"here we are\n";
   ConstraintBuilder cb(&parser);
-
-
-  auto de = cb.build(parsetree);
+  auto de = cb.build(parsetree);  // calling constraintBuilder
   ConstraintPrinter cp(std::cout, 2);
   cp.print(de);
-
-
-  //auto de = cb.build(parsetree);
-
-  //ConstraintPrinter cp(std::cout, 2);
-  //cp.print(de);
-
 
   return std::make_optional<std::shared_ptr<Constraints>>(cb.build(parsetree));
 }
@@ -97,7 +84,7 @@ std::string Constraints::type2str(std::shared_ptr<Type> t) {
 }
 
 /* 
- * A pair of lookup tables for mapping between operators and ther 
+ * A pair of lookup tables for mapping between operators and their
  * string representations in the grammar.
  * Coordinate any changes between the two.
  */
@@ -225,7 +212,62 @@ std::map<std::string, Expr::Op> soMap = {
    {"llvm.ceil.f64",Expr::Op::Ceilf64},
    {"llvm.ceil.f80",Expr::Op::Ceilf80},
    {"llvm.ceil.f128",Expr::Op::Ceilf128},
-   {"llvm.ceil.ppcf128",Expr::Op::Ceilppcf128}
+   {"llvm.ceil.ppcf128",Expr::Op::Ceilppcf128},
+
+
+
+  {"llvm.pow.f32",Expr::Op::Powf32},
+  {"llvm.pow.f64",Expr::Op::Powf64},
+  {"llvm.pow.f80",Expr::Op::Powf80},
+  {"llvm.pow.f128",Expr::Op::Powf128},
+  {"llvm.pow.ppcf128",Expr::Op::Powppcf128},
+
+  {"llvm.powi.f32",Expr::Op::Powif32},
+  {"llvm.powi.f64",Expr::Op::Powif64},
+  {"llvm.powi.f80",Expr::Op::Powif80},
+  {"llvm.powi.f128",Expr::Op::Powif128},
+  {"llvm.powi.ppcf128",Expr::Op::Powippcf128},
+
+  {"llvm.fma.f32",Expr::Op::Fmaf32},
+  {"llvm.fma.f64",Expr::Op::Fmaf64},
+  {"llvm.fma.f80",Expr::Op::Fmaf80},
+  {"llvm.fma.f128",Expr::Op::Fmaf128},
+  {"llvm.fma.ppcf128",Expr::Op::Fmappcf128},
+
+
+ {"llvm.minnum.f32",Expr::Op::Minnumf32},
+ {"llvm.minnum.f64",Expr::Op::Minnumf64},
+ {"llvm.minnum.f80",Expr::Op::Minnumf80},
+ {"llvm.minnum.f128",Expr::Op::Minnumf128},
+ {"llvm.minnum.ppcf128",Expr::Op::Minnumf128},
+
+
+ {"llvm.maxnum.f32",Expr::Op::Maxnumf32},
+ {"llvm.maxnum.f64",Expr::Op::Maxnumf64},
+ {"llvm.maxnum.f80",Expr::Op::Maxnumf80},
+ {"llvm.maxnum.f128",Expr::Op::Maxnumf128},
+ {"llvm.maxnum.ppcf128",Expr::Op::Maxnumppcf128},
+
+ {"llvm.minimum.f32",Expr::Op::Minimumf32},
+ {"llvm.minimum.f64",Expr::Op::Minimumf64},
+ {"llvm.minimum.f80",Expr::Op::Minimumf80},
+ {"llvm.minimum.f128",Expr::Op::Minimumf128},
+ {"llvm.minimum.ppcf128",Expr::Op::Minimumppcf128},
+
+
+ {"llvm.maximum.f32",Expr::Op::Maximumf32},
+ {"llvm.maximum.f64",Expr::Op::Maximumf64},
+ {"llvm.maximum.f80",Expr::Op::Maximumf80},
+ {"llvm.maximum.f128",Expr::Op::Maximumf128},
+ {"llvm.maximum.ppcf128",Expr::Op::Maximumppcf128},
+
+
+ {"llvm.copysign.f32",Expr::Op::Copysignf32},
+ {"llvm.copysign.f64",Expr::Op::Copysignf64},
+ {"llvm.copysign.f80",Expr::Op::Copysignf80},
+ {"llvm.copysign.f128",Expr::Op::Copysignf128},
+ {"llvm.copysign.ppcf128",Expr::Op::Copysignppcf128}
+
 };
 
 std::map<Expr::Op, std::string> osMap = {
@@ -287,7 +329,7 @@ std::map<Expr::Op, std::string> osMap = {
   {Expr::Op::LOr, "lor"},
 
 
-  //added by SBH
+  //start: added by SBH
 
   {Expr::Op::Sinf32,"llvm.sin.f32"},
   {Expr::Op::Sinf64,"llvm.sin.f64"},
@@ -353,7 +395,63 @@ std::map<Expr::Op, std::string> osMap = {
   {Expr::Op::Ceilf64,"llvm.ceil.f64"},
   {Expr::Op::Ceilf80,"llvm.ceil.f80"},
   {Expr::Op::Ceilf128,"llvm.ceil.f128"},
-  {Expr::Op::Ceilppcf128,"llvm.ceil.ppcf128"}
+  {Expr::Op::Ceilppcf128,"llvm.ceil.ppcf128"},
+
+
+  {Expr::Op::Powf32,"llvm.pow.f32"},
+  {Expr::Op::Powf64,"llvm.pow.f64"},
+  {Expr::Op::Powf80,"llvm.pow.f80"},
+  {Expr::Op::Powf128,"llvm.pow.f128"},
+  {Expr::Op::Powppcf128,"llvm.pow.ppcf128"},
+
+  {Expr::Op::Powif32,"llvm.powi.f32"},
+  {Expr::Op::Powif64,"llvm.powi.f64"},
+  {Expr::Op::Powif80,"llvm.powi.f80"},
+  {Expr::Op::Powif128,"llvm.powi.f128"},
+  {Expr::Op::Powippcf128,"llvm.powi.ppcf128"},
+
+  {Expr::Op::Fmaf32,"llvm.fma.f32"},
+  {Expr::Op::Fmaf64,"llvm.fma.f64"},
+  {Expr::Op::Fmaf80,"llvm.fma.f80"},
+  {Expr::Op::Fmaf128,"llvm.fma.f128"},
+  {Expr::Op::Fmappcf128,"llvm.fma.ppcf128"},
+
+
+ {Expr::Op::Minnumf32,"llvm.minnum.f32"},
+ {Expr::Op::Minnumf64,"llvm.minnum.f64"},
+ {Expr::Op::Minnumf80,"llvm.minnum.f80"},
+ {Expr::Op::Minnumf128,"llvm.minnum.f128"},
+ {Expr::Op::Minnumf128,"llvm.minnum.ppcf128"},
+
+
+ {Expr::Op::Maxnumf32,"llvm.maxnum.f32"},
+ {Expr::Op::Maxnumf64,"llvm.maxnum.f64"},
+ {Expr::Op::Maxnumf80,"llvm.maxnum.f80"},
+ {Expr::Op::Maxnumf128,"llvm.maxnum.f128"},
+ {Expr::Op::Maxnumppcf128,"llvm.maxnum.ppcf128"},
+
+ {Expr::Op::Minimumf32,"llvm.minimum.f32"},
+ {Expr::Op::Minimumf64,"llvm.minimum.f64"},
+ {Expr::Op::Minimumf80,"llvm.minimum.f80"},
+ {Expr::Op::Minimumf128,"llvm.minimum.f128"},
+ {Expr::Op::Minimumppcf128,"llvm.minimum.ppcf128"},
+
+
+ {Expr::Op::Maximumf32,"llvm.maximum.f32"},
+ {Expr::Op::Maximumf64,"llvm.maximum.f64"},
+ {Expr::Op::Maximumf80,"llvm.maximum.f80"},
+ {Expr::Op::Maximumf128,"llvm.maximum.f128"},
+ {Expr::Op::Maximumppcf128,"llvm.maximum.ppcf128"},
+
+
+ {Expr::Op::Copysignf32,"llvm.copysign.f32"},
+ {Expr::Op::Copysignf64,"llvm.copysign.f64"},
+ {Expr::Op::Copysignf80,"llvm.copysign.f80"},
+ {Expr::Op::Copysignf128,"llvm.copysign.f128"},
+ {Expr::Op::Copysignppcf128,"llvm.copysign.ppcf128"}
+
+  //end: added by SBH
+
 
 }; 
 
@@ -419,7 +517,7 @@ void BinaryExpr::accept(ConstraintVisitor* visitor) {
     getChild(1)->accept(visitor);
   }
   visitor->endVisit(this);
-}    
+}
 
 /*
  * Constraint symbol definition and sub-expression create routines
@@ -519,5 +617,14 @@ std::shared_ptr<BinaryExpr> Constraints::create(std::shared_ptr<Expr> c1, std::s
   n->constraint = this;
   return n;
 }
+
+//added by SBH for binary intrinsic
+std::shared_ptr<BinaryExpr> Constraints::create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o, std::shared_ptr<Type> t) {
+  auto n = std::make_shared<BinaryExpr>(c1,c2,o,t);
+  n->constraint = this;
+  return n;
+}
+
+
 
 }
