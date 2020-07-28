@@ -47,7 +47,67 @@ std::map<std::string, std::string> mapping = {
 
 {"land", "BAND("},
 {"lor", "BOR("},
-{"lnot", "BNOT("}
+{"lnot", "BNOT("},
+
+//Intrinsics UNARY
+
+{"llvm.sin.f32", "SIN_("},
+{"llvm.sin.f64", "SIN_("},
+{"llvm.sin.f80", "SIN_("},
+{"llvm.sin.f128", "SIN_("},
+
+{"llvm.cos.f32", "COS_("},
+{"llvm.cos.f64", "COS_("},
+{"llvm.cos.f80", "COS_("},
+{"llvm.cos.f128", "COS_("},
+
+{"llvm.exp.f32", "EXP_("},
+{"llvm.exp.f64", "EXP_("},
+{"llvm.exp.f80", "EXP_("},
+{"llvm.exp.f128", "EXP_("},
+
+{"llvm.log.f32", "LOG_("},
+{"llvm.log.f64", "LOG_("},
+{"llvm.log.f80", "LOG_("},
+{"llvm.log.f128", "LOG_("},
+
+{"llvm.log10.f32", "LOG10_("},
+{"llvm.log10.f64", "LOG10_("},
+{"llvm.log10.f80", "LOG10_("},
+{"llvm.log10.f128", "LOG10_("},
+
+{"llvm.sqrt.f32", "SQRT_("},
+{"llvm.sqrt.f64", "SQRT_("},
+{"llvm.sqrt.f80", "SQRT_("},
+{"llvm.sqrt.f128", "SQRT_("},
+
+//Intrinsics BINARY
+
+{"llvm.pow.f32", "POW_("},
+{"llvm.pow.f64", "POW_("},
+{"llvm.pow.f80", "POW_("},
+{"llvm.pow.f128", "POW_("},
+
+{"llvm.minnum.f32", "MIN_("},
+{"llvm.minnum.f64", "MIN_("},
+{"llvm.minnum.f80", "MIN_("},
+{"llvm.minnum.f128", "MIN_("},
+
+{"llvm.maxnum.f32", "MAX_("},
+{"llvm.maxnum.f64", "MAX_("},
+{"llvm.maxnum.f80", "MAX_("},
+{"llvm.maxnum.f128", "MAX_("},
+
+{"llvm.minimum.f32", "MIN_("},
+{"llvm.minimum.f64", "MIN_("},
+{"llvm.minimum.f80", "MIN_("},
+{"llvm.minimum.f128", "MIN_("},
+
+{"llvm.maximum.f32", "MAX_("},
+{"llvm.maximum.f64", "MAX_("},
+{"llvm.maximum.f80", "MAX_("},
+{"llvm.maximum.f128", "MAX_("}
+
 };
 
 void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
@@ -57,17 +117,17 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
   int num = c->symbols.size();
   for (auto &n : c->symbols) {
     num--;
+    std::string low, high;
+    std::string ranges = c->symbolRange(n);     // Can be changed if symbolRange returns a pair instead of a string
+    int ind = ranges.find(" ");
+    low = ranges.substr(0, ind);
+    high = ranges.substr(ind+1);
+
     if(c->symbolType(n)[0] == 'i'){
-      if(c->symbolType(n) == "i1")
-        os << id << " UNIFORM_INT -1 1";
-      else if(c->symbolType(n) == "i8")
-        os << id << " UNIFORM_INT -129 127";
-      else if(c->symbolType(n) == "i16")
-        os << id << " UNIFORM_INT -32769 32767";
-      else if(c->symbolType(n) == "i32")
-        os << id << " UNIFORM_INT -999999999 999999999"; //Full range not working
-      else if(c->symbolType(n) == "i64")
-        os << id << " UNIFORM_INT -999999999 999999999";  // -9223372036854775809 9223372036854775807 (Full range not working)
+      if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
+        // low = std::to_string(std::stoll(low)-1);
+        os << id << " UNIFORM_INT "<<low<<" "<<high;
+      }
       else{
         os << "Invalid Integer type. Exiting!!\n";
         return;
@@ -75,18 +135,9 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
       dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
     }
 
-    else if(c->symbolType(n) == "long"){
-      os << id << " UNIFORM_INT -999999999 999999999";			// -1.17549e-38 3.4e+38 (Full range not working)
-      dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
-    }
-
-    else if(c->symbolType(n) == "float"){
-      os << id << " UNIFORM_REAL -1.17549e-4 3.4e+4";			// -1.17549e-38 3.4e+38 (Full range not working)
-      dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
-    }
-
-    else if(c->symbolType(n) == "double"){
-      os << id << " UNIFORM_REAL -2.22507e-4 1.7e+4";		// -2.22507e-308 1.7e+308 (Full Range not working)
+    else if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
+      // low = std::to_string(std::stold(low)-1);
+      os << id << " UNIFORM_REAL "<<low<<" "<<high;
       dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
     }
 

@@ -57,34 +57,29 @@ public:
     FUEq, FUNe, FUlt, FUle, FUgt, FUge, FUno, 	     // float comparison
     LAnd, LOr, 					     // logical
 
-    //added by SBH
+    //added by SBH  for unary llvm intrinsics (Reordered by Rishab)
+   
+   Sinf32, Cosf32, Expf32, Exp2f32, Logf32, Log2f32, Log10f32, Fabsf32, Sqrtf32, Floorf32, Ceilf32,
+   Sinf64, Cosf64, Expf64, Exp2f64, Logf64, Log2f64, Log10f64, Fabsf64, Sqrtf64, Floorf64, Ceilf64,
+   Sinf80, Cosf80, Expf80, Exp2f80, Logf80, Log2f80, Log10f80, Fabsf80, Sqrtf80, Floorf80, Ceilf80,
+   Sinf128, Cosf128, Expf128, Exp2f128, Logf128, Log2f128, Log10f128, Fabsf128, Sqrtf128, Floorf128, Ceilf128,
+   Sinppcf128, Cosppcf128, Expppcf128, Exp2ppcf128, Logppcf128, Log2ppcf128, Log10ppcf128, Fabsppcf128, Sqrtppcf128, Floorppcf128, Ceilppcf128,
 
-   Sinf32, Sinf64, Sinf80, Sinf128, Sinppcf128,
-   Cosf32, Cosf64, Cosf80, Cosf128, Cosppcf128,
-   Expf32, Expf64, Expf80, Expf128, Expppcf128,
-   Exp2f32, Exp2f64, Exp2f80, Exp2f128, Exp2ppcf128,
-   Logf32, Logf64, Logf80, Logf128, Logppcf128,
+   //added by SBH for binary llvm intrinsics (Reordered by Rishab)
 
-   Log2f32, Log2f64, Log2f80, Log2f128, Log2ppcf128,
-
-   Log10f32, Log10f64, Log10f80, Log10f128, Log10ppcf128,
-
-   Fabsf32, Fabsf64, Fabsf80, Fabsf128, Fabsppcf128,
-
-
-   Sqrtf32, Sqrtf64, Sqrtf80, Sqrtf128,Sqrtppcf128,
-   Floorf32, Floorf64, Floorf80, Floorf128, Floorppcf128,
-   Ceilf32, Ceilf64, Ceilf80, Ceilf128, Ceilppcf128,
-
+   Powf32, Powif32, Fmaf32, Minnumf32, Maxnumf32, Minimumf32, Maximumf32, Copysignf32,
+   Powf64, Powif64, Fmaf64, Minnumf64, Maxnumf64, Minimumf64, Maximumf64, Copysignf64,
+   Powf80, Powif80, Fmaf80, Minnumf80, Maxnumf80, Minimumf80, Maximumf80, Copysignf80,
+   Powf128, Powif128, Fmaf128, Minnumf128, Maxnumf128, Minimumf128, Maximumf128, Copysignf128,
+   Powppcf128, Powippcf128, Fmappcf128, Minnumppcf128, Maxnumppcf128, Minimumppcf128, Maximumppcf128, Copysignppcf128,
 
     //added by SBH
 
     FirstUnary = Trunc, LastUnary = FNeg,
     FirstCast = Trunc, LastCast = BitCast,
     FirstBinary = Add, LastBinary = LOr,
-    FirstUnaryIntr = Sinf32, LastUnaryIntr = Ceilppcf128      //added by SBH
-
-
+    FirstUnaryIntr = Sinf32, LastUnaryIntr = Ceilppcf128,      //added by SBH   [Need to change]
+    FirstBinaryIntr = Powf32, LastBinaryIntr = Copysignppcf128 //added by SBH   [Need to change]
 
   };
 
@@ -105,7 +100,7 @@ public:
   void setType(std::shared_ptr<Type> t) { type = t; }
   std::shared_ptr<Type> getType() { return type; }
   Op getOp() const { return op; }
- Constraints* getConstraint() { return constraint; }
+  Constraints* getConstraint() { return constraint; }
 
   // Delegated visitor hook
   virtual void accept(ConstraintVisitor * visitor) = 0;
@@ -175,6 +170,9 @@ class BinaryExpr : public Expr {
 public:
   BinaryExpr(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o)
       { op = o; child[0] = c1; child[1] = c2; }
+  BinaryExpr(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o, std::shared_ptr<Type> t)   // added for binary intrinsic SBH
+            { op = o; child[0] = c1; child[1] = c2; type = t; }
+
   std::shared_ptr<Expr> getChild(int i) { return child[i]; }
   void setChild(int i, std::shared_ptr<Expr> c) { child[i] = c; }
   void accept(ConstraintVisitor * visitor) override;
@@ -190,8 +188,7 @@ class Constraints {
   std::map<std::string, std::string> symbolTypes;
   std::map<std::string, std::string> symbolValues;
 
-  std::map<std::string, std::string> symbolValueMins; // added by SBH
-  std::map<std::string, std::string> symbolValueMaxs; // added by SBH
+  std::map<std::string, std::pair<std::string, std::string> > symbolRanges; // Added by Rishab
   std::shared_ptr<Expr> expr = nullptr;
 
   // Recording of interned sub-expressions to reduce redundancy
@@ -201,7 +198,7 @@ public:
   std::set<std::string> symbols;
 
 
-  void defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max);  //change this method to read a vector of size three // added by SBH
+  void defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max);  // added by SBH
 
 
 
@@ -210,8 +207,7 @@ public:
   std::string symbolType(std::string n) { return symbolTypes.find(n)->second; }
   std::string symbolValue(std::string n) { return symbolValues.find(n)->second; }
 
-  std::string symbolValueMin(std::string n) { return symbolValueMins.find(n)->second; }   // added by SBH
-  std::string symbolValueMax(std::string n) { return symbolValueMaxs.find(n)->second; }   // added by SBH
+  std::string symbolRange(std::string n) { return (symbolRanges[n].first + " " + symbolRanges[n].second); } // Added by Rishab
 
   void setExpr(std::shared_ptr<Expr> e) { expr = e; }
   std::shared_ptr<Expr> getExpr() { return expr; }
@@ -226,6 +222,7 @@ public:
   std::shared_ptr<UnaryExpr> create(std::shared_ptr<Expr> c, Expr::Op o);
   std::shared_ptr<UnaryExpr> create(std::shared_ptr<Expr> c, Expr::Op o, std::shared_ptr<Type> t);
   std::shared_ptr<BinaryExpr> create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o);
+  std::shared_ptr<BinaryExpr> create(std::shared_ptr<Expr> c1, std::shared_ptr<Expr> c2, Expr::Op o, std::shared_ptr<Type> t);  // for Binary Intrinsic Expr [SBH]
 
   // Translation methods for external and internal representations
   std::shared_ptr<Type> str2type(std::string s);

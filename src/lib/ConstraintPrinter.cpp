@@ -11,7 +11,13 @@ void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
     num--;
     os << indent() << n << " : ";
     os << c->symbolType(n) << " = " << c->symbolValue(n);
-    os << ", R:[" << c->symbolValueMin(n) <<","<< c->symbolValueMax(n)<<"]";  // added by SBH //printed range
+    std::string ranges = c->symbolRange(n);     // Can be changed if symbolRange returns a pair instead of a string
+    int ind = ranges.find(" ");
+    std::string low = ranges.substr(0, ind);
+    std::string high = ranges.substr(ind+1);
+
+    os << ", R:[" << low <<","<< high<<"]";  // Changed by Rishab
+
     os << ((num>0) ? ",\n" : "\n");
   }
   indentLevel--;
@@ -94,12 +100,19 @@ void ConstraintPrinter::endVisit(BinaryExpr * element) {
 
   indentLevel--;
   std::string result = indent() + "(";
-  result += element->getConstraint()->op2str(element->getOp()) + "\n";
+  auto op = element->getOp();
+  result += element->getConstraint()->op2str(op) + " ";
+
+  if(op >= Constraint::Expr::Op::FirstBinaryIntr && op <= Constraint::Expr::Op::LastBinaryIntr)
+    result += element->getConstraint()->type2str(element->getType()) + "\n";
+  else
+    result += "\n";
+
   result += result1 + "\n";
   result += result2 + "\n";
   result += indent() + ")";
   visitResults.push_back(result);
-}   									\
+}
 
 std::string ConstraintPrinter::indent() const {
   return std::string(indentLevel*indentSize, ' ');

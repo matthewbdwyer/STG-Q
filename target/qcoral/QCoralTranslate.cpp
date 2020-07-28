@@ -18,9 +18,9 @@ int main(int argc, const char *argv[]) {
 
   if (constraint) {
 
-    cout << "STG parsesd successfully\n";
-    //QCoralPrinter qcp(std::cout, 2);
-    //qcp.print(constraint.value());
+    // cout << "STG parsesd successfully\n";
+    QCoralPrinter qcp(std::cout, 2);
+    qcp.print(constraint.value());
   } else {
     cout << "STG parse error\n";
   }

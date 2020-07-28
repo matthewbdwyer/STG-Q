@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 
 using namespace std;
 //
@@ -10,10 +11,12 @@ int main(int argc, char** argv){
 	ifstream is;
 	int nof = argc-1;
 	string comb = "";
+	string append = "";
 
 	if(nof){
 		is.open(argv[nof]);
 		while(getline(is, line)){
+
 			comb += line + "\n";
 			if(line == ":Constraints:")
 				break;
@@ -32,15 +35,29 @@ int main(int argc, char** argv){
 				last_line = line;
 
 		//comb += last_line + "\n";
+		int loc = last_line.find(';');
+		string before = last_line;
+		string after = "";
+
+		if( loc != -1){
+			before = last_line.substr(0, loc);
+			after =  last_line.substr(loc, last_line.length());
+		}
+
 		if(cons == "")
-			cons = last_line;
+			cons = before;
 		else
-			cons = "BOR(" + cons + ", " + last_line + ")";
+			cons = "BOR(" + cons + ", " + before + ")";
+
+		if(append == "")
+			append = after;
+		else
+			append += after;
 
 		is.close();
 	}
 
-	comb = comb + cons;
+	comb = comb + cons + append;
 
 	//cout<<comb<<"\n";
 
@@ -48,7 +65,6 @@ int main(int argc, char** argv){
 
 	out << comb;
     out.close();
-
 	return 0;
 
 }
