@@ -5,4 +5,4 @@
 
 ./QC_Quantify.sh **test_folder_path** **qCORAL_path**
 
-./QC_Quantify.sh **unit_test_path** **qCORAL_path**
+./Quantify.sh **unit_test_path** **qCORAL_path**
