@@ -2,7 +2,8 @@ grammar ConstraintGrammar;
 
 /* 
  * Simple grammar for STG constraint
- *  - begins with symbol dictionary which defines type, value and min, max range for symbol
+ *  - begins with symbol dictionary which defines type, value and min, 
+ *    max range for symbol
  *  - then consists of a single logical expression
  *
  * Rule labels are introduced for the visitor pattern.
@@ -16,7 +17,46 @@ grammar ConstraintGrammar;
 
 constraint : '[' (symbolDef (',' symbolDef)* )? ']' expr ;
 
-symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ', R:[' NUMBER ',' NUMBER'], D:[' NUMBER ',' NUMBER ',' NUMBER']';
+// symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ', R:[' NUMBER ',' NUMBER'], D:[' NUMBER ',' NUMBER ',' NUMBER']';
+
+/*
+ * Some comments about the above rule
+ *   1) The rule makes ranges and distributions required, we might want them
+ *      to be options with a default value, e.g., min/max, uniform
+ *   2) The tokenization of the rule is very restrictive.  Writing ', R:[' 
+ *      forces the whitespace to be a single character.  Grammar's should
+ *      be written to allow for arbitrary whitespace.
+ * Here is an alternative version that resolves these issues.
+ */
+symbolDef : IDENTIFIER ':' TYPE '=' NUMBER (',' rangeSpec)? (',' distSpec)? ;
+
+rangeSpec : 'range' ':' '[' NUMBER ',' NUMBER ']' ;
+
+distSpec : 'uniform' '(' NUMBER ',' NUMBER ')' 
+         | 'normal' '(' NUMBER ',' NUMBER ')' 
+         | // add more of these here
+;
+
+/*
+ * This allows the range and distribution specs to be optional through the 
+ * use of the '?' in the symbolDef rule.
+ *
+ * Each individual symbol is now its own token allowing for arbitrary 
+ * whitespace.
+ *
+ * The syntax is a bit more explicit, changing R to range, and there is
+ * less overloading, i.e., [] changed to () for distributions.  The former
+ * is the notation for an interval and the latter for parameterization.
+ *
+ * It pulls the distribution specs out into a set of separate rules.
+ * This allows the number of parameters to be matched to the distribution.
+ *
+ * A consequence of the above is that now a symbolDef is more complicated.
+ * This means that you probably want to think about enhancing the AST
+ * representation in Constraint.h to define node types for symbol defs
+ * and dictionaries.  Then extending the Constraint builder, printer, etc.
+ * accordingly.
+ */
 
 expr : leafExpr
      | '(' unaryExpr ')'
