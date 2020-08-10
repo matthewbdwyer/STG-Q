@@ -18,6 +18,11 @@ void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
 
     os << ", R:[" << low <<","<< high<<"]";  // Changed by Rishab
 
+    // Added by Rishab for multiple distributions
+    int distribution = std::stoi(c->get_distribution(n));
+    std::pair<std::string, std::string> params = c->get_params(n);
+    os << ", D:[" << distribution <<","<< params.first << "," << params.second <<"]";
+
     os << ((num>0) ? ",\n" : "\n");
   }
   indentLevel--;

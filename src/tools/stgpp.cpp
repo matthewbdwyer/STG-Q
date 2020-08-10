@@ -48,7 +48,7 @@ int main(int argc, const char *argv[]) {
       }
     }
 
-    if (nocf) {
+    if (!nocf) {
       if (verbose) cerr << "STG constant folding\n";
       ConstraintFolder cf;
       cf.fold(constraint, verbose);

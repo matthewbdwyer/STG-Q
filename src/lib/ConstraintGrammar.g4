@@ -16,7 +16,7 @@ grammar ConstraintGrammar;
 
 constraint : '[' (symbolDef (',' symbolDef)* )? ']' expr ;
 
-symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ', R:[' NUMBER ',' NUMBER']';
+symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ', R:[' NUMBER ',' NUMBER'], D:[' NUMBER ',' NUMBER ',' NUMBER']';
 
 expr : leafExpr
      | '(' unaryExpr ')'

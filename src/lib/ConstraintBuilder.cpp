@@ -20,7 +20,7 @@ ConstraintBuilder::build(ConstraintGrammarParser::ConstraintContext *ctx) {
   }
 
   // Visit the expression
-  visit(ctx->expr());	
+  visit(ctx->expr()); 
   theConstraint->setExpr(visitedExpr);
 
   return theConstraint;
@@ -40,7 +40,13 @@ Any ConstraintBuilder::visitSymbolDef(  //changed by SBH
   std::string min_range = numbers[1]->getText();
   std::string max_range = numbers[2]->getText();
 
-  theConstraint->defineSymbol(name, type, val, min_range, max_range);  //, min, mix);
+//Added by Rishab to support Different Distributions
+
+  std::string distribution = numbers[3]->getText();
+  std::string param1 = numbers[4]->getText();
+  std::string param2 = numbers[5]->getText();
+
+  theConstraint->defineSymbol(name, type, val, min_range, max_range, distribution, param1, param2);  //, min, mix);
   return "";
 }
 

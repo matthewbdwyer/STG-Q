@@ -517,12 +517,15 @@ void BinaryExpr::accept(ConstraintVisitor* visitor) {
  * Constraint symbol definition and sub-expression create routines
  */
 
-void Constraints::defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max) {  // changed  by SBH
+void Constraints::defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max, std::string distribution, std::string param1, std::string param2) {  // changed  by SBH;    Appended by Rishab to support distributions
   symbols.insert(n);
   symbolTypes.insert(std::pair<std::string, std::string>(n, t));
   symbolValues.insert(std::pair<std::string, std::string>(n, v));
   symbolRanges[n] = std::pair<std::string, std::string> (min, max); // Added by Rishab
 
+  // Added by Rishab to support distributions
+  distributions[n] = distribution;
+  params[n] = std::pair<std::string, std::string> (param1, param2);
 }
 
 /*

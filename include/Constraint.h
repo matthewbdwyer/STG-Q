@@ -46,16 +46,16 @@ public:
     Trunc, ZExt, SExt, UItoFP, SItoFP,                // casts from ints
     FPTrunc, FPExt, FPtoUI, FPtoSI,                  // casts from floats
     BitCast,
-    LNot,					     // logical not
-    FNeg,					     // float negation
+    LNot,              // logical not
+    FNeg,              // float negation
     // Binary operators
-    Add, Sub, Mul, UDiv, SDiv, URem, SRem,	     // int arithmetic
-    And, Or, Xor, Shl, LShr, AShr,	             // bitwise
+    Add, Sub, Mul, UDiv, SDiv, URem, SRem,       // int arithmetic
+    And, Or, Xor, Shl, LShr, AShr,               // bitwise
     Eq, Ne, Ult, Ule, Ugt, Uge, Slt, Sle, Sgt, Sge,  // comparison
-    FAdd, FSub, FMul, FDiv, FRem,   		     // float arithmetic
-    FOEq, FONe, FOlt, FOle, FOgt, FOge, FOrd, 	     // float comparison
-    FUEq, FUNe, FUlt, FUle, FUgt, FUge, FUno, 	     // float comparison
-    LAnd, LOr, 					     // logical
+    FAdd, FSub, FMul, FDiv, FRem,            // float arithmetic
+    FOEq, FONe, FOlt, FOle, FOgt, FOge, FOrd,        // float comparison
+    FUEq, FUNe, FUlt, FUle, FUgt, FUge, FUno,        // float comparison
+    LAnd, LOr,               // logical
 
     //added by SBH  for unary llvm intrinsics (Reordered by Rishab)
    
@@ -189,6 +189,11 @@ class Constraints {
   std::map<std::string, std::string> symbolValues;
 
   std::map<std::string, std::pair<std::string, std::string> > symbolRanges; // Added by Rishab
+
+  // Added by Rishab to support distributions
+  std::map<std::string, std::string> distributions;
+  std::map<std::string, std::pair<std::string, std::string> > params;
+
   std::shared_ptr<Expr> expr = nullptr;
 
   // Recording of interned sub-expressions to reduce redundancy
@@ -197,17 +202,17 @@ class Constraints {
 public:
   std::set<std::string> symbols;
 
-
-  void defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max);  // added by SBH
-
-
-
+  void defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max, std::string distribution, std::string param1, std::string param2); // changed by Rishab
 
   bool isDefined(std::string n);
   std::string symbolType(std::string n) { return symbolTypes.find(n)->second; }
   std::string symbolValue(std::string n) { return symbolValues.find(n)->second; }
 
   std::string symbolRange(std::string n) { return (symbolRanges[n].first + " " + symbolRanges[n].second); } // Added by Rishab
+
+  //Added by Rishab to support distributions
+  std::string get_distribution(std::string n) { return distributions[n];}
+  std::pair<std::string, std::string> get_params(std::string n) {return params[n];}
 
   void setExpr(std::shared_ptr<Expr> e) { expr = e; }
   std::shared_ptr<Expr> getExpr() { return expr; }

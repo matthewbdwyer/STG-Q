@@ -4,18 +4,18 @@
 using namespace Constraint;
 
 std::map<std::string, std::string> dictionary;
-std::map<std::string, int> seen;							// For checking if the id occurs in constraint or not
+std::map<std::string, int> seen;              // For checking if the id occurs in constraint or not
 int id = 1;
 std::map<std::string, std::string> mapping = {
 
 {"fneg", "MUL("},
 {"fptosi", "ASINT("},
 
-{"trunc", ""},				// Previously it was ASINT(
-{"zext", ""},				// ""
-{"sext", ""},				// ""
-{"fptrunc", ""},			// Previously it was ASDOUBLE(
-{"fpext", ""},				// ""
+{"trunc", ""},        // Previously it was ASINT(
+{"zext", ""},       // ""
+{"sext", ""},       // ""
+{"fptrunc", ""},      // Previously it was ASDOUBLE(
+{"fpext", ""},        // ""
 
 {"sitofp", "ASDOUBLE("},
 {"add", "ADD("},
@@ -81,6 +81,11 @@ std::map<std::string, std::string> mapping = {
 {"llvm.sqrt.f80", "SQRT_("},
 {"llvm.sqrt.f128", "SQRT_("},
 
+{"llvm.exp2.f32", "POW_(DCONST(2.0),"},
+{"llvm.exp2.f64", "POW_(DCONST(2.0),"},
+{"llvm.exp2.f80", "POW_(DCONST(2.0),"},
+{"llvm.exp2.f128", "POW_(DCONST(2.0),"},
+
 //Intrinsics BINARY
 
 {"llvm.pow.f32", "POW_("},
@@ -123,21 +128,51 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
     low = ranges.substr(0, ind);
     high = ranges.substr(ind+1);
 
+    //Added to support distributions
+    int distribution = std::stoi(c->get_distribution(n));
+    std::pair<std::string, std::string> params = c->get_params(n);
+
+    // Initially getting the distribution and making the qcoral dictionary
+
+    if((distribution == 1 || distribution == 0) && c->symbolType(n)[0] == 'i')
+        os << id << " UNIFORM_INT "<<low<<" "<<high;
+
+    else if(distribution == 1 || distribution == 0)
+        os << id << " UNIFORM_REAL "<<low<<" "<<high;
+        
+    else if(distribution == 2)
+      os<< id << " EXPONENTIAL "<<low<<" "<<high<<" "<< params.first;
+
+    else if(distribution == 3)
+      os<< id << " BINOMIAL "<<low<<" "<<high<<" "<< params.first << " "<< params.second;
+
+    else if(distribution == 4)
+      os<< id << " POISSON "<<low<<" "<<high<<" "<< params.first;
+
+    else if(distribution == 5)
+      os<< id << " GEOMETRIC "<<low<<" "<<high<<" "<< params.first;
+
+    else if(distribution == 6)
+      os<< id << " NORMAL "<<low<<" "<<high<<" "<< params.first << " "<< params.second;
+
+    else{
+      std::cerr<<"Invalid distribution!!";
+      exit(0);
+    }
+
+    // Now saving variables in a dictionary for lookup
+
     if(c->symbolType(n)[0] == 'i'){
       if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
-        // low = std::to_string(std::stoll(low)-1);
-        os << id << " UNIFORM_INT "<<low<<" "<<high;
+        dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
       }
       else{
         os << "Invalid Integer type. Exiting!!\n";
-        return;
+        exit(0);
       }
-      dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
     }
 
     else if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
-      // low = std::to_string(std::stold(low)-1);
-      os << id << " UNIFORM_REAL "<<low<<" "<<high;
       dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
     }
 
@@ -151,6 +186,7 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
     seen[dictionary[n]] = 0;
     id++;
   }
+
   indentLevel--;
   os << "\n";
 
@@ -159,13 +195,13 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
   os << visitResults.back();
   visitResults.pop_back();
   for(auto it: seen){
-  	if(it.second == 0){
-  		if(it.first[0] == 'D')
-  			os<<";DEQ("<<it.first<<","<<it.first<<")";
-  		else
-  			os<<";IEQ("<<it.first<<","<<it.first<<")";
-  	}
-  		
+    if(it.second == 0){
+      if(it.first[0] == 'D')
+        os<<";DEQ("<<it.first<<","<<it.first<<")";
+      else
+        os<<";IEQ("<<it.first<<","<<it.first<<")";
+    }
+      
   }
   os << "\n";
 
@@ -174,9 +210,9 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
 
 void QCoralPrinter::endVisit(Symbol * element) {
   if(dictionary.find(element->getName()) != dictionary.end()){
-  	std::string name = dictionary[element->getName()];
-  	//int id_no = stoi(name.substr(8, name.length()-9));
-  	seen[name] = 1;
+    std::string name = dictionary[element->getName()];
+    //int id_no = stoi(name.substr(8, name.length()-9));
+    seen[name] = 1;
     visitResults.push_back(name);
   }
   else
@@ -187,14 +223,14 @@ void QCoralPrinter::endVisit(IntConstant * element) {
   
   std::string result;
 
-  if(element->getType()->getWidth() == 1 && element->getValue() == 1)						// BCONST(true)
-  	result = "IEQ(ICONST(1), ICONST(1))";
+  if(element->getType()->getWidth() == 1 && element->getValue() == 1)           // BCONST(true)
+    result = "IEQ(ICONST(1), ICONST(1))";
 
-  else if(element->getType()->getWidth() == 1 && element->getValue() == 0)					// BCONST(false)
-  	result = "IEQ(ICONST(1), ICONST(0))";
+  else if(element->getType()->getWidth() == 1 && element->getValue() == 0)          // BCONST(false)
+    result = "IEQ(ICONST(1), ICONST(0))";
 
   else
-  	result = "ICONST(" + std::to_string(element->getValue()) + ")"; 
+    result = "ICONST(" + std::to_string(element->getValue()) + ")"; 
 
   visitResults.push_back(result);
 }
@@ -235,21 +271,21 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
   
   if(result == ""){
 
-  	if(op == "trunc" && theConstraint->type2str(element->getType()) == "i1"){
-  		//os<<"\nResult1 --> "<<result1<<"\n";
-  		if(result1 == "ICONST(0)" || result1 == "IEQ(ICONST(1), ICONST(0))")
-  			result = "IEQ(ICONST(1), ICONST(0))";
-  		else
-  			result = "IEQ(ICONST(1), ICONST(1))";
-  	}
-  	else
-  	result = result1;
+    if(op == "trunc" && theConstraint->type2str(element->getType()) == "i1"){
+      //os<<"\nResult1 --> "<<result1<<"\n";
+      if(result1 == "ICONST(0)" || result1 == "IEQ(ICONST(1), ICONST(0))")
+        result = "IEQ(ICONST(1), ICONST(0))";
+      else
+        result = "IEQ(ICONST(1), ICONST(1))";
+    }
+    else
+    result = result1;
   }
   else
-  	result += result1 + ")";
+    result += result1 + ")";
 
   visitResults.push_back(result);
-}   		
+}       
 
 bool QCoralPrinter::visit(BinaryExpr * element) {
   indentLevel++;
@@ -257,6 +293,7 @@ bool QCoralPrinter::visit(BinaryExpr * element) {
 }
 
 void QCoralPrinter::endVisit(BinaryExpr * element) {
+
   std::string result2 = visitResults.back();
   visitResults.pop_back();
   std::string result1 = visitResults.back();
@@ -277,7 +314,7 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
   else
     result += result1 + "," + result2 + ")";
   visitResults.push_back(result);
-}   									
+}                     
 
 std::string QCoralPrinter::indent() const {
   return std::string(indentLevel*indentSize, ' ');
