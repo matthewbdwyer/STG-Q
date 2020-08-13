@@ -28,6 +28,8 @@ private:
   bool verbose = false;
 
   void createBooleanConstant(bool b);
+  void foldBinaryOneConstant(Expr::Op op, bool const0,
+                             std::shared_ptr<Expr> child0, std::shared_ptr<Expr> child1);
 
   ConstraintPrinter cp;
   Constraint::Constraints* constraint;
