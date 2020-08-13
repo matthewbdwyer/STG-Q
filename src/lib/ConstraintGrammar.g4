@@ -28,13 +28,16 @@ constraint : '[' (symbolDef (',' symbolDef)* )? ']' expr ;
  *      be written to allow for arbitrary whitespace.
  * Here is an alternative version that resolves these issues.
  */
-symbolDef : IDENTIFIER ':' TYPE '=' NUMBER (',' rangeSpec)? (',' distSpec)? ;
+symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ',' rangeSpec (',' distSpec)? ;
 
 rangeSpec : 'range' ':' '[' NUMBER ',' NUMBER ']' ;
 
-distSpec : 'uniform' '(' NUMBER ',' NUMBER ')' 
-         | 'normal' '(' NUMBER ',' NUMBER ')' 
-         | // add more of these here
+distSpec : 'uniform' 
+	 | 'exponential' '(' NUMBER ')' 
+	 | 'binomial' '(' NUMBER ',' NUMBER ')'
+	 | 'poisson' '(' NUMBER ',' NUMBER ')'
+	 | 'geometric' '(' NUMBER ')'
+	 | 'normal' '(' NUMBER ',' NUMBER ')'
 ;
 
 /*

@@ -16,12 +16,20 @@ void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
     std::string low = ranges.substr(0, ind);
     std::string high = ranges.substr(ind+1);
 
-    os << ", R:[" << low <<","<< high<<"]";  // Changed by Rishab
+    os << ", range : [" << low <<","<< high<<"]";  // Changed by Rishab
 
     // Added by Rishab for multiple distributions
-    int distribution = std::stoi(c->get_distribution(n));
+    std::string distribution = c->get_distribution(n);
     std::pair<std::string, std::string> params = c->get_params(n);
-    os << ", D:[" << distribution <<","<< params.first << "," << params.second <<"]";
+
+    if(distribution == "uniform")
+      os << ", uniform";
+
+    else if(distribution == "exponential" || distribution == "geometric")
+      os << ", " << distribution <<"("<< params.first<<")";
+
+    else
+      os << ", " << distribution <<"("<< params.first << "," << params.second <<")";
 
     os << ((num>0) ? ",\n" : "\n");
   }

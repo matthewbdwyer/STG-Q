@@ -129,30 +129,30 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
     high = ranges.substr(ind+1);
 
     //Added to support distributions
-    int distribution = std::stoi(c->get_distribution(n));
+    std::string distribution = c->get_distribution(n);
     std::pair<std::string, std::string> params = c->get_params(n);
 
     // Initially getting the distribution and making the qcoral dictionary
 
-    if((distribution == 1 || distribution == 0) && c->symbolType(n)[0] == 'i')
+    if(distribution == "uniform" && c->symbolType(n)[0] == 'i')
         os << id << " UNIFORM_INT "<<low<<" "<<high;
 
-    else if(distribution == 1 || distribution == 0)
+    else if(distribution == "uniform")
         os << id << " UNIFORM_REAL "<<low<<" "<<high;
         
-    else if(distribution == 2)
+    else if(distribution == "exponential")
       os<< id << " EXPONENTIAL "<<low<<" "<<high<<" "<< params.first;
 
-    else if(distribution == 3)
+    else if(distribution == "binomial")
       os<< id << " BINOMIAL "<<low<<" "<<high<<" "<< params.first << " "<< params.second;
 
-    else if(distribution == 4)
+    else if(distribution == "poisson")
       os<< id << " POISSON "<<low<<" "<<high<<" "<< params.first;
 
-    else if(distribution == 5)
+    else if(distribution == "geometric")
       os<< id << " GEOMETRIC "<<low<<" "<<high<<" "<< params.first;
 
-    else if(distribution == 6)
+    else if(distribution == "normal")
       os<< id << " NORMAL "<<low<<" "<<high<<" "<< params.first << " "<< params.second;
 
     else{
@@ -262,7 +262,8 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
   if(mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    result += "\nUnary key not found... Exiting!!\n";
+    std::cerr << "\nUnary key not found..." << op <<"\n";
+    // result += "\nUnary key not found... Exiting!!\n";
     return;
   }
 
@@ -305,7 +306,8 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
   if( mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    result += "\nBinary key not found... Exiting!!\n";
+    std::cerr << "\n Binary key not found..." << op <<"\n";
+    // result += "\nBinary key not found... Exiting!!\n";
     return;
   }
 
