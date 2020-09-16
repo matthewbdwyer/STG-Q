@@ -22,7 +22,7 @@ std::map<std::string, std::string> mapping = {
 {"sub", "SUB("},
 {"mul", "MUL("},
 {"sdiv", "DIV("},
-{"srem", "MOD("},
+{"srem", "ASINT(MOD("},
 {"fadd", "ADD("},
 {"fsub", "SUB("},
 {"fmul", "MUL("},
@@ -37,6 +37,7 @@ std::map<std::string, std::string> mapping = {
 {"sge", "IGE("},
 {"oeq", "DEQ("},
 {"one", "DNE("},
+{"fune", "DNE("},      // Newly added
 {"olt", "DLT("},
 {"ole", "DLE("},
 {"ogt", "DGT("},
@@ -85,6 +86,23 @@ std::map<std::string, std::string> mapping = {
 {"llvm.exp2.f64", "POW_(DCONST(2.0),"},
 {"llvm.exp2.f80", "POW_(DCONST(2.0),"},
 {"llvm.exp2.f128", "POW_(DCONST(2.0),"},
+
+//New functions added for testing
+
+{"llvm.floor.f32", "ASDOUBLE("},
+{"llvm.floor.f64", "ASDOUBLE("},
+{"llvm.floor.f80", "ASDOUBLE("},
+{"llvm.floor.f128", "ASDOUBLE("},
+
+{"llvm.ceil.f32", "ASDOUBLE("},
+{"llvm.ceil.f64", "ASDOUBLE("},
+{"llvm.ceil.f80", "ASDOUBLE("},
+{"llvm.ceil.f128", "ASDOUBLE("},
+
+{"llvm.fabs.f32", "ADD("},
+{"llvm.fabs.f64", "ADD("},
+{"llvm.fabs.f80", "ADD("},
+{"llvm.fabs.f128", "ADD("},
 
 //Intrinsics BINARY
 
@@ -191,20 +209,24 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
   os << "\n";
 
   os << ":Constraints:\n";
-  c->getExpr()->accept(this); 
-  os << visitResults.back();
-  visitResults.pop_back();
+  
   for(auto it: seen){
     if(it.second == 0){
       if(it.first[0] == 'D')
-        os<<";DEQ("<<it.first<<","<<it.first<<")";
+        os<<"BAND(DEQ("<<it.first<<","<<it.first<<"), ";
       else
-        os<<";IEQ("<<it.first<<","<<it.first<<")";
-    }
-      
+        os<<"BAND(IEQ("<<it.first<<","<<it.first<<"), ";
+    }    
   }
-  os << "\n";
 
+  c->getExpr()->accept(this); 
+  os << visitResults.back();
+  visitResults.pop_back();
+
+  for(auto it: seen)
+    os<<")";
+
+  os << "\n";
   os.flush();
 }
 
@@ -263,14 +285,26 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
     result += mapping[op];
   else{
     std::cerr << "\nUnary key not found..." << op <<"\n";
-    // result += "\nUnary key not found... Exiting!!\n";
     return;
   }
 
   if(op == "fneg")
-    result += ", DCONST(-1)";
+    result += result1 + ", DCONST(-1))";
+
+  else if(op.find("llvm.ceil") != std::string::npos){
+  	// result = "BOR(BAND(DGT(" + result1 + ", DCONST(0)), DGT(ASDOUBLE(ASINT(ADD(" + result1 + ", DCONST(0.9999999999999)"
+  	result += "ASINT(ADD(" + result1 + ", MUL(ASDOUBLE(DGT(" + result1 + ", DCONST(0))), DCONST(0.9999999999999)))))";
+  }
+
+  else if(op.find("llvm.floor") != std::string::npos){
+  	result += "ASINT(SUB(" + result1 + ", MUL(ASDOUBLE(DLT(" + result1+ ", DCONST(0))), DCONST(0.9999999999999)))))";
+  }
+
+  else if(op.find("llvm.fabs") != std::string::npos){
+  	result += "MUL(" + result1 + ", MUL(ASDOUBLE(DLT(" + result1 + ", DCONST(0.0))) , DCONST(-1.0))), MUL(" + result1 + ", ASDOUBLE(DGT(" + result1 + ", DCONST(0.0)))))";
+  }
   
-  if(result == ""){
+  else if(result == ""){
 
     if(op == "trunc" && theConstraint->type2str(element->getType()) == "i1"){
       //os<<"\nResult1 --> "<<result1<<"\n";
@@ -279,9 +313,21 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
       else
         result = "IEQ(ICONST(1), ICONST(1))";
     }
+
+    else if(op == "zext" && theConstraint->type2str(element->getType()) == "i32"){
+      // std::cerr<<"FOund zext...\t"<<result1<<"\n";
+      if(result1 == "ICONST(0)" || result1 == "IEQ(ICONST(1), ICONST(0))")
+        result = "ICONST(0)";
+      else if(result1 == "ICONST(1)" || result1 == "IEQ(ICONST(1), ICONST(1))")
+        result = "ICONST(1)";
+      else
+        result = "ASINT(" + result1 + ")";
+    }
+
     else
     result = result1;
   }
+
   else
     result += result1 + ")";
 
@@ -311,8 +357,14 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
     return;
   }
 
-  if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext")
+  if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext"){
+    std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
     result += result2 + ")";
+  }
+
+  else if(op == "srem")
+  	result += "ASDOUBLE(" + result1 + "), " + "ASDOUBLE(" + result2 + ")))";
+
   else
     result += result1 + "," + result2 + ")";
   visitResults.push_back(result);
@@ -321,4 +373,3 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
 std::string QCoralPrinter::indent() const {
   return std::string(indentLevel*indentSize, ' ');
 }
-
