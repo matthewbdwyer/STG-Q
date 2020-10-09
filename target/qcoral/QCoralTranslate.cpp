@@ -17,10 +17,11 @@ int main(int argc, const char *argv[]) {
   auto constraint = Constraint::parse(stream);
 
   if (constraint) {
+
+    // cout << "STG parsesd successfully\n";
     QCoralPrinter qcp(std::cout, 2);
     qcp.print(constraint.value());
   } else {
     cout << "STG parse error\n";
   }
-
 }

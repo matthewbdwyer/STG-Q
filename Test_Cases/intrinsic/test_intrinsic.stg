@@ -1,0 +1,8 @@
+[
+S0 : double = 45.000000, R:[-180,180], D:[2,0.45,0],
+S1 : double = 30.000000, R:[-180,180], D:[3,10,0.3]
+]
+
+//Test: passed
+
+(lnot(ogt (fdiv (llvm.sin.f64 double S0) (llvm.cos.f64 double S0)) (double 0.500000)))

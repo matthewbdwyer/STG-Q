@@ -9,7 +9,7 @@ class ConstraintTypeChecker: public ConstraintVisitor {
 public:
   ConstraintTypeChecker() {}
 
-  bool check(std::shared_ptr<Constraint::Constraint> constraint, bool verbose);
+  bool check(std::shared_ptr<Constraint::Constraints> constraint, bool verbose);
 
   /* 
    * This visitor visits the entire expression, customizing the  

@@ -11,7 +11,7 @@ class ConstraintFolder: public ConstraintVisitor {
 public:
   ConstraintFolder() {}
 
-  void fold(std::shared_ptr<Constraint::Constraint> constraint, bool verbose);
+  void fold(std::shared_ptr<Constraint::Constraints> constraint, bool verbose);
 
   /* 
    * This visitor visits the entire expression, customizing the  
@@ -28,9 +28,11 @@ private:
   bool verbose = false;
 
   void createBooleanConstant(bool b);
+  void foldBinaryOneConstant(Expr::Op op, bool const0,
+                             std::shared_ptr<Expr> child0, std::shared_ptr<Expr> child1);
 
   ConstraintPrinter cp;
-  Constraint::Constraint* constraint;
+  Constraint::Constraints* constraint;
 
   // vector holds a new expression to be spliced in or std::nullopt
   std::vector<std::optional<std::shared_ptr<Expr>>> visitResults;

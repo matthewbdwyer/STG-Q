@@ -12,7 +12,7 @@ public:
   QCoralPrinter(std::ostream &os, int indentSize ) : 
       os(os), indentSize(indentSize) {}
 
-  void print(std::shared_ptr<Constraint::Constraint> constraint);
+  void print(std::shared_ptr<Constraint::Constraints> constraint);
 
   /* 
    * This visitor visits the entire expression, customizing the  
@@ -33,7 +33,7 @@ private:
   int indentSize = 2;
 
   std::ostream &os;
-  std::shared_ptr<Constraint::Constraint> theConstraint;
+  std::shared_ptr<Constraint::Constraints> theConstraint;
 
   /* 
    * Records the strings produced by visiting sub-expressions.

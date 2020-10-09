@@ -27,7 +27,7 @@ folder_path=$1
 # printf "Folder name: $folder \n"
 files=$folder_path/*
 
-cd ./build/src/tools
+cd ../../build/src/tools    																	#Changed this
 declare -i nof=0
 for file in $files
 do
@@ -40,7 +40,7 @@ done
 
 
 cd $OLDPWD
-cd ./build/target/qcoral
+cd ../../build/target/qcoral     																#Changed this
 files=/tmp/QCounter/stg/*
 
 nof=0

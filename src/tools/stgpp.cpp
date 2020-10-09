@@ -36,7 +36,7 @@ int main(int argc, const char *argv[]) {
   std::ifstream stream;
   stream.open(sourceFile);
 
-  if (auto maybeConstraint = Constraint::parse(stream); maybeConstraint) {
+  if (auto maybeConstraint = Constraint::parse(stream)) {
     auto constraint = maybeConstraint.value();
 
     if (!notc) {

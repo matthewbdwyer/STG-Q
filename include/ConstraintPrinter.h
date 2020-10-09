@@ -12,7 +12,7 @@ public:
   ConstraintPrinter(std::ostream &os, int indentSize ) : 
       os(os), indentSize(indentSize) {}
 
-  void print(std::shared_ptr<Constraint::Constraint> constraint);
+  void print(std::shared_ptr<Constraint::Constraints> constraint);
   std::string print(Constraint::Expr* e);
 
   /* 

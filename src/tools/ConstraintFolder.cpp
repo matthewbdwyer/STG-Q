@@ -9,7 +9,7 @@
 using namespace Constraint;
 using namespace std;
 
-void ConstraintFolder::fold(std::shared_ptr<Constraint::Constraint> c, bool v) {
+void ConstraintFolder::fold(std::shared_ptr<Constraint::Constraints> c, bool v) {
   // Enable verbose mode for folder
   verbose = v;
   constraint = c.get();
@@ -221,15 +221,17 @@ void ConstraintFolder::endVisit(BinaryExpr * element) {
   }
   visitResults.pop_back();
 
+  if (verbose) {
+    cerr << "Folder :\n"+cp.print(element)+"\n";
+  }
+
+  auto op = element->getOp();
   auto child0 = element->getChild(0);
   auto child1 = element->getChild(1);
+
   if (auto c0 = dynamic_pointer_cast<Constant>(child0)) {
     if (auto c1 = dynamic_pointer_cast<Constant>(child1)) {
-      auto op = element->getOp();
-
-      if (verbose) {
-        cerr << "Folder :\n"+cp.print(element)+"\n";
-      }
+      // Both operands are constants
 
       if ((Expr::Op::Add <= op && op <= Expr::Op::Sge) || (op == Expr::Op::LAnd) || (op == Expr::Op::LOr)) {
         // Integer operands
@@ -469,24 +471,185 @@ void ConstraintFolder::endVisit(BinaryExpr * element) {
         assert(false);
       }
 
+    } else {
+      // child0 is constant, child1 is not constant
+      foldBinaryOneConstant(op, true, child0, child1);
+    }
 
-      if (verbose) {
-        if (auto maybeReplacement = visitResults.back(); maybeReplacement) {
-           cerr << "replaced with\n"+cp.print(maybeReplacement.value().get())+"\n";
+  } else if (auto c1 = dynamic_pointer_cast<Constant>(child1)) {
+    // child0 is not constant, child 1 is constant
+    foldBinaryOneConstant(op, false, child0, child1);
+
+  } else {
+    // neither child is constant
+    visitResults.push_back(std::nullopt);
+  }
+
+  if (verbose) {
+    if (auto maybeReplacement = visitResults.back(); maybeReplacement) {
+      cerr << "replaced with\n"+cp.print(maybeReplacement.value().get())+"\n";
+    } else {
+      cerr << "retained\n";
+    }
+  }
+}
+
+void ConstraintFolder::foldBinaryOneConstant(Expr::Op op, bool const0, 
+                           std::shared_ptr<Expr> child0, std::shared_ptr<Expr> child1) {
+  auto cChild = const0 ? child0 : child1;
+  auto vChild = !const0 ? child0 : child1;
+
+  if ((Expr::Op::Add <= op && op <= Expr::Op::SRem) || 
+      (op == Expr::Op::LAnd) || (op == Expr::Op::LOr)) {
+    // Integer operands
+    auto iChild = dynamic_pointer_cast<IntConstant>(cChild);
+    auto iVal = iChild->getValue();
+
+    switch(op) {
+      case Expr::Op::Add:
+        if (iVal == 0) {
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
         } else {
-           cerr << "retained\n";
+          visitResults.push_back(std::nullopt);
         }
+        break;
+      case Expr::Op::Sub:
+        // non-symmetric operator
+        if (!const0 && iVal == 0) {
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+        } else {
+          visitResults.push_back(std::nullopt);
+        }
+        break;
+      case Expr::Op::Mul:
+        if (iVal == 0) {
+          iChild->setValue(0);
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(iChild));
+        } else if (iVal == 1) {
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+        } else {
+          visitResults.push_back(std::nullopt);
+        }
+        break;
+      case Expr::Op::SDiv:
+      case Expr::Op::SRem:
+        if (const0 && iVal == 0) {
+          iChild->setValue(0);
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(iChild));
+        } else {
+          visitResults.push_back(std::nullopt);
+        }
+        break;
+
+      case Expr::Op::LAnd:
+        if (iVal == 0) {
+          iChild->setValue(0);
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(iChild));
+        } else {
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+        }
+        break;
+
+      case Expr::Op::LOr:
+        if (iVal == 1) {
+          iChild->setValue(1);
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(iChild));
+        } else {
+          visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+        }
+        break;
+
+      default:
+        visitResults.push_back(std::nullopt);
+        break;
+     }
+  } else if (Expr::Op::FAdd <= op && op <= Expr::Op::FRem) {
+    // Float or double operators
+    if (auto fChild = dynamic_pointer_cast<FloatConstant>(cChild)) {
+      // Float constant operand
+      auto fVal = fChild->getValue();
+
+      switch(op) {
+        case Expr::Op::FAdd:
+          if (fVal == 0.0) {
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+          } else {
+            visitResults.push_back(std::nullopt);
+          }
+          break;
+        case Expr::Op::FSub:
+          if (!const0 && fVal == 0.0) {
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+          } else {
+            visitResults.push_back(std::nullopt);
+          }
+          break;
+        case Expr::Op::FMul:
+          if (fVal == 0.0) {
+            fChild->setValue(0.0);
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(fChild));
+          } else if (fVal == 1.0) {
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+          } else {
+            visitResults.push_back(std::nullopt);
+          }
+          break;
+        case Expr::Op::FDiv:
+        case Expr::Op::FRem:
+          if (const0 && fVal == 0.0) {
+            fChild->setValue(0.0);
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(fChild));
+          } else {
+            visitResults.push_back(std::nullopt);
+          }
+          break;
+      }
+
+    } else if (auto dChild = dynamic_pointer_cast<FloatConstant>(cChild)) {
+      // Float constant operand
+      auto dVal = dChild->getValue();
+
+      switch(op) {
+        case Expr::Op::FAdd:
+          if (dVal == 0.0) {
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+          } else {
+            visitResults.push_back(std::nullopt);
+          }
+          break;
+        case Expr::Op::FSub:
+          if (!const0 && dVal == 0.0) {
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+          } else {
+            visitResults.push_back(std::nullopt);
+          }
+          break;
+        case Expr::Op::FMul:
+          if (dVal == 0.0) {
+            dChild->setValue(0.0);
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(dChild));
+          } else if (dVal == 1.0) {
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(vChild));
+          } else {
+            visitResults.push_back(std::nullopt);
+          }
+          break;
+        case Expr::Op::FDiv:
+        case Expr::Op::FRem:
+          if (const0 && dVal == 0.0) {
+            dChild->setValue(0.0);
+            visitResults.push_back(std::optional<std::shared_ptr<Expr>>(dChild));
+          } else {
+            visitResults.push_back(std::nullopt);
+          }
+          break;
       }
 
     } else {
-      // child1 is not constant
       visitResults.push_back(std::nullopt);
     }
 
   } else {
-    // child0 is not constant
     visitResults.push_back(std::nullopt);
   }
-
-
 }

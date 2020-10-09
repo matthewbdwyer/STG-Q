@@ -1,3 +1,4 @@
+
 project(STG-Q)
 
 # minimum required CMAKE version

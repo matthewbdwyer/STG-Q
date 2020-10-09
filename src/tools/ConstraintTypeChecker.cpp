@@ -6,7 +6,7 @@
 using namespace Constraint;
 using namespace std;
 
-bool ConstraintTypeChecker::check(std::shared_ptr<Constraint::Constraint> c, bool v) {
+bool ConstraintTypeChecker::check(std::shared_ptr<Constraint::Constraints> c, bool v) {
   // Enable verbose mode for type checker
   verbose = v;
   
@@ -105,7 +105,26 @@ void ConstraintTypeChecker::endVisit(UnaryExpr * element) {
       result = false;
     }
     element->setType(result1);
-  } else {
+  }
+
+  else if(Expr::Op::Sinf32 <= op && op <= Expr::Op::Ceilppcf128){ //Added by Rishab for Unary Intrinsics
+    std::string operator_string = constraint->op2str(op);
+    int operator_width = stoi(operator_string.substr(operator_string.length()-2));
+
+    if(operator_width == 28)
+      operator_width = 128;
+
+    if (!(result1->getBase() == Type::Base::Float && 
+          result1->getWidth() == operator_width)) { 
+      cerr << "Type Error: Operator "+constraint->op2str(op);
+      cerr << " has operand of type "+constraint->type2str(result1);
+      cerr << "\n";
+      result = false;
+    }
+    element->setType(result1);
+  }
+
+  else {
     cerr << "Type Error: invalid UnaryExpr operator "+constraint->op2str(op)+"\n";
     assert(false);
   }
@@ -116,7 +135,7 @@ void ConstraintTypeChecker::endVisit(UnaryExpr * element) {
     cerr << "Type Checker : operator "+constraint->op2str(op);
     cerr << " of type "+constraint->type2str(element->getType())+"\n";
   }
-}   		
+}   	
 
 /*
  * If the type constraints are satisfied the type of the binary
@@ -189,7 +208,26 @@ void ConstraintTypeChecker::endVisit(BinaryExpr * element) {
       result = false;
     }
     element->setType(result1);
-  } else {
+  }
+  else if(Expr::Op::Powf32 <= op && op <= Expr::Op::Copysignppcf128){  //Added by Rishab for Binary Intrinsics
+    std::string operator_string = constraint->op2str(op);
+    int operator_width = stoi(operator_string.substr(operator_string.length()-2));
+
+    if(operator_width == 28)
+      operator_width = 128;
+
+    if (!(result1->getBase() == Type::Base::Float && 
+          result2->getBase() == Type::Base::Float &&
+          result1->getWidth() == operator_width && result2->getWidth() == operator_width)) { 
+      cerr << "Type Error: Operator "+constraint->op2str(op);
+      cerr << " has operands of type "+constraint->type2str(result1);
+      cerr << " and "+constraint->type2str(result2);
+      cerr << "\n";
+      result = false;
+    }
+    element->setType(result1);
+  }
+  else {
     cerr << "Type Error: invalid BinaryExpr operator "+constraint->op2str(op)+"\n";
     assert(false);
   }
