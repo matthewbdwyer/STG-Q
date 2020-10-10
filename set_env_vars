@@ -1,4 +1,8 @@
+#
+# Infer STGQ_HOME and set all other environment variables
+#
 export STGQ_HOME=$(dirname $(readlink -f "$0"))
+
 export STGQ_LIB=$STGQ_HOME/lib
 export STGQ_BIN=$STGQ_HOME/bin
 export QCORAL_HOME=$STGQ_HOME/qcoral
