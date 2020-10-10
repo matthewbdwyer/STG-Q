@@ -1,0 +1,2 @@
+export STGQ_HOME=$(dirname $(readlink -f "$0"))
+export STGQ_LIB=$STGQ_HOME/lib
