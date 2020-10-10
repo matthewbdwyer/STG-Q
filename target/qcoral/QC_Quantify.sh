@@ -1,5 +1,8 @@
 #!/bin/bash
-qcoral_path=${2:-/home/rishab/Downloads/qcoral-fse-replication/qcoral}
+#qcoral_path=${2:-/home/rishab/Downloads/qcoral-fse-replication/qcoral}
+qcoral_path=$QCORAL_HOME
+
+top_folder=$(realpath $1)
 printf "\nNOTE: Intermediate files will be stored in /tmp/QCounter\n";
 if [ ! -d /tmp/QCounter ]
 	then
@@ -13,17 +16,18 @@ if [ ! -d /tmp/QCounter ]
 		mkdir /tmp/QCounter/stg
 fi
 
+# FIXME: this should not be in the script
 g++ -o comb QC_Combine.cpp
 g++ -o res QC_Result.cpp
 
 declare -i no_out=0
-declare -i total=$(ls $1 -1 | wc -l)
+declare -i total=$(ls $folder_path -1 | wc -l)
 
 printf "Total folders to test: $total \n"
 
 printf "Testing folders: 0/${total} \n"
 
-for folder in $1/*
+for folder in $top_folder/*
 do
 	rm -rf /tmp/QCounter/qc/*
 	rm -rf /tmp/QCounter/stg/*
@@ -31,9 +35,10 @@ do
 	exp=""
 
 	folder_path=$folder
-	# printf "Folder name: $folder \n"
+	printf "Folder name: $folder \n"
 	files=$folder_path/*
 
+	# FIXME
 	cd ../../build/src/tools																		#Changed this
 	declare -i nof=0
 	for file in $files
@@ -61,6 +66,7 @@ do
 
 
 	cd $OLDPWD
+	# FIXME
 	cd ../../build/target/qcoral           															#Changed this
 	files=/tmp/QCounter/stg/*
 
@@ -99,5 +105,4 @@ printf "\n"
 
 printf "\n"
 # ./res > "/tmp/QCounter/Final_result.out"
-
 # tail -1 /tmp/QCounter/Final_result.out

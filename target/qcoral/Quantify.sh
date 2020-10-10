@@ -1,5 +1,10 @@
 #!/bin/bash
-qcoral_path=${2:-/home/rishab/Downloads/qcoral-fse-replication/qcoral}
+
+if [ -z "$QCORAL_HOME" ]; then
+	echo "Environment variable QCORAL_HOME is undefined"
+	exit 1
+fi
+
 printf "\nNOTE: Intermediate files will be stored in /tmp/QCounter\n";
 if [ ! -d /tmp/QCounter ]
 	then
@@ -13,9 +18,6 @@ if [ ! -d /tmp/QCounter ]
 		mkdir /tmp/QCounter/stg
 fi
 
-g++ -o comb QC_Combine.cpp
-g++ -o res QC_Result.cpp
-
 declare -i no_out=0
 declare -i total=$(ls $1 -1 | wc -l)
 
@@ -23,31 +25,25 @@ rm -rf /tmp/QCounter/qc/*
 rm -rf /tmp/QCounter/stg/*
 no_out+=1
 
-folder_path=$1
-# printf "Folder name: $folder \n"
+folder_path=$(realpath $1)
 files=$folder_path/*
 
-cd ../../build/src/tools    																	#Changed this
 declare -i nof=0
 for file in $files
 do
   if [[ "$file" == *".stg" ]]; then
 	nof+=1
-	./stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
+	stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
   fi
-
 done
 
-
-cd $OLDPWD
-cd ../../build/target/qcoral     																#Changed this
 files=/tmp/QCounter/stg/*
 
 nof=0
 for file in $files
 do
 	nof+=1
-	./stg2qc "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/qc/${nof}.qcoral"
+	stg2qc "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/qc/${nof}.qcoral"
 done
 
 
@@ -59,16 +55,16 @@ do
 	arr+=' '
 done
 
-cd $OLDPWD
-./comb $arr
-pw=$pwd
-cd $qcoral_path
+comb $arr
+pushd $QCORAL_HOME >/dev/null
+#
+# to run qcoral you need to be in the proper directory
+#
 ./run_qcoral.sh --mcIterativeImprovement --mcProportionalBoxSampleAllocation --mcSeed 123456 --mcMaxSamples 5000000 --mcInitialPartitionBudget 50000 --mcTargetVariance 1E-20 --mcSamplesPerIncrement 10000 "/tmp/QCounter/comb.qcoral" > "/tmp/QCounter/out/Result_${no_out}.out"
 
 tail -1 "/tmp/QCounter/out/Result_${no_out}.out"
 printf "\n"
-cd $OLDPWD
-
+popd >/dev/null
 
 # files=/tmp/QCounter/out/*
 
@@ -78,7 +74,7 @@ cd $OLDPWD
 # 	printf "\n"
 # done
 
-printf "\n"
+#printf "\n"
 # ./res > "/tmp/QCounter/Final_result.out"
 
 # tail -1 /tmp/QCounter/Final_result.out
