@@ -3,7 +3,9 @@
 #
 
 if [ -z "$STGQ_HOME" ]; then
-	STGQ_HOME=$(dirname $(readlink -f "$0"))
+	echo "Environment variable STGQ_HOME is undefined"
+	echo "Did you forget to source set_env_vars?"
+	exit 1
 fi
 
 if [ -z "$STGQ_LIB" ]; then
