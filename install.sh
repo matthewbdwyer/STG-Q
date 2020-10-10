@@ -8,21 +8,19 @@ if [ -z "$STGQ_HOME" ]; then
 	exit 1
 fi
 
-if [ -z "$STGQ_LIB" ]; then
-	STGQ_LIB="$STGQ_LIB"/lib
+if [ ! -d "$STGQ_LIB" ]; then
+	STGQ_LIB="$STGQ_HOME"/lib
 	if [ ! -d "STGQ_LIB" ]; then
 		mkdir "$STGQ_LIB"
 	fi
 
 fi
 
-if [ -z "$STGQ_BIN" ]; then
-	STGQ_BIN=$STGQ_LIB/bin
-	if [ ! -d "STGQ_BIN" ]; then
-		mkdir "$STGQ_BIN"
-	fi
-fi
 
-
+# install other package
 cd $STGQ_HOME
 ./get-packages.sh
+
+# download antlr4
+cd $STGQ_LIB
+wget https://www.antlr.org/download/antlr-4.8-complete.jar
