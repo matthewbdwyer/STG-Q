@@ -31,6 +31,7 @@ To build the libraries and executable:
   2. `cd build`
   3. `cmake ..`
   4. `make`
+  5. `make install`
 
 NB: You may see warnings related to ignored type attribute ATN that are due to some
 type gymnastics in the current implementation of the ANTLR4 CPP Visitor implementation.
