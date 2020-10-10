@@ -11,7 +11,7 @@ OTHER_PKGS="uuid-dev libz-dev"
 JAVA_PKGS="antlr4"
 REALPAVER_PKGS="flex bison"
 
-for p in $LLVM_PKGS $OTHER_PKGS $JAVA_PKGS $REALPAVE_PKGS
+for p in $LLVM_PKGS $OTHER_PKGS $JAVA_PKGS $REALPAVER_PKGS
 do
-	sudo apt-get install $p
+	sudo apt-get install -y $p
 done
