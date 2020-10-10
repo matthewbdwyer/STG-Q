@@ -22,5 +22,8 @@ cd $STGQ_HOME
 ./get-packages.sh
 
 # download antlr4
-cd $STGQ_LIB
-wget https://www.antlr.org/download/antlr-4.8-complete.jar
+if [ ! -f "$STGQ_LIB/antlr-4.8-complete.jar" ]; then
+	cd $STGQ_LIB
+	wget https://www.antlr.org/download/antlr-4.8-complete.jar
+	cd -
+fi
