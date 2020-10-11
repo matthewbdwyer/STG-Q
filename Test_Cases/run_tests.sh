@@ -19,21 +19,21 @@ do
 
 	mean=$(Quantify.sh $test_directory 2>/dev/null | grep mean | cut -d',' -f2 | cut -d'=' -f2)
 	mean=$(printf "%.12f" $mean)
-	exp=$(cut -d' ' -f1 $test_directory/expected.txt)
-	exp=$(printf "%.12f" $exp)
+	expected=$(cut -d' ' -f1 $test_directory/expected.txt)
+	expected=$(printf "%.12f" $expected)
 
 	#
 	# check the mean value is within <tolerance> percentage of expected value
 	#
 	tolerance=0.01
-	within_tolerance=$(echo "sqrt(($mean - $exp) * ($mean - $exp)) / $exp < $tolerance" | bc)
+	within_tolerance=$(echo "sqrt(($mean - $expected) * ($mean - $expected)) / $expected < $tolerance" | bc)
 	if [ $within_tolerance -eq 1 ]; then
 		result="PASS"
 	else
 		result="FAIL"
 		exit_code=1
 	fi
-	printf "TEST %-30s: $result (computed: %.6f expected: %.6f)\n" $test_directory $mean $exp
+	printf "TEST %-30s: $result (computed: %.6f expected: %.6f)\n" $test_directory $mean $expected
 done
 
 exit $exit_code
