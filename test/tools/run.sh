@@ -55,9 +55,6 @@ else
   echo -n "fail : "
   echo -n ${numfailures}/${numtests}
   echo " tests failed"
+  exit 1
 fi
-  
-
-
-
 
