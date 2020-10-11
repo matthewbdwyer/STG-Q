@@ -52,10 +52,7 @@ do
   fi
 done
 
-if [ ${numfailures} -eq "0" ]; 
-then
-  echo "TEST [All Tests]: PASS"
-else
+if [ ! ${numfailures} -eq "0" ]; then
   echo -n "fail : "
   echo -n ${numfailures}/${numtests}
   echo " tests failed"
