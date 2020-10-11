@@ -30,7 +30,7 @@ fi
 
 # download realpaver
 echo "========================"
-echo "Intalling realpaver     "
+echo "Installing realpaver     "
 echo "========================"
 REALPAVER="$STGQ_HOME/realpaver-0.4/bin/realpaver"
 if [ ! -x "$REALPAVER" ]; then
@@ -43,7 +43,7 @@ fi
 
 # download qcoral
 echo "========================"
-echo "Intalling qcoral        "
+echo "Installing qcoral        "
 echo "========================"
 cd $STGQ_HOME
 if [ ! -d qcoral ]; then
