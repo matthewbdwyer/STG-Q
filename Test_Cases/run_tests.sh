@@ -2,6 +2,12 @@
 
 cd $(dirname $(readlink -f "$0"))
 
+#
+# set the tolerance (%) by which the computed STG score in a test
+# can deviate from the expected score
+#
+tolerance=0.01
+
 exit_code=0
 for test_directory in `ls`
 do
@@ -25,7 +31,6 @@ do
 	#
 	# check the mean value is within <tolerance> percentage of expected value
 	#
-	tolerance=0.01
 	within_tolerance=$(echo "sqrt(($mean - $expected) * ($mean - $expected)) / $expected < $tolerance" | bc)
 	if [ $within_tolerance -eq 1 ]; then
 		result="PASS"
