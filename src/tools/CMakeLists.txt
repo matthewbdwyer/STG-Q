@@ -12,3 +12,4 @@ llvm_map_components_to_libnames(llvm_libs Support)
 
 target_link_libraries(stgpp stg ${llvm_libs})
 
+install (TARGETS stgpp DESTINATION $ENV{STGQ_BIN})
