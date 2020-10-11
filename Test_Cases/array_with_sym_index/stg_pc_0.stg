@@ -1,6 +1,6 @@
 [
-A : i32 = 1,
-B : i32 = 1
+A : i32 = 1, range:[-100000,100000],uniform,
+B : i32 = 1, range:[-100000,100000],uniform
 ]
 
 //Test: failed

@@ -1,7 +1,7 @@
 [
-X : i32 = 5,
-Y : i32 = 38,
-Z : i32 = 58
+X : i32 = 5, range:[-100000,100000],uniform,
+Y : i32 = 38, range:[-100000,100000],uniform,
+Z : i32 = 58, range:[-100000,100000],uniform
 ]
 
 //Test: failed
