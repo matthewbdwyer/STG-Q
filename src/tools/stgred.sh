@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STGDIFF=${STGINSTALL}/stgdiff.sh
+STGDIFF=${STGQ_BIN}/stgdiff.sh
 
 shopt -s nullglob
 files=($1/*.stg)

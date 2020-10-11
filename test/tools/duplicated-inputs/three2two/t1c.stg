@@ -1,1 +1,1 @@
-[ S0:i32 = 7 ] (sgt S0 (i32 10))
+[ S0:i32 = 7, range:[0,1000], uniform ] (sgt S0 (i32 10))

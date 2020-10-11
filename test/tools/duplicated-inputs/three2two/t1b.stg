@@ -1,6 +1,6 @@
 // Dictionary
 [ 
-  S0:i32 = 4 
+  S0:i32 = 4, range:[0,1000], uniform
 ]
 
 // Expr
