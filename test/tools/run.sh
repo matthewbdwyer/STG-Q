@@ -31,26 +31,26 @@ do
 done
 
 # STG duplication tests
-#for i in duplicated-inputs/*/
-#do
-#  base="$(basename -- $i)"
-#  ((numtests++))
-#
-#  echo "base = $base"
-#
-#  inputsOut="$(${STGRED} $i)" 
-#  echo "inputsOut = $inputsOut"
-#  if [ "$inputsOut" != $(< duplicated-inputs/$base.out) ];
-#  then
-#    echo -n "Expected " 
-#    echo -n duplicated-inputs/$base.out
-#    echo -n " for "
-#    echo -n $i
-#    echo -n ", but found "
-#    echo  "$inputsOut"
-#    ((numfailures++))
-#  fi
-#done
+for i in duplicated-inputs/*/
+do
+  base="$(basename -- $i)"
+  ((numtests++))
+
+  inputsOut="$(${STGRED} $i)" 
+  if [ "$inputsOut" != $(< duplicated-inputs/$base.out) ];
+  then
+    echo -n "TEST dedup[$base]: FAIL"
+    echo -n "Expected " 
+    echo -n duplicated-inputs/$base.out
+    echo -n " for "
+    echo -n $i
+    echo -n ", but found "
+    echo  "$inputsOut"
+    ((numfailures++))
+  else
+    echo "TEST dedup[$base]: PASS"
+  fi
+done
 
 if [ ${numfailures} -eq "0" ]; 
 then
