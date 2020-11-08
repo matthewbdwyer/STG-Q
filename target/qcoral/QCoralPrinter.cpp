@@ -42,13 +42,14 @@ std::map<std::string, std::string> mapping = {
 {"ole", "DLE("},
 {"ogt", "DGT("},
 {"oge", "DGE("},
-
-// {"ult", "ILT("},
-// {"fult", "DLT("},
-
+{"ult", ""},
+{"ugt", ""},
+{"fult", ""},
+{"fugt", ""},
 {"land", "BAND("},
 {"lor", "BOR("},
 {"lnot", "BNOT("},
+{"xor", "BXOR("},
 
 //Intrinsics UNARY
 
@@ -61,6 +62,10 @@ std::map<std::string, std::string> mapping = {
 {"llvm.cos.f64", "COS_("},
 {"llvm.cos.f80", "COS_("},
 {"llvm.cos.f128", "COS_("},
+
+{"tan", "TAN_("},
+
+{"atan2", "ATAN2_("},
 
 {"llvm.exp.f32", "EXP_("},
 {"llvm.exp.f64", "EXP_("},
@@ -314,7 +319,7 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
         result = "IEQ(ICONST(1), ICONST(1))";
     }
 
-    else if(op == "zext" && theConstraint->type2str(element->getType()) == "i32"){
+    else if(op == "zext" && theConstraint->type2str(element->getType())[0] == 'i'){
       // std::cerr<<"FOund zext...\t"<<result1<<"\n";
       if(result1 == "ICONST(0)" || result1 == "IEQ(ICONST(1), ICONST(0))")
         result = "ICONST(0)";
@@ -362,6 +367,30 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
     result += result2 + ")";
   }
 
+  else if(op == "ult")
+    result += "BOR(BAND(IGT("+result1+", ICONST(0)), BAND(IGT("+result2+", ICONST(0)), ILT("+result1+", "+result2+"))),\
+      BOR(BAND(ILT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), ILT("+result1+", "+result2+"))),\
+        BOR(BAND(IGT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), ILT("+result1+", MUL("+result2+", ICONST(-1))))),\
+        BAND(ILT("+result1+", ICONST(0)), BAND(IGT("+result2+", ICONST(0)), ILT(MUL("+result1+", ICONST(-1)), "+result2+"))))))";
+
+  else if(op == "fult")
+      result += "BOR(BAND(DGT("+result1+", DCONST(0)), BAND(DGT("+result2+", DCONST(0)), DLT("+result1+", "+result2+"))),\
+      BOR(BAND(DLT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DLT("+result1+", "+result2+"))),\
+        BOR(BAND(DGT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DLT("+result1+", MUL("+result2+", DCONST(-1))))),\
+        BAND(DLT("+result1+", DCONST(0)), BAND(DGT("+result2+", DCONST(0)), DLT(MUL("+result1+", DCONST(-1)), "+result2+"))))))";
+
+  else if(op == "ugt")
+    result += "BOR(BAND(IGT("+result1+", ICONST(0)), BAND(IGT("+result2+", ICONST(0)), IGT("+result1+", "+result2+"))),\
+      BOR(BAND(ILT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), IGT("+result1+", "+result2+"))),\
+        BOR(BAND(IGT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), IGT("+result1+", MUL("+result2+", ICONST(-1))))),\
+        BAND(ILT("+result1+", ICONST(0)), BAND(IGT("+result2+", ICONST(0)), IGT(MUL("+result1+", ICONST(-1)), "+result2+"))))))";
+  
+  else if(op == "fugt")
+      result += "BOR(BAND(DGT("+result1+", DCONST(0)), BAND(DGT("+result2+", DCONST(0)), DGT("+result1+", "+result2+"))),\
+      BOR(BAND(DLT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DGT("+result1+", "+result2+"))),\
+        BOR(BAND(DGT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DGT("+result1+", MUL("+result2+", DCONST(-1))))),\
+        BAND(DLT("+result1+", DCONST(0)), BAND(DGT("+result2+", DCONST(0)), DGT(MUL("+result1+", DCONST(-1)), "+result2+"))))))"; 
+
   else if(op == "srem")
   	result += "ASDOUBLE(" + result1 + "), " + "ASDOUBLE(" + result2 + ")))";
 
@@ -373,3 +402,4 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
 std::string QCoralPrinter::indent() const {
   return std::string(indentLevel*indentSize, ' ');
 }
+

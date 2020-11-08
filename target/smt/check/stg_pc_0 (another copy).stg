@@ -1,0 +1,25 @@
+[
+A : i32 = 38,range:[-20,20],uniform,
+B : i32 = 38,range:[-20,20],uniform,
+C : i32 = 38,range:[-20,20],uniform
+]
+
+//Test: passed
+
+(land
+  (lnot(sle A (i32 0)))
+  (land
+    (lnot(sle B (i32 0)))
+    (land
+      (lnot(sle C (i32 0)))
+      (land
+        (eq A B)
+        (land
+          (eq A C)
+          (eq B C)
+        )
+      )
+    )
+  )
+)
+
