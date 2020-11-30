@@ -28,17 +28,8 @@ constraint : '[' (symbolDef (',' symbolDef)* )? ']' expr ;
  *      be written to allow for arbitrary whitespace.
  * Here is an alternative version that resolves these issues.
  */
-symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ',' rangeSpec (',' distSpec)? ;
+symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ;
 
-rangeSpec : 'range' ':' '[' NUMBER ',' NUMBER ']' ;
-
-distSpec : 'uniform' 
-	 | 'exponential' '(' NUMBER ')' 
-	 | 'binomial' '(' NUMBER ',' NUMBER ')'
-	 | 'poisson' '(' NUMBER ',' NUMBER ')'
-	 | 'geometric' '(' NUMBER ')'
-	 | 'normal' '(' NUMBER ',' NUMBER ')'
-;
 
 /*
  * This allows the range and distribution specs to be optional through the 
@@ -97,6 +88,7 @@ UNINTRFUN : 'llvm.sin.f32'
           | 'llvm.cos.f80'
           | 'llvm.cos.f128'
           | 'llvm.cos.ppcf128'
+          | 'tan.f32'
           | 'llvm.exp.f32'
           | 'llvm.exp.f64'
           | 'llvm.exp.f80'
@@ -149,6 +141,7 @@ BININTRFUN : 'llvm.pow.f32'
            | 'llvm.pow.f80'
            | 'llvm.pow.f128'
            | 'llvm.pow.ppcf128'
+           | 'atan2.f32'
            | 'llvm.powi.f32'
            | 'llvm.powi.f64'
            | 'llvm.powi.f80'

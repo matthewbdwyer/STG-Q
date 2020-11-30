@@ -1,5 +1,5 @@
 #include "QCoralPrinter.h"
-#include <iostream>
+#include <jsoncpp/json/json.h>
 
 using namespace Constraint;
 
@@ -63,9 +63,7 @@ std::map<std::string, std::string> mapping = {
 {"llvm.cos.f80", "COS_("},
 {"llvm.cos.f128", "COS_("},
 
-{"tan", "TAN_("},
-
-{"atan2", "ATAN2_("},
+{"tan.f32", "TAN_("},
 
 {"llvm.exp.f32", "EXP_("},
 {"llvm.exp.f64", "EXP_("},
@@ -116,6 +114,8 @@ std::map<std::string, std::string> mapping = {
 {"llvm.pow.f80", "POW_("},
 {"llvm.pow.f128", "POW_("},
 
+{"atan2.f32", "ATAN2_("},
+
 {"llvm.minnum.f32", "MIN_("},
 {"llvm.minnum.f64", "MIN_("},
 {"llvm.minnum.f80", "MIN_("},
@@ -138,53 +138,126 @@ std::map<std::string, std::string> mapping = {
 
 };
 
-void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
+void QCoralPrinter::parseDict(const char *dict, std::string var) {
+
+  Json::Value root;
+  std::ifstream ifs;
+  ifs.open(std::string(dict));
+  ifs >> root;
+
+  Json::Value data = root[var];
+
+  if(data.isNull()){
+    std::cerr<<"No data available for: "<< var<<"\n";
+    return;
+  }
+
+  std::string distribution = data["distribution"].asString();
+  
+  if(distribution.empty()){
+    std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_INT)"<<"\n";
+    distribution = "UNIFORM_INT";
+  }
+
+  Json::Value range = data["range"];
+
+  if(range.isNull()){
+    std::cerr<<"No Range available for: "<< var<<"\n";
+    return;
+  }
+
+  std::string max = range["max"].asString();
+
+  if(max.empty())
+  {
+    std::cerr<<"No Max value available for: "<< var<<"\n";
+    return;
+  }
+
+  std::string min = range["min"].asString();
+
+  if(min.empty())
+  {
+    std::cerr<<"No min value available for: "<< var<<"\n";
+    return;
+  }
+
+  if(distribution == "UNIFORM_INT" || distribution == "UNIFORM_REAL")
+    os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
+
+  else{
+    Json::Value parameters = data["parameters"];
+
+    if(distribution == "GEOMETRIC"){
+      std::string p = parameters["p"].asString();
+      if(p.empty()){
+        std::cerr<<"No probability given for: "<< var<<"\n";
+        return;
+      }
+      os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< p<<"\n";
+    }
+
+    else if(distribution == "POISSON"){
+      std::string lambda = parameters["lambda"].asString();
+      if(lambda.empty()){
+        std::cerr<<"No lambda given for: "<< var<<"\n";
+        return;
+      }
+      os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< lambda<<"\n";
+    }
+
+    else if(distribution == "EXPONENTIAL"){
+      std::string mean = parameters["mean"].asString();
+      if(mean.empty()){
+        std::cerr<<"No mean given for: "<< var<<"\n";
+        return;
+      }
+      os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< mean<<"\n";
+    }
+
+    else if(distribution == "BINOMIAL"){
+      std::string num_trials = parameters["num_trials"].asString();
+      std::string p = parameters["p"].asString();
+
+      if(num_trials.empty() || p.empty()){
+        std::cerr<<"Insufficient parameters given for: "<< var<<". A binomial variable requires num_trials and probability.\n";
+        return;
+      }
+      os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< num_trials<<" "<<p<<"\n";
+    }
+
+    else if(distribution == "NORMAL"){
+      std::string mean = parameters["mean"].asString();
+      std::string sd = parameters["sd"].asString();
+
+      if(mean.empty() || sd.empty()){
+        std::cerr<<"Insufficient parameters given for: "<< var<<". A normal variable requires mean and standard deviation.\n";
+        return;
+      }
+      os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< mean<<" "<<sd<<"\n";
+    }
+
+    else{
+      std::cerr<<"Invalid distribution for: "<< var<<"\n";
+      return;
+    }
+  }
+
+}
+
+
+void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
   theConstraint = c;
   os << ":Variables:\n";
   indentLevel++;
+
+
   int num = c->symbols.size();
   for (auto &n : c->symbols) {
     num--;
-    std::string low, high;
-    std::string ranges = c->symbolRange(n);     // Can be changed if symbolRange returns a pair instead of a string
-    int ind = ranges.find(" ");
-    low = ranges.substr(0, ind);
-    high = ranges.substr(ind+1);
-
-    //Added to support distributions
-    std::string distribution = c->get_distribution(n);
-    std::pair<std::string, std::string> params = c->get_params(n);
-
-    // Initially getting the distribution and making the qcoral dictionary
-
-    if(distribution == "uniform" && c->symbolType(n)[0] == 'i')
-        os << id << " UNIFORM_INT "<<low<<" "<<high;
-
-    else if(distribution == "uniform")
-        os << id << " UNIFORM_REAL "<<low<<" "<<high;
-        
-    else if(distribution == "exponential")
-      os<< id << " EXPONENTIAL "<<low<<" "<<high<<" "<< params.first;
-
-    else if(distribution == "binomial")
-      os<< id << " BINOMIAL "<<low<<" "<<high<<" "<< params.first << " "<< params.second;
-
-    else if(distribution == "poisson")
-      os<< id << " POISSON "<<low<<" "<<high<<" "<< params.first;
-
-    else if(distribution == "geometric")
-      os<< id << " GEOMETRIC "<<low<<" "<<high<<" "<< params.first;
-
-    else if(distribution == "normal")
-      os<< id << " NORMAL "<<low<<" "<<high<<" "<< params.first << " "<< params.second;
-
-    else{
-      std::cerr<<"Invalid distribution!!";
-      exit(0);
-    }
+    parseDict(dict, n);
 
     // Now saving variables in a dictionary for lookup
-
     if(c->symbolType(n)[0] == 'i'){
       if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
         dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
@@ -205,7 +278,7 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
     }
 
     //os << "(" << c->symbolType(n)[0] << ")" << " = " << c->symbolValue(n);
-    os << "\n";
+    // os << "\n";
     seen[dictionary[n]] = 0;
     id++;
   }

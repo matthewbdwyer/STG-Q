@@ -165,6 +165,8 @@ std::map<std::string, Expr::Op> soMap = {
   {"llvm.cos.f128",Expr::Op::Cosf128},
   {"llvm.cos.ppcf128",Expr::Op::Cosppcf128},
 
+  {"tan.f32", Expr::Op::tanf32},
+
   {"llvm.exp.f32",Expr::Op::Expf32},
   {"llvm.exp.f64",Expr::Op::Expf64},
   {"llvm.exp.f80",Expr::Op::Expf80},
@@ -226,6 +228,8 @@ std::map<std::string, Expr::Op> soMap = {
   {"llvm.pow.f128",Expr::Op::Powf128},
   {"llvm.pow.ppcf128",Expr::Op::Powppcf128},
 
+  {"atan2.f32", Expr::Op::atan2f32},
+
   {"llvm.powi.f32",Expr::Op::Powif32},
   {"llvm.powi.f64",Expr::Op::Powif64},
   {"llvm.powi.f80",Expr::Op::Powif80},
@@ -269,6 +273,7 @@ std::map<std::string, Expr::Op> soMap = {
   {"llvm.copysign.f80",Expr::Op::Copysignf80},
   {"llvm.copysign.f128",Expr::Op::Copysignf128},
   {"llvm.copysign.ppcf128",Expr::Op::Copysignppcf128}
+
 };
 
 std::map<Expr::Op, std::string> osMap = {
@@ -344,6 +349,8 @@ std::map<Expr::Op, std::string> osMap = {
   {Expr::Op::Cosf128,"llvm.cos.f128"},
   {Expr::Op::Cosppcf128,"llvm.cos.ppcf128"},
 
+  {Expr::Op::tanf32, "tan.f32"},
+
   {Expr::Op::Expf32,"llvm.exp.f32"},
   {Expr::Op::Expf64,"llvm.exp.f64"},
   {Expr::Op::Expf80,"llvm.exp.f80"},
@@ -406,6 +413,8 @@ std::map<Expr::Op, std::string> osMap = {
   {Expr::Op::Powf128,"llvm.pow.f128"},
   {Expr::Op::Powppcf128,"llvm.pow.ppcf128"},
 
+  {Expr::Op::atan2f32, "atan2.f32"},
+
   {Expr::Op::Powif32,"llvm.powi.f32"},
   {Expr::Op::Powif64,"llvm.powi.f64"},
   {Expr::Op::Powif80,"llvm.powi.f80"},
@@ -447,6 +456,7 @@ std::map<Expr::Op, std::string> osMap = {
   {Expr::Op::Copysignf80,"llvm.copysign.f80"},
   {Expr::Op::Copysignf128,"llvm.copysign.f128"},
   {Expr::Op::Copysignppcf128,"llvm.copysign.ppcf128"}
+  
 }; 
 
 Expr::Op Constraints::str2op(std::string s) {
@@ -517,15 +527,15 @@ void BinaryExpr::accept(ConstraintVisitor* visitor) {
  * Constraint symbol definition and sub-expression create routines
  */
 
-void Constraints::defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max, std::string distribution, std::string param1, std::string param2) {  // changed  by SBH;    Appended by Rishab to support distributions
+void Constraints::defineSymbol(std::string n, std::string t, std::string v) {  // changed by Rishab
   symbols.insert(n);
   symbolTypes.insert(std::pair<std::string, std::string>(n, t));
   symbolValues.insert(std::pair<std::string, std::string>(n, v));
-  symbolRanges[n] = std::pair<std::string, std::string> (min, max); // Added by Rishab
+  // symbolRanges[n] = std::pair<std::string, std::string> (min, max); // Added by Rishab
 
   // Added by Rishab to support distributions
-  distributions[n] = distribution;
-  params[n] = std::pair<std::string, std::string> (param1, param2);
+  // distributions[n] = distribution;
+  // params[n] = std::pair<std::string, std::string> (param1, param2);
 }
 
 /*

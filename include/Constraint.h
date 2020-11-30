@@ -59,7 +59,7 @@ public:
 
     //added by SBH  for unary llvm intrinsics (Reordered by Rishab)
    
-   Sinf32, Cosf32, Expf32, Exp2f32, Logf32, Log2f32, Log10f32, Fabsf32, Sqrtf32, Floorf32, Ceilf32,
+   Sinf32, Cosf32, Expf32, Exp2f32, Logf32, Log2f32, Log10f32, Fabsf32, Sqrtf32, Floorf32, Ceilf32, tanf32,
    Sinf64, Cosf64, Expf64, Exp2f64, Logf64, Log2f64, Log10f64, Fabsf64, Sqrtf64, Floorf64, Ceilf64,
    Sinf80, Cosf80, Expf80, Exp2f80, Logf80, Log2f80, Log10f80, Fabsf80, Sqrtf80, Floorf80, Ceilf80,
    Sinf128, Cosf128, Expf128, Exp2f128, Logf128, Log2f128, Log10f128, Fabsf128, Sqrtf128, Floorf128, Ceilf128,
@@ -67,7 +67,7 @@ public:
 
    //added by SBH for binary llvm intrinsics (Reordered by Rishab)
 
-   Powf32, Powif32, Fmaf32, Minnumf32, Maxnumf32, Minimumf32, Maximumf32, Copysignf32, atan2,
+   Powf32, Powif32, Fmaf32, Minnumf32, Maxnumf32, Minimumf32, Maximumf32, Copysignf32, atan2f32,
    Powf64, Powif64, Fmaf64, Minnumf64, Maxnumf64, Minimumf64, Maximumf64, Copysignf64,
    Powf80, Powif80, Fmaf80, Minnumf80, Maxnumf80, Minimumf80, Maximumf80, Copysignf80,
    Powf128, Powif128, Fmaf128, Minnumf128, Maxnumf128, Minimumf128, Maximumf128, Copysignf128,
@@ -188,11 +188,11 @@ class Constraints {
   std::map<std::string, std::string> symbolTypes;
   std::map<std::string, std::string> symbolValues;
 
-  std::map<std::string, std::pair<std::string, std::string> > symbolRanges; // Added by Rishab
+  // std::map<std::string, std::pair<std::string, std::string> > symbolRanges; // Added by Rishab
 
   // Added by Rishab to support distributions
-  std::map<std::string, std::string> distributions;
-  std::map<std::string, std::pair<std::string, std::string> > params;
+  // std::map<std::string, std::string> distributions;
+  // std::map<std::string, std::pair<std::string, std::string> > params;
 
   std::shared_ptr<Expr> expr = nullptr;
 
@@ -202,17 +202,17 @@ class Constraints {
 public:
   std::set<std::string> symbols;
 
-  void defineSymbol(std::string n, std::string t, std::string v, std::string min, std::string max, std::string distribution, std::string param1, std::string param2); // changed by Rishab
+  void defineSymbol(std::string n, std::string t, std::string v); // changed by Rishab
 
   bool isDefined(std::string n);
   std::string symbolType(std::string n) { return symbolTypes.find(n)->second; }
   std::string symbolValue(std::string n) { return symbolValues.find(n)->second; }
 
-  std::string symbolRange(std::string n) { return (symbolRanges[n].first + " " + symbolRanges[n].second); } // Added by Rishab
+  // std::string symbolRange(std::string n) { return (symbolRanges[n].first + " " + symbolRanges[n].second); } // Added by Rishab
 
   //Added by Rishab to support distributions
-  std::string get_distribution(std::string n) { return distributions[n];}
-  std::pair<std::string, std::string> get_params(std::string n) {return params[n];}
+  // std::string get_distribution(std::string n) { return distributions[n];}
+  // std::pair<std::string, std::string> get_params(std::string n) {return params[n];}
 
   void setExpr(std::shared_ptr<Expr> e) { expr = e; }
   std::shared_ptr<Expr> getExpr() { return expr; }

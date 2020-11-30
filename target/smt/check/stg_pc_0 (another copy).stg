@@ -1,7 +1,7 @@
 [
-A : i32 = 38,range:[-20,20],uniform,
-B : i32 = 38,range:[-20,20],uniform,
-C : i32 = 38,range:[-20,20],uniform
+A : i32 = 38,
+B : i32 = 38,
+C : i32 = 38
 ]
 
 //Test: passed

@@ -1,9 +1,11 @@
 #include "ConstraintPrinter.h"
 #include <iostream>
+#include <jsoncpp/json/json.h>
+#include <fstream>
 
 using namespace Constraint;
 
-void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
+void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
   os << "// Dictionary\n[\n";
   indentLevel++;
   int num = c->symbols.size();
@@ -11,28 +13,9 @@ void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
     num--;
     os << indent() << n << " : ";
     os << c->symbolType(n) << " = " << c->symbolValue(n);
-    std::string ranges = c->symbolRange(n);     // Can be changed if symbolRange returns a pair instead of a string
-    int ind = ranges.find(" ");
-    std::string low = ranges.substr(0, ind);
-    std::string high = ranges.substr(ind+1);
-
-    os << ", range : [" << low <<","<< high<<"]";  // Changed by Rishab
-
-    // Added by Rishab for multiple distributions
-    std::string distribution = c->get_distribution(n);
-    std::pair<std::string, std::string> params = c->get_params(n);
-
-    if(distribution == "uniform")
-      os << ", uniform";
-
-    else if(distribution == "exponential" || distribution == "geometric")
-      os << ", " << distribution <<"("<< params.first<<")";
-
-    else
-      os << ", " << distribution <<"("<< params.first << "," << params.second <<")";
-
     os << ((num>0) ? ",\n" : "\n");
   }
+
   indentLevel--;
   os << "]\n";
 

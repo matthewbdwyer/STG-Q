@@ -35,35 +35,19 @@ Any ConstraintBuilder::visitSymbolDef(  //changed by SBH
 
 //changed by Rishab
 
-  std::vector range_specs = ctx->rangeSpec()->NUMBER();
-  std::string min_range = range_specs[0]->getText();
-  std::string max_range = range_specs[1]->getText();
+  // std::vector range_specs = ctx->rangeSpec()->NUMBER();
+  // std::string min_range = "-100";//range_specs[0]->getText();
+  // std::string max_range = "100";//range_specs[1]->getText();
 
 //Added by Rishab to support Different Distributions
-  std::string dist_name;
-  std::string param1, param2;
+  // std::string dist_name;
+  // std::string param1, param2;
 
-  if(ctx->distSpec() && ctx->distSpec()->getText() != "uniform"){
-    
-    std::string dist_spec = ctx->distSpec()->getText();
-    int idx = dist_spec.find('(');
-    dist_name = dist_spec.substr(0, idx);
-    param1 = ctx->distSpec()->NUMBER()[0]->getText();
+  // dist_name = "uniform";
+  // param1 = "0";
+  // param2 = "0";
 
-    if(dist_name == "exponential" || dist_name == "geometric")
-      param2 = "0";
-
-    else
-      param2 = ctx->distSpec()->NUMBER()[1]->getText();
-  }
-
-  else{
-    dist_name = "uniform";
-    param1 = "0";
-    param2 = "0";
-  }
-
-  theConstraint->defineSymbol(name, type, val, min_range, max_range, dist_name, param1, param2);
+  theConstraint->defineSymbol(name, type, val);
   return "";
 }
 

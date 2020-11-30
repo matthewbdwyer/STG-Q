@@ -1,6 +1,6 @@
 #!/bin/bash
 # qcoral_path=${2:-/home/rishab/Music/qcoral}
-qcoral_path=${2:-/home/rishab/Downloads/qcoral-fse-replication/qcoral}
+qcoral_path=${3:-/home/rishab/Downloads/qcoral-fse-replication/qcoral}
 
 printf "\nNOTE: Intermediate files will be stored in /tmp/QCounter\n";
 if [ ! -d /tmp/QCounter ]
@@ -26,6 +26,7 @@ rm -rf /tmp/QCounter/stg/*
 no_out+=1
 
 folder_path=$1
+dictionary_path=$2
 # printf "Folder name: $folder \n"
 files=$folder_path/*
 
@@ -35,7 +36,7 @@ for file in $files
 do
   if [[ "$file" == *".stg" ]]; then
 	nof+=1
-	./stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
+	./stgpp "$folder_path/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/stg/${nof}.stg"
   fi
 
 done
@@ -50,7 +51,7 @@ nof=0
 for file in $files
 do
 	nof+=1
-	./stg2smt "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/smt/${nof}.smt"
+	./stg2smt "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/smt/${nof}.smt"
 	sha_this="$(sha512sum /tmp/QCounter/smt/${nof}.smt| cut -d " " -f 1)"
 	all_files=/tmp/QCounter/smt/*
 

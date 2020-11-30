@@ -12,7 +12,8 @@ public:
   ConstraintPrinter(std::ostream &os, int indentSize ) : 
       os(os), indentSize(indentSize) {}
 
-  void print(std::shared_ptr<Constraint::Constraints> constraint);
+  void print(std::shared_ptr<Constraint::Constraints> constraint, const char *dict);
+  void parseDict(const char *dict, std::string var);
   std::string print(Constraint::Expr* e);
 
   /* 

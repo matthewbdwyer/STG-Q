@@ -1,5 +1,5 @@
 #include "SMTPrinter.h"
-#include <iostream>
+#include <jsoncpp/json/json.h>
 
 using namespace Constraint;
 
@@ -10,11 +10,11 @@ std::map<std::string, std::string> mapping = {
 {"fneg", ""},
 {"fptosi", "(to_int"},
 
-{"trunc", ""},        // Previously it was ASINT(
-{"zext", ""},       // ""
-{"sext", ""},       // ""
-{"fptrunc", ""},      // Previously it was ASDOUBLE(
-{"fpext", ""},        // ""
+{"trunc", ""},
+{"zext", ""},
+{"sext", ""},
+{"fptrunc", ""},
+{"fpext", ""},
 
 {"sitofp", "(to_real"},
 {"add", "(+ "},
@@ -130,54 +130,95 @@ std::map<std::string, std::string> mapping = {
 
 };
 
-void SMTPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
+
+void SMTPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constraints> c, std::string var) {
+
+  Json::Value root;
+  std::ifstream ifs;
+  ifs.open(std::string(dict));
+  ifs >> root;
+
+  Json::Value data = root[var];
+
+  if(data.isNull()){
+    std::cerr<<"No data available for: "<< var<<"\n";
+    return;
+  }
+
+  std::string distribution = data["distribution"].asString();
+  
+  if(distribution.empty()){
+    std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_INT)"<<"\n";
+    distribution = "UNIFORM_INT";
+  }
+
+  Json::Value range = data["range"];
+
+  if(range.isNull()){
+    std::cerr<<"No Range available for: "<< var<<"\n";
+    return;
+  }
+
+  std::string max = range["max"].asString();
+
+  if(max.empty())
+  {
+    std::cerr<<"No Max value available for: "<< var<<"\n";
+    return;
+  }
+
+  std::string min = range["min"].asString();
+
+  if(min.empty())
+  {
+    std::cerr<<"No min value available for: "<< var<<"\n";
+    return;
+  }
+
+  if(distribution == "UNIFORM_INT" || distribution == "UNIFORM_REAL"){
+    
+    if(c->symbolType(var) == "i1")
+      os << "(declare-const id_"<< id << " Bool)";
+
+    else if(c->symbolType(var)[0] == 'i'){
+      os<< "(set-info :domain \"id_" << id <<" UniformInt "<< min<<" "<<max<<"\")\n";
+      os << "(declare-const id_"<< id << " Int)\n";
+    }
+
+    else if(c->symbolType(var) == "float" || c->symbolType(var) == "double"){
+      os<< "(set-info :domain \"id_" << id <<" UniformReal "<< min<<" "<<max<<"\")\n";
+      os << "(declare-const id_"<< id << " Real)\n";
+    }
+
+    else{
+      std::cerr<<"Invalid TYPE!!  --> " << c->symbolType(var);
+      return;
+    }
+
+  }
+
+  else{
+    std::cerr<<"Only Uniform distribution currently available in SMT for: "<< var<<"\n";
+    return;
+  }
+
+}
+
+
+
+void SMTPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
   theConstraint = c;
   // os << "(set-option :print-success false)\n";
   // mvn package assembly:single
   // os << "(set-logic AUFLIRA)\n";
   // os << "(set-option :seed 121314)\n(set-option :partitioning true)\n(set-option :non-linear-counter \"qcoral\")\n";
-  os << "(declare-const EXP Real)\n(assert (= EXP 2.71828182846))";
+  os << "(declare-const EXP Real)\n(assert (= EXP 2.71828182846))\n";
 
   indentLevel++;
-  int num = c->symbols.size();
   for (auto &n : c->symbols) {
-    num--;
-    std::string low, high;
-    std::string ranges = c->symbolRange(n);     // Can be changed if symbolRange returns a pair instead of a string
-    int ind = ranges.find(" ");
-    low = ranges.substr(0, ind);
-    high = ranges.substr(ind+1);
-
-    //Added to support distributions
-    std::string distribution = c->get_distribution(n);
-    std::pair<std::string, std::string> params = c->get_params(n);
-
-    // Initially getting the distribution and making the SMT dictionary
-
-    if(distribution == "uniform" && c->symbolType(n) == "i1")
-      os << "(declare-const id_"<< id << " Bool)";
-
-    else if(distribution == "uniform" && c->symbolType(n)[0] == 'i'){
-      os << "(declare-const id_"<< id << " Int)\n";
-      os << "(assert (>= id_"<<id<<" "+ low <<" ))";
-      os << "(assert (<= id_"<<id<<" "+ high <<" ))";
-      // os << "(declare-var id_"<< id << " (Int "<< low << " " << high << "))";
-    }
-
-    else if(distribution == "uniform" && (c->symbolType(n) == "float" || c->symbolType(n) == "double")){
-      os << "(declare-const id_"<< id << " Real)\n";
-      os << "(assert (>= id_"<<id<<" "+ low <<" ))";
-      os << "(assert (<= id_"<<id<<" "+ high <<" ))";
-      // os << "(declare-var id_"<< id << " (Float "<< low << " " << high << "))";    
-    }
-
-    else{
-      std::cerr<<"Invalid TYPE!!  --> " << c->symbolType(n);
-      exit(0);
-    }
-
+    parseDict(dict, c, n);
     dictionary[n] = "id_" + std::to_string(id);
-    os << "\n";
+    // os << "\n";
     id++;
   }
 

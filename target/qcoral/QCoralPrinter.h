@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 
 class QCoralPrinter: public ConstraintVisitor {
 public:
@@ -12,7 +13,9 @@ public:
   QCoralPrinter(std::ostream &os, int indentSize ) : 
       os(os), indentSize(indentSize) {}
 
-  void print(std::shared_ptr<Constraint::Constraints> constraint);
+  void print(std::shared_ptr<Constraint::Constraints> constraint, const char *dict);
+
+  void parseDict(const char *dict, std::string var);
 
   /* 
    * This visitor visits the entire expression, customizing the  

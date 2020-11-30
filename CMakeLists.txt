@@ -12,7 +12,13 @@ set(CMAKE_CXX_STANDARD 17)
 # compile with debug flags
 #set(CMAKE_BUILD_TYPE Debug)
 
-######## ANTLR4 CPP target rules ###########
+# Adding coverage
+add_compile_options(--coverage -O0)
+
+#set(LDFLAGS "${LDFLAGS} --coverage")
+#set(CXXFLAGS "${CXXFLAGS} --coverage")
+
+#CXXFLAGS = $(CXXFLAGS) ####### ANTLR4 CPP target rules ###########
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
 
@@ -50,3 +56,6 @@ include_directories(include)
 add_subdirectory(target)
 
 #add_subdirectory(test)
+
+#target_link_libraries(stg2qc stg --coverage)
+
