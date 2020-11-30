@@ -1,0 +1,25 @@
+{
+	"X": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "-10000",
+	       "max": "10000"
+	    }
+	},
+
+	"Y": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "-10000",
+	       "max": "10000"
+	    }
+	},
+
+	"Z": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "-10000",
+	       "max": "10000"
+	    }
+	}
+}

@@ -1,8 +1,8 @@
 [
-S0 : double = 45.000000, range:[-100000,100000],uniform,
-S1 : double = 30.000000, range:[-100000,100000],uniform
+S0 : double = 45.000000,
+S1 : double = 30.000000
 ]
 
 //Test: passed
 
-(lnot(ogt (fdiv (llvm.sin.f64 double S0) (llvm.cos.f64 double S0)) (double 0.500000)))
+(lnot(ogt (fdiv (llvm.sin.f64 double S0) (llvm.cos.f64 double S0)) (double 0.000000)))

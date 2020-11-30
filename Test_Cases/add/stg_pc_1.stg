@@ -1,8 +1,7 @@
 [
-X : i32 = 50, range:[-100000,100000],uniform,
-Y : i32 = 38, range:[-100000,100000],uniform
+X : i32 = 50,
+Y : i32 = 38
 ]
-
 //Test: passed
 
 (land

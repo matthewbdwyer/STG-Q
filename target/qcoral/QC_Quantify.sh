@@ -18,6 +18,8 @@ g++ -o res QC_Result.cpp
 
 declare -i no_out=0
 declare -i total=$(ls $1 -1 | wc -l)
+total=$[total - 1]
+# declare -i total=$(ls $1 -1 | grep "^d" | wc -l)
 
 printf "Total folders to test: $total \n"
 
@@ -25,12 +27,23 @@ printf "Testing folders: 0/${total} \n"
 
 for folder in $1/*
 do
+	if [ ! -d $folder ]; then
+		continue
+	fi
+
+	if [ ! -f $folder/expected.txt ]; then
+		printf "TEST %-30s: SKIP\n" $folder
+		total=$[total - 1]
+		continue
+	fi
+
 	rm -rf /tmp/QCounter/qc/*
 	rm -rf /tmp/QCounter/stg/*
 	no_out+=1
 	exp=""
 
 	folder_path=$folder
+	dictionary_path="$folder_path/dict.json"
 	# printf "Folder name: $folder \n"
 	files=$folder_path/*
 
@@ -40,7 +53,7 @@ do
 	do
 	  if [[ "$file" == *".stg" ]]; then
 		nof+=1
-		./stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
+		./stgpp "$folder_path/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/stg/${nof}.stg"
 	  fi
 
 	  if [[ "$file" =~ "expected" ]]; then
@@ -68,7 +81,7 @@ do
 	for file in $files
 	do
 		nof+=1
-		./stg2qc "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/qc/${nof}.qcoral"
+		./stg2qc "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/qc/${nof}.qcoral"
 	done
 
 

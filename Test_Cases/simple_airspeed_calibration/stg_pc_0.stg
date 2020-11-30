@@ -1,9 +1,9 @@
 [
-S0 : float = 20.3, range:[-1000,1000],uniform,
-S1 : float = 4.5, range:[-1000,1000],uniform,
-S2 : float = 8.7, range:[-1000,1000],uniform,
-S3 : float = 8, range:[-1000,1000],uniform,
-S4 : float = 8.2, range:[-1000,1000],uniform
+S0 : float = 20.3,
+S1 : float = 4.5,
+S2 : float = 8.7,
+S3 : float = 8,
+S4 : float = 8.2
 ]
 
 //Test: failed

@@ -24,6 +24,8 @@ do
 
 	# output of quantify: [qCORAL:results] samples=5000000, mean=2.499708e-01, variance=3.749708e-08, time=4.682822, stdev=1.936416e-04
 
+	# echo "$(Quantify.sh $testdir $testdir/dict.json)"
+
 	mean=$(Quantify.sh $testdir 2>/dev/null | grep mean | cut -d',' -f2 | cut -d'=' -f2)
 	mean=$(printf "%.12f" $mean)
 	expected=$(cut -d' ' -f1 $testdir/expected.txt)

@@ -1,6 +1,6 @@
 [
-S0 : double = 3.400000, range : [-100, 100], uniform,
-S1 : float = 5.500000, range : [-100, 100], exponential (2)
+S0 : double = 3.400000,
+S1 : float = 5.500000
 ]
 
 //Test: failed
