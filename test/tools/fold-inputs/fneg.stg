@@ -1,5 +1,5 @@
 // Dictionary
-[ S0:i1 = 0, range: [0,1000], uniform ]
+[ S0:i1 = 0 ]
 
 // Expr
 (fult (fneg (fneg (fneg (float 9.799)))) (float 0.0))

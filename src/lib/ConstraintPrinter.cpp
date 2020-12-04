@@ -5,7 +5,7 @@
 
 using namespace Constraint;
 
-void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
+void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
   os << "// Dictionary\n[\n";
   indentLevel++;
   int num = c->symbols.size();

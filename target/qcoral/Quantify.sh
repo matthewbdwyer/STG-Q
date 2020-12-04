@@ -40,7 +40,7 @@ for file in $files
 do
   if [[ "$file" == *".stg" ]]; then
 	nof+=1
-	./stgpp "$folder_path/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/stg/${nof}.stg"
+	./stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
   fi
 
 done

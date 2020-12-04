@@ -1,5 +1,5 @@
 // Dictionary
-[ S0:i1 = 0, range: [0, 1000], uniform ]
+[ S0:i1 = 0 ]
 
 // Expr
 (trunc i1 (trunc i8 (trunc i16 (trunc i32 (i64 17)))))

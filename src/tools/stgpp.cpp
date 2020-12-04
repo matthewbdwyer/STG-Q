@@ -28,9 +28,6 @@ static cl::opt<bool> verbose("verbose",
 static cl::opt<std::string> sourceFile(cl::Positional,
                                        cl::desc("<stg source file>"),
                                        cl::Required, cl::cat(STGPPcat));
-static cl::opt<std::string> dictionary(cl::Positional,
-                                       cl::desc("<dictionary source file>"),
-                                       cl::Required, cl::cat(STGPPcat));
 
 int main(int argc, const char *argv[]) {
   cl::HideUnrelatedOptions(STGPPcat); // suppress non STGPP options
@@ -58,7 +55,7 @@ int main(int argc, const char *argv[]) {
     }
 
     ConstraintPrinter cp(std::cout, 2);
-    cp.print(constraint, argv[2]);
+    cp.print(constraint);
   } else {
     cout << "STG parse error\n";
     exit (EXIT_FAILURE);

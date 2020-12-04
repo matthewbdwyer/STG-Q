@@ -1,5 +1,5 @@
 // Dictionary
-[ S0:i1 = 0, range: [0, 1000], uniform ]
+[ S0:i1 = 0 ]
 
 // Expr
 (lnot (lnot (lnot (i1 0))))
