@@ -8,6 +8,8 @@ cd $(dirname $(readlink -f "$0"))
 #
 tolerance=0.01
 
+test_dir="$(dirname $(readlink -f "$0"))"
+
 exit_code=0
 for testdir in `ls`
 do
@@ -18,15 +20,12 @@ do
 
 	# no expected.txt file, so skip
 	if [ ! -f $testdir/expected.txt ]; then
-		printf "TEST %-30s: SKIP\n" $testdir
+		printf "TEST %-30s: SKIP (No expected.txt found)\n" $testdir
 		continue
 	fi
 
 	# output of quantify: [qCORAL:results] samples=5000000, mean=2.499708e-01, variance=3.749708e-08, time=4.682822, stdev=1.936416e-04
-
-	# echo "$(Quantify.sh $testdir $testdir/dict.json)"
-
-	mean=$(Quantify.sh $testdir 2>/dev/null | grep mean | cut -d',' -f2 | cut -d'=' -f2)
+	mean=$($STGQ_HOME/target/qcoral/Quantify.sh $test_dir/$(basename "$testdir") $test_dir/$(basename "$testdir")/dict.json 2>/dev/null | grep mean | cut -d',' -f2 | cut -d'=' -f2)
 	mean=$(printf "%.12f" $mean)
 	expected=$(cut -d' ' -f1 $testdir/expected.txt)
 	expected=$(printf "%.12f" $expected)

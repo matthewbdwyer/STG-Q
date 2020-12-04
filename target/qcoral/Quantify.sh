@@ -1,7 +1,6 @@
 #!/bin/bash
 # qcoral_path=${2:-/home/rishab/Music/qcoral}
-qcoral_path=${3:-/home/rishab/Downloads/qcoral-fse-replication/qcoral}
-
+qcoral_path=$STGQ_HOME/qcoral
 printf "\nNOTE: Intermediate files will be stored in /tmp/QCounter\n";
 if [ ! -d /tmp/QCounter ]
 	then
@@ -35,7 +34,7 @@ dictionary_path=$2
 # printf "Folder name: $folder \n"
 files=$folder_path/*
 
-cd ../../build/src/tools    																	#Changed this
+cd $STGQ_HOME/build/src/tools 																	#Changed this
 declare -i nof=0
 for file in $files
 do
@@ -48,7 +47,7 @@ done
 
 
 cd $OLDPWD
-cd ../../build/target/qcoral     																#Changed this
+cd $STGQ_HOME/build/target/qcoral
 files=/tmp/QCounter/stg/*
 
 nof=0
