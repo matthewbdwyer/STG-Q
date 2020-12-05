@@ -31,7 +31,7 @@ Any ConstraintBuilder::visitSymbolDef(  //changed by SBH
   ConstraintGrammarParser::SymbolDefContext *ctx) {
   std::string name = ctx->IDENTIFIER()->getText();
   std::string type = ctx->TYPE()->getText();
-  std::string val = ctx->NUMBER()->getText();
+  // std::string val = ctx->NUMBER()->getText();
 
 //changed by Rishab
 
@@ -47,7 +47,7 @@ Any ConstraintBuilder::visitSymbolDef(  //changed by SBH
   // param1 = "0";
   // param2 = "0";
 
-  theConstraint->defineSymbol(name, type, val);
+  theConstraint->defineSymbol(name, type);
   return "";
 }
 

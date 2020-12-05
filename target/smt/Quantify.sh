@@ -30,13 +30,13 @@ dictionary_path=$2
 # printf "Folder name: $folder \n"
 files=$folder_path/*
 
-cd ../../build/src/tools    																	#Changed this
+cd $STGQ_HOME/build/src/tools    																	#Changed this
 declare -i nof=0
 for file in $files
 do
   if [[ "$file" == *".stg" ]]; then
 	nof+=1
-	./stgpp "$folder_path/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/stg/${nof}.stg"
+	./stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
   fi
 
 done
@@ -44,7 +44,7 @@ done
 # Converting stg file to smt, then checking for uniqueness using sha512. If such smt file is already generated, delete the current smt file.
 
 cd $OLDPWD
-cd ../../build/target/smt     															
+cd $STGQ_HOME/build/target/smt     															
 files=/tmp/QCounter/stg/*
 
 nof=0

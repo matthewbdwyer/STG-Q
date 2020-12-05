@@ -12,7 +12,8 @@ void ConstraintPrinter::print(std::shared_ptr<Constraint::Constraints> c) {
   for (auto &n : c->symbols) {
     num--;
     os << indent() << n << " : ";
-    os << c->symbolType(n) << " = " << c->symbolValue(n);
+    // os << c->symbolType(n) << " = " << c->symbolValue(n);
+    os << c->symbolType(n);
     os << ((num>0) ? ",\n" : "\n");
   }
 

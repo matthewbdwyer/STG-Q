@@ -15,7 +15,7 @@ public:
 
   void print(std::shared_ptr<Constraint::Constraints> constraint, const char *dict);
 
-  void parseDict(const char *dict, std::string var);
+  void parseDict(const char *dict, std::string var, std::string type);
 
   /* 
    * This visitor visits the entire expression, customizing the  

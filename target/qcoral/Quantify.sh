@@ -30,7 +30,7 @@ rm -rf /tmp/QCounter/stg/*
 no_out+=1
 
 folder_path=$1
-dictionary_path=$2
+dictionary_path=${2:-None}
 # printf "Folder name: $folder \n"
 files=$folder_path/*
 
@@ -54,7 +54,11 @@ nof=0
 for file in $files
 do
 	nof+=1
-	./stg2qc "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/qc/${nof}.qcoral"
+	if [[ "$dictionary_path" == "None" ]];then
+		./stg2qc "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/qc/${nof}.qcoral"
+	else
+		./stg2qc "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/qc/${nof}.qcoral"
+	fi
 done
 
 

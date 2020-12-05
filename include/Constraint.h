@@ -202,7 +202,7 @@ class Constraints {
 public:
   std::set<std::string> symbols;
 
-  void defineSymbol(std::string n, std::string t, std::string v); // changed by Rishab
+  void defineSymbol(std::string n, std::string t); // changed by Rishab    std::string v
 
   bool isDefined(std::string n);
   std::string symbolType(std::string n) { return symbolTypes.find(n)->second; }

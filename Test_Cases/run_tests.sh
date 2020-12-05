@@ -11,6 +11,7 @@ tolerance=0.01
 test_dir="$(dirname $(readlink -f "$0"))"
 
 exit_code=0
+mean=0
 for testdir in `ls`
 do
 	# skip non-directories
@@ -25,7 +26,12 @@ do
 	fi
 
 	# output of quantify: [qCORAL:results] samples=5000000, mean=2.499708e-01, variance=3.749708e-08, time=4.682822, stdev=1.936416e-04
-	mean=$($STGQ_HOME/target/qcoral/Quantify.sh $test_dir/$(basename "$testdir") $test_dir/$(basename "$testdir")/dict.json 2>/dev/null | grep mean | cut -d',' -f2 | cut -d'=' -f2)
+	if [ ! -f "$test_dir/$(basename "$testdir")/dict.json" ]; then
+		mean=$($STGQ_HOME/target/qcoral/Quantify.sh $test_dir/$(basename "$testdir") 2>/dev/null | grep mean | cut -d',' -f2 | cut -d'=' -f2)
+	else
+		mean=$($STGQ_HOME/target/qcoral/Quantify.sh $test_dir/$(basename "$testdir") $test_dir/$(basename "$testdir")/dict.json 2>/dev/null | grep mean | cut -d',' -f2 | cut -d'=' -f2)
+	fi
+
 	mean=$(printf "%.12f" $mean)
 	expected=$(cut -d' ' -f1 $testdir/expected.txt)
 	expected=$(printf "%.12f" $expected)
@@ -33,7 +39,8 @@ do
 	#
 	# check the mean value is within <tolerance> percentage of expected value
 	#
-	within_tolerance=$(echo "sqrt(($mean - $expected) * ($mean - $expected)) / $expected < $tolerance" | bc)
+	within_tolerance=$(echo "scale=4;sqrt(($mean - $expected) * ($mean - $expected)) / $expected < $tolerance" | bc)
+	
 	if [ $within_tolerance -eq 1 ]; then
 		result="PASS"
 	else

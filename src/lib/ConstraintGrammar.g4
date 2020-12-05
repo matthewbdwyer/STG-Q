@@ -28,8 +28,9 @@ constraint : '[' (symbolDef (',' symbolDef)* )? ']' expr ;
  *      be written to allow for arbitrary whitespace.
  * Here is an alternative version that resolves these issues.
  */
-symbolDef : IDENTIFIER ':' TYPE '=' NUMBER ;
+// symbolDef : IDENTIFIER ':' TYPE '=' NUMBER | IDENTIFIER ':' TYPE ;
 
+symbolDef : IDENTIFIER ':' TYPE ('=' NUMBER)?;
 
 /*
  * This allows the range and distribution specs to be optional through the 

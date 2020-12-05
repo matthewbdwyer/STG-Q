@@ -138,7 +138,7 @@ std::map<std::string, std::string> mapping = {
 
 };
 
-void QCoralPrinter::parseDict(const char *dict, std::string var) {
+void QCoralPrinter::parseDict(const char *dict, std::string var, std::string type) {
 
   Json::Value root;
   std::ifstream ifs;
@@ -155,31 +155,75 @@ void QCoralPrinter::parseDict(const char *dict, std::string var) {
   std::string distribution = data["distribution"].asString();
   
   if(distribution.empty()){
-    std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_INT)"<<"\n";
-    distribution = "UNIFORM_INT";
+    if(type == "float" || type == "double"){
+      std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
+      distribution = "UNIFORM_REAL";
+    }
+
+    else{
+      std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_INT)"<<"\n";
+      distribution = "UNIFORM_INT";
+    }
   }
 
   Json::Value range = data["range"];
+  std::string max, min;
 
   if(range.isNull()){
-    std::cerr<<"No Range available for: "<< var<<"\n";
-    return;
+    if(type == "float" || type == "double"){
+      std::cerr<<"No Range available for: "<< var<<". Setting default range (-1,000,000 to 1,000,000)\n";
+      min = "-1000000";
+      max = "1000000";
+    }
+
+    else if(type == "i8"){
+      std::cerr<<"No Range available for: "<< var<<". Setting default range (-128 to 127)\n";
+      min = "-128";
+      max = "127";
+    }
+
+    else if(type == "i16"){
+      std::cerr<<"No Range available for: "<< var<<". Setting default range (-32,768 to 32,767)\n";
+      min = "-32768";
+      max = "32767";
+    }
+
+    else if(type == "i32"){
+      std::cerr<<"No Range available for: "<< var<<". Setting default range (-1,000,000 to 1,000,000)\n";
+      min = "-1000000";
+      max = "1000000";
+    }
+
+    else if(type == "i64" || type == "long"){
+      std::cerr<<"No Range available for: "<< var<<". Setting default range (-1,000,000 to 1,000,000)\n";
+      min = "-1000000";
+      max = "1000000";
+    }
+
+    else{
+      std::cerr<<"Invalid data type!! "<<var<<"\n";
+      return;
+    }
   }
 
-  std::string max = range["max"].asString();
+  else{
 
-  if(max.empty())
-  {
-    std::cerr<<"No Max value available for: "<< var<<"\n";
-    return;
-  }
+    max = range["max"].asString();
 
-  std::string min = range["min"].asString();
+    if(max.empty())
+    {
+      std::cerr<<"No Max value available for: "<< var<<"\n";
+      return;
+    }
 
-  if(min.empty())
-  {
-    std::cerr<<"No min value available for: "<< var<<"\n";
-    return;
+    min = range["min"].asString();
+
+    if(min.empty())
+    {
+      std::cerr<<"No min value available for: "<< var<<"\n";
+      return;
+    }
+
   }
 
   if(distribution == "UNIFORM_INT" || distribution == "UNIFORM_REAL")
@@ -255,7 +299,59 @@ void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char
   int num = c->symbols.size();
   for (auto &n : c->symbols) {
     num--;
-    parseDict(dict, n);
+
+    if(dict != NULL)
+      parseDict(dict, n, c->symbolType(n));
+
+    else{
+
+      std::string distribution, max, min;
+
+      if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
+        std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
+        distribution = "UNIFORM_REAL";
+        std::cerr<<"No Range available for: "<< n <<". Setting default range (-1,000,000 to 1,000,000)\n";
+        min = "-1000000";
+        max = "1000000";
+      }
+
+      else{
+        std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_INT)"<<"\n";
+        distribution = "UNIFORM_INT";
+      }
+
+      if(c->symbolType(n) == "i8"){
+        std::cerr<<"No Range available for: "<< n<<". Setting default range (-128 to 127)\n";
+        min = "-128";
+        max = "127";
+      }
+
+      else if(c->symbolType(n) == "i16"){
+        std::cerr<<"No Range available for: "<< n <<". Setting default range (-32,768 to 32,767)\n";
+        min = "-32768";
+        max = "32767";
+      }
+
+      else if(c->symbolType(n) == "i32"){
+        std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+        min = "-1000000";
+        max = "1000000";
+      }
+
+      else if(c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
+        std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+        min = "-1000000";
+        max = "1000000";
+      }
+
+      else if(c->symbolType(n) != "float" && c->symbolType(n) != "double"){
+        std::cerr<<"Invalid data type!! "<<n<<"\n";
+        return;
+      }
+
+      os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
+
+    }
 
     // Now saving variables in a dictionary for lookup
     if(c->symbolType(n)[0] == 'i'){
