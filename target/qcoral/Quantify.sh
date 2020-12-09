@@ -29,9 +29,14 @@ rm -rf /tmp/QCounter/qc/*
 rm -rf /tmp/QCounter/stg/*
 no_out+=1
 
-folder_path=$1
-dictionary_path=${2:-None}
-# printf "Folder name: $folder \n"
+folder_path=$(readlink -f $1)
+dictionary_path=""
+if [ $2 ]; then
+	dictionary_path=$(readlink -f $2)
+else
+	dictionary_path="None"
+fi
+
 files=$folder_path/*
 
 cd $STGQ_HOME/build/src/tools 																	#Changed this
