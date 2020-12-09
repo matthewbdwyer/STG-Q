@@ -1,6 +1,6 @@
 {
 	"S": {
-	    "distribution": "EXPONENTIAL",
+	    "distribution": "UNIFORM_REAL",
 	    "range": {
 	       "min": "-100000",
 	       "max": "100000"

@@ -1,0 +1,7 @@
+[
+X : double
+]
+
+//Test: failed.
+
+(ole X (double 5))
