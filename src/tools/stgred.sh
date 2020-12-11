@@ -4,10 +4,11 @@ STGDIFF=${STGQ_BIN}/stgdiff.sh
 
 shopt -s nullglob
 files=($1/*.stg)
-declare -A uniques
 
-if [ ! -d "$2" ]; then
-	mkdir "$2"
+if [ ! -z "$2" ]; then
+  if [ ! -d "$2" ]; then
+    mkdir "$2"
+  fi
 fi
 
 for ((i=0; i<${#files[@]}; i++)); 
@@ -24,12 +25,13 @@ do
     fi
   done
   if [ "$duplicate" == "no" ]; then
-	  name=$(basename -- "${files[$i]}")
-	  if [ -d $2 ]; then
-	  echo "$name is unique -- copying into $2"
-	  cp ${files[$i]} $2
-	  uniques[$name]=1
-  	fi
+    name=$(basename -- "${files[$i]}")
+    if [ ! -z "$2" ]; then
+      if [ -d "$2" ]; then
+        echo "$name is unique -- copying into $2"
+        cp ${files[$i]} $2
+      fi
+    fi
   fi 
 done
 
