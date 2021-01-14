@@ -1,0 +1,53 @@
+[
+A : float = 0
+]
+
+//Test: passed
+
+(land
+  (lnot(olt (float 1.000000) (fsub (float -0.000000) (float 6.000000))))
+  (land
+    (lnot(ogt (float 1.000000) (float 6.000000)))
+    (land
+      (lnot(ogt A (float 0.000000)))
+      (land
+        (lnot(ogt (fsub (float -0.000000) A) (float 0.000000)))
+        (land
+          (olt (float 0.000000) (fsub (float 1.000000) (float 0.000000)))
+          (land
+            (lnot(eq (i32 1) (i32 0)))
+            (land
+              (ne (i32 1) (i32 0))
+              (land
+                (lnot(olt (fadd (fmul (fmul (float 2.000000) A) A) (fmul (fmul (float 4.000000) (fmul (sitofp float (i32 1)) (float 55.200001))) (fsub (float 1.000000) (float 0.000000)))) (float 0.000000)))
+                (land
+                  (oge (fdiv (fadd (fsub (float -0.000000) A) (fmul (float 0.500000) (llvm.sqrt.f32 float (fadd (fmul (fmul (float 2.000000) A) A) (fmul (fmul (float 4.000000) (fmul (sitofp float (i32 1)) (float 55.200001))) (fsub (float 1.000000) (float 0.000000))))))) (fmul (sitofp float (i32 1)) (float 55.200001))) (float 0.000000))
+                  (land
+                    (oge (fadd (fdiv A (fmul (sitofp float (i32 1)) (float 55.200001))) (fdiv (fadd (fsub (float -0.000000) A) (fmul (float 0.500000) (llvm.sqrt.f32 float (fadd (fmul (fmul (float 2.000000) A) A) (fmul (fmul (float 4.000000) (fmul (sitofp float (i32 1)) (float 55.200001))) (fsub (float 1.000000) (float 0.000000))))))) (fmul (sitofp float (i32 1)) (float 55.200001)))) (float 0.000000))
+                    (land
+                      (ogt (fadd A (fmul (fmul (sitofp float (i32 1)) (float 55.200001)) (fdiv (fadd (fsub (float -0.000000) A) (fmul (float 0.500000) (llvm.sqrt.f32 float (fadd (fmul (fmul (float 2.000000) A) A) (fmul (fmul (float 4.000000) (fmul (sitofp float (i32 1)) (float 55.200001))) (fsub (float 1.000000) (float 0.000000))))))) (fmul (sitofp float (i32 1)) (float 55.200001))))) (float 6.0))
+                      (land
+                        (ogt (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001))) (float 0.000000))
+                        (land
+                          (ogt (fadd (fdiv A (fmul (sitofp float (i32 1)) (float 55.200001))) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001)))) (float 0.000000))
+                          (land
+                            (ogt (fadd A (fmul (fmul (sitofp float (i32 1)) (float 55.200001)) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001))))) (float 0.000000))
+                            (land
+                              (ogt (fadd A (fmul (fmul (sitofp float (i32 1)) (float 55.200001)) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001))))) (float 0.000000))
+                              (ogt (fdiv (fadd (fsub (fadd (fsub (fsub (fmul (fmul (fmul (float -0.500000) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001)))) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001)))) (fmul (sitofp float (i32 1)) (float 55.200001))) (fmul (fmul (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001))) (fadd (fdiv A (fmul (sitofp float (i32 1)) (float 55.200001))) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001))))) (fmul (sitofp float (i32 1)) (float 55.200001)))) (fmul (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001))) A)) (fmul (fmul (fmul (float 0.500000) (fadd (fdiv A (fmul (sitofp float (i32 1)) (float 55.200001))) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001))))) (fadd (fdiv A (fmul (sitofp float (i32 1)) (float 55.200001))) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001))))) (fmul (sitofp float (i32 1)) (float 55.200001)))) (fmul (fadd (fdiv A (fmul (sitofp float (i32 1)) (float 55.200001))) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001)))) A)) (fsub (float 1.000000) (float 0.000000))) (fadd A (fmul (fmul (sitofp float (i32 1)) (float 55.200001)) (fdiv (fsub (float 6.0) A) (fmul (sitofp float (i32 1)) (float 55.200001)))))) (float 0.000000))
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+)
+

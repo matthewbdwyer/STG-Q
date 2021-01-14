@@ -1,6 +1,6 @@
 #!/bin/bash
 # qcoral_path=${2:-/home/rishab/Music/qcoral}
-qcoral_path=${3:-/home/rishab/Downloads/qcoral-fse-replication/qcoral}
+qcoral_path=$STGQ_HOME/qcoral
 
 printf "\nNOTE: Intermediate files will be stored in /tmp/QCounter\n";
 if [ ! -d /tmp/QCounter ]
@@ -25,8 +25,13 @@ rm -rf /tmp/QCounter/smt/*
 rm -rf /tmp/QCounter/stg/*
 no_out+=1
 
-folder_path=$1
-dictionary_path=$2
+folder_path=$(readlink -f $1)
+dictionary_path=""
+if [ $2 ]; then
+	dictionary_path=$(readlink -f $2)
+else
+	dictionary_path="None"
+fi
 # printf "Folder name: $folder \n"
 files=$folder_path/*
 
@@ -90,20 +95,23 @@ for (( i=0; i<${#files[@]}-1; i++ ))
 do 
 	for (( j=i+1; j<${#files[@]}; j++ ))
 	do
-		ans="$(python implication.py "/tmp/QCounter/smt/$(basename "${files[i]}")" "/tmp/QCounter/smt/$(basename "${files[j]}")")"
-		IFS=$'\n' y=($ans)
+		if [[ -f "/tmp/QCounter/smt/$(basename "${files[j]}")" ]]; then
 
-		if [ "${y[0]}" == "proved" ]
-		then
-			printf "${files[i]} implies ${files[j]}\n"
-			rm "/tmp/QCounter/smt/$(basename "${files[i]}")"
-			break
-		fi
+			ans="$(python3 implication.py "/tmp/QCounter/smt/$(basename "${files[i]}")" "/tmp/QCounter/smt/$(basename "${files[j]}")")"
+			IFS=$'\n' y=($ans)
 
-		if [ "${y[-1]}" == "proved" ]
-		then
-			printf "${files[j]} implies ${files[i]}\n"
-			rm "/tmp/QCounter/smt/$(basename "${files[j]}")"
+			if [ "${y[0]}" == "proved" ]
+			then
+				printf "${files[i]} implies ${files[j]}\n"
+				rm "/tmp/QCounter/smt/$(basename "${files[i]}")"
+				break
+			fi
+
+			if [ "${y[-1]}" == "proved" ]
+			then
+				printf "${files[j]} implies ${files[i]}\n"
+				rm "/tmp/QCounter/smt/$(basename "${files[j]}")"
+			fi
 		fi
 	done
 done

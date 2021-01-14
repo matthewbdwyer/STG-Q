@@ -1,0 +1,45 @@
+[
+A : float = 1.19209e-7,
+M_A : float = 8
+]
+
+//Test: passed
+
+(land
+  (lnot(olt (float 0.000000) (fsub (float -0.000000) (float 6.000000))))
+  (land
+    (lnot(ogt (float 0.000000) (float 6.000000)))
+    (land
+      (ogt A (float 0.000000))
+      (land
+        (lnot(ogt A (float 0.000000)))
+        (land
+          (lnot(olt (float 0.000000) (fsub (float 0.000000) (float 0.000000))))
+          (land
+            (lnot(olt (fsub (float 0.000000) (float 0.000000)) (float 0.000000)))
+            (land
+              (eq (i32 0) (i32 0))
+              (land
+                (lnot(olt (float 0.000000) A))
+                (land
+                  (lnot(olt A (float 0.000000)))
+                  (land
+                    (lnot(ne (i32 0) (i32 0)))
+                    (land
+                      (lnot(fune (float 0.000000) (float 0.000000)))
+                      (land
+                        (lnot(fune (float 0.000000) (float 0.000000)))
+                        (lnot(fune (float 0.000000) (float 0.000000)))
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+)
+

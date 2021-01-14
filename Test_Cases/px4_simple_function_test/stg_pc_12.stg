@@ -1,0 +1,24 @@
+[
+A : float = 0,
+M_A : float = 6
+]
+
+//Test: passed
+
+(land
+  (lnot(olt (fadd (float 0.000000) (fmul (float 0.100000) (float 1.000000))) (float 0.000000)))
+  (land
+    (ogt (fsub (fadd (float 0.000000) (fmul (float 0.100000) (float 1.000000))) (float 0.000000)) (float 0.000000))
+    (land
+      (lnot(olt (fsub (fadd (float 0.000000) (fmul (float 0.100000) (float 1.000000))) (float 0.000000)) (float 0.000000)))
+      (land
+        (ogt (fsub (fsub (fadd (float 0.000000) (fmul (float 0.100000) (float 1.000000))) (float 0.000000)) (float 0.000000)) (float 0.000000))
+        (land
+          (lnot(olt (fsub (fsub (fadd (float 0.000000) (fmul (float 0.100000) (float 1.000000))) (float 0.000000)) (float 0.000000)) (float 0.000000)))
+          (ogt (fsub (fsub (fsub (fadd (float 0.000000) (fmul (float 0.100000) (float 1.000000))) (float 0.000000)) (float 0.000000)) (float 0.000000)) (float 0.000000))
+        )
+      )
+    )
+  )
+)
+
