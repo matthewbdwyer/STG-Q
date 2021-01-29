@@ -5,6 +5,7 @@
 using namespace Constraint;
 
 std::unordered_set <std::string> dict_set; 
+bool no_var = true;
 std::map<std::string, std::string> mapping = {
 
 {"fneg", ""},
@@ -224,13 +225,17 @@ void SMTPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *d
   indentLevel--;
   os << "\n";
 
-  os << "(assert ";
+  os << "(assert  (and ";
 
   c->getExpr()->accept(this); 
   os << visitResults.back();
   visitResults.pop_back();
 
-  os << ")\n";
+  if(no_var)
+    os << " (= 1 0)))\n";
+  else
+    os << " (= 1 1)))\n";
+
   os.flush();
 }
 
@@ -239,6 +244,7 @@ void SMTPrinter::endVisit(Symbol * element) {
   if(dict_set.find(element->getName()) != dict_set.end()){
     std::string name = element->getName();
     visitResults.push_back(name);
+    no_var = false;
   }
   else
     visitResults.push_back("\nELEMENT NOT FOUND IN DICTIONARY --> " + element->getName() + "\n");

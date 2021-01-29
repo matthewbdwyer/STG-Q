@@ -1,0 +1,9 @@
+{
+	"B": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "0",
+	       "max": "2"
+	    }
+	}
+}

@@ -1,0 +1,8 @@
+[
+B : double
+]
+
+//Test: failed
+
+(lnot(ogt (llvm.pow.f64 double B (double 2)) (llvm.sqrt.f64 double B)))
+

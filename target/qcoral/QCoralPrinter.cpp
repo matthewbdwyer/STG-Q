@@ -6,6 +6,7 @@ using namespace Constraint;
 std::map<std::string, std::string> dictionary;
 std::map<std::string, int> seen;              // For checking if the id occurs in constraint or not
 int id = 1;
+bool no_var = true;  // For checking if any variable is present in the constraint
 std::map<std::string, std::string> mapping = {
 
 {"fneg", "MUL("},
@@ -291,114 +292,129 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
 
 
 void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
+  
   theConstraint = c;
   os << ":Variables:\n";
   indentLevel++;
 
-
   int num = c->symbols.size();
-  for (auto &n : c->symbols) {
-    num--;
+  // os << "symbol size: "<<c->getExpr()<<"\n";
+  // if(num == 0){
+  //   std::cout<<"No variable!";
+  //   os << "1 UNIFORM_REAL -100 100\n";
+  //   os << "DGT(DVAR(ID_1),DVAR(ID_1))\n";
+  // }
 
-    if(dict != NULL)
-      parseDict(dict, n, c->symbolType(n));
+  // else{
 
-    else{
+    for (auto &n : c->symbols) {
+      num--;
 
-      std::string distribution, max, min;
+      if(dict != NULL)
+        parseDict(dict, n, c->symbolType(n));
 
-      if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
-        std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
-        distribution = "UNIFORM_REAL";
-        std::cerr<<"No Range available for: "<< n <<". Setting default range (-1,000,000 to 1,000,000)\n";
-        min = "-1000000";
-        max = "1000000";
+      else{
+
+        std::string distribution, max, min;
+
+        if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
+          std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
+          distribution = "UNIFORM_REAL";
+          std::cerr<<"No Range available for: "<< n <<". Setting default range (-1,000,000 to 1,000,000)\n";
+          min = "-1000000";
+          max = "1000000";
+        }
+
+        else{
+          std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_INT)"<<"\n";
+          distribution = "UNIFORM_INT";
+        }
+
+        if(c->symbolType(n) == "i8"){
+          std::cerr<<"No Range available for: "<< n<<". Setting default range (-128 to 127)\n";
+          min = "-128";
+          max = "127";
+        }
+
+        else if(c->symbolType(n) == "i16"){
+          std::cerr<<"No Range available for: "<< n <<". Setting default range (-32,768 to 32,767)\n";
+          min = "-32768";
+          max = "32767";
+        }
+
+        else if(c->symbolType(n) == "i32"){
+          std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+          min = "-1000000";
+          max = "1000000";
+        }
+
+        else if(c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
+          std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+          min = "-1000000";
+          max = "1000000";
+        }
+
+        else if(c->symbolType(n) != "float" && c->symbolType(n) != "double"){
+          std::cerr<<"Invalid data type!! "<<n<<"\n";
+          return;
+        }
+
+        os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
+
+      }
+
+      // Now saving variables in a dictionary for lookup
+      if(c->symbolType(n)[0] == 'i'){
+        if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
+          dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
+        }
+        else{
+          os << "Invalid Integer type. Exiting!!\n";
+          exit(0);
+        }
+      }
+
+      else if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
+        dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
       }
 
       else{
-        std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_INT)"<<"\n";
-        distribution = "UNIFORM_INT";
-      }
-
-      if(c->symbolType(n) == "i8"){
-        std::cerr<<"No Range available for: "<< n<<". Setting default range (-128 to 127)\n";
-        min = "-128";
-        max = "127";
-      }
-
-      else if(c->symbolType(n) == "i16"){
-        std::cerr<<"No Range available for: "<< n <<". Setting default range (-32,768 to 32,767)\n";
-        min = "-32768";
-        max = "32767";
-      }
-
-      else if(c->symbolType(n) == "i32"){
-        std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
-        min = "-1000000";
-        max = "1000000";
-      }
-
-      else if(c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
-        std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
-        min = "-1000000";
-        max = "1000000";
-      }
-
-      else if(c->symbolType(n) != "float" && c->symbolType(n) != "double"){
-        std::cerr<<"Invalid data type!! "<<n<<"\n";
+        os << "Invalid data type. Exiting!!\n";
         return;
       }
 
-      os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
-
+      seen[dictionary[n]] = 0;
+      id++;
     }
 
-    // Now saving variables in a dictionary for lookup
-    if(c->symbolType(n)[0] == 'i'){
-      if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
-        dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
-      }
-      else{
-        os << "Invalid Integer type. Exiting!!\n";
-        exit(0);
-      }
+    indentLevel--;
+    os << "\n";
+
+    os << ":Constraints:\n";
+    os << "BAND(";
+    
+    for(auto it: seen){
+      if(it.second == 0){
+        if(it.first[0] == 'D')
+          os<<"BAND(DEQ("<<it.first<<","<<it.first<<"), ";
+        else
+          os<<"BAND(IEQ("<<it.first<<","<<it.first<<"), ";
+      }    
     }
 
-    else if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
-      dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
-    }
+    c->getExpr()->accept(this); 
+    os << visitResults.back();
+    visitResults.pop_back();
 
-    else{
-      os << "Invalid data type. Exiting!!\n";
-      return;
-    }
+    for(auto it: seen)
+      os<<")";
 
-    //os << "(" << c->symbolType(n)[0] << ")" << " = " << c->symbolValue(n);
-    // os << "\n";
-    seen[dictionary[n]] = 0;
-    id++;
-  }
+    if(no_var)
+      os<<", IEQ(ICONST(1), ICONST(0)))";
+    else
+      os<<", IEQ(ICONST(1), ICONST(1)))";
 
-  indentLevel--;
-  os << "\n";
-
-  os << ":Constraints:\n";
-  
-  for(auto it: seen){
-    if(it.second == 0){
-      if(it.first[0] == 'D')
-        os<<"BAND(DEQ("<<it.first<<","<<it.first<<"), ";
-      else
-        os<<"BAND(IEQ("<<it.first<<","<<it.first<<"), ";
-    }    
-  }
-
-  c->getExpr()->accept(this); 
-  os << visitResults.back();
-  visitResults.pop_back();
-
-  for(auto it: seen)
-    os<<")";
+  // }
 
   os << "\n";
   os.flush();
@@ -409,6 +425,7 @@ void QCoralPrinter::endVisit(Symbol * element) {
     std::string name = dictionary[element->getName()];
     //int id_no = stoi(name.substr(8, name.length()-9));
     seen[name] = 1;
+    no_var = false;
     visitResults.push_back(name);
   }
   else
