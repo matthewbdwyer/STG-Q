@@ -49,7 +49,7 @@ done
 # Converting stg file to smt, then checking for uniqueness using sha512. If such smt file is already generated, delete the current smt file.
 
 cd $OLDPWD
-cd $STGQ_HOME/build/target/smt     															
+cd $STGQ_HOME/build/target/bv     															
 files=/tmp/QCounter/stg/*
 
 nof=0
@@ -57,9 +57,9 @@ for file in $files
 do
 	nof+=1
 	if [[ "$dictionary_path" == "None" ]];then
-		./stg2smt "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/smt/${nof}.smt"
+		./stg2bv "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/smt/${nof}.smt"
 	else
-		./stg2smt "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/smt/${nof}.smt"
+		./stg2bv "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/smt/${nof}.smt"
 	fi
 	
 	sha_this="$(sha512sum /tmp/QCounter/smt/${nof}.smt| cut -d " " -f 1)"

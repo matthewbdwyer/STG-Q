@@ -1,6 +1,6 @@
 [
-S0 : double = 45.000000,
-S1 : double = 30.000000
+S0 : double,
+S1 : double
 ]
 
 //Test: passed

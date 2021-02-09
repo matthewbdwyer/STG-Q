@@ -135,7 +135,18 @@ std::map<std::string, std::string> mapping = {
 {"llvm.maximum.f32", "MAX_("},
 {"llvm.maximum.f64", "MAX_("},
 {"llvm.maximum.f80", "MAX_("},
-{"llvm.maximum.f128", "MAX_("}
+{"llvm.maximum.f128", "MAX_("},
+
+{"sin","SIN_("},
+{"cos","COS_("},
+{"tan","TAN_("},
+{"log","LOG_("},
+{"log10f","LOG10_("},
+// {"log2f",Expr::Op::Log2f},
+{"sqrt","SQRT_("},
+{"pow","POW_("},
+{"exp","EXP_("},
+{"expf","EXP_("}
 
 };
 

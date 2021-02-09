@@ -1,9 +1,12 @@
 [
-M_A : float = 8,
-A : float = 0
+S0 : double,
+S1 : double
+
 ]
 
 //Test: passed
 
-(olt (fadd (fmul (fmul (float 2.000000) (float 1.100000)) (float 1.100000)) (fmul (fmul (float 4.000000) (float -1.000000)) (float 1.200000))) (float 0.000000))
-
+(land
+  (ogt (pow double S0 S1) (pow double S0 (sitofp double (i32 2))))
+  (ogt (pow double S0 S1) (double 0.500000))
+)

@@ -111,6 +111,7 @@ Any ConstraintBuilder::visitBinaryExpr(ConstraintGrammarParser::BinaryExprContex
   visit(ctx->expr(0));
   std::shared_ptr<Constraint::Expr> c1 = visitedExpr;
   visit(ctx->expr(1));
+
   visitedExpr = theConstraint->create(c1, visitedExpr, op);
   return "";
 }
@@ -129,6 +130,9 @@ Any ConstraintBuilder::visitUnIntrExpr(ConstraintGrammarParser::UnIntrExprContex
 Any ConstraintBuilder::visitBinIntrExpr(ConstraintGrammarParser::BinIntrExprContext *ctx) {
   auto op = theConstraint->str2op(ctx->BININTRFUN()->getText());
   auto type = theConstraint->str2type(ctx->TYPE()->getText());
+
+  std::cout<<"OP:" << op<< "\nType: "<<type<<"\n";
+
   visit(ctx->expr(0));
   std::shared_ptr<Constraint::Expr> c1 = visitedExpr;
   visit(ctx->expr(1));

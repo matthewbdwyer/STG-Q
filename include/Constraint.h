@@ -64,6 +64,7 @@ public:
    Sinf80, Cosf80, Expf80, Exp2f80, Logf80, Log2f80, Log10f80, Fabsf80, Sqrtf80, Floorf80, Ceilf80,
    Sinf128, Cosf128, Expf128, Exp2f128, Logf128, Log2f128, Log10f128, Fabsf128, Sqrtf128, Floorf128, Ceilf128,
    Sinppcf128, Cosppcf128, Expppcf128, Exp2ppcf128, Logppcf128, Log2ppcf128, Log10ppcf128, Fabsppcf128, Sqrtppcf128, Floorppcf128, Ceilppcf128,
+   Sin, Cos, Tan, Exp, Expf, Log, Log10f, Log2f, Sqrt,
 
    //added by SBH for binary llvm intrinsics (Reordered by Rishab)
 
@@ -72,14 +73,15 @@ public:
    Powf80, Powif80, Fmaf80, Minnumf80, Maxnumf80, Minimumf80, Maximumf80, Copysignf80,
    Powf128, Powif128, Fmaf128, Minnumf128, Maxnumf128, Minimumf128, Maximumf128, Copysignf128,
    Powppcf128, Powippcf128, Fmappcf128, Minnumppcf128, Maxnumppcf128, Minimumppcf128, Maximumppcf128, Copysignppcf128,
+   Pow,
 
     //added by SBH
 
     FirstUnary = Trunc, LastUnary = FNeg,
     FirstCast = Trunc, LastCast = BitCast,
     FirstBinary = Add, LastBinary = LOr,
-    FirstUnaryIntr = Sinf32, LastUnaryIntr = Ceilppcf128,      //added by SBH   [Need to change]
-    FirstBinaryIntr = Powf32, LastBinaryIntr = Copysignppcf128 //added by SBH   [Need to change]
+    FirstUnaryIntr = Sinf32, LastUnaryIntr = Sqrt,      //added by SBH   [Need to change]
+    FirstBinaryIntr = Powf32, LastBinaryIntr = Pow //added by SBH   [Need to change]
 
   };
 

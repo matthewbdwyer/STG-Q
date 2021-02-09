@@ -272,7 +272,18 @@ std::map<std::string, Expr::Op> soMap = {
   {"llvm.copysign.f64",Expr::Op::Copysignf64},
   {"llvm.copysign.f80",Expr::Op::Copysignf80},
   {"llvm.copysign.f128",Expr::Op::Copysignf128},
-  {"llvm.copysign.ppcf128",Expr::Op::Copysignppcf128}
+  {"llvm.copysign.ppcf128",Expr::Op::Copysignppcf128},
+
+  {"sin",Expr::Op::Sin},
+  {"cos",Expr::Op::Cos},
+  {"tan",Expr::Op::Tan},
+  {"log",Expr::Op::Log},
+  {"log10f",Expr::Op::Log10f},
+  {"log2f",Expr::Op::Log2f},
+  {"sqrt",Expr::Op::Sqrt},
+  {"pow",Expr::Op::Pow},
+  {"exp",Expr::Op::Exp},
+  {"expf",Expr::Op::Expf}
 
 };
 
@@ -455,7 +466,18 @@ std::map<Expr::Op, std::string> osMap = {
   {Expr::Op::Copysignf64,"llvm.copysign.f64"},
   {Expr::Op::Copysignf80,"llvm.copysign.f80"},
   {Expr::Op::Copysignf128,"llvm.copysign.f128"},
-  {Expr::Op::Copysignppcf128,"llvm.copysign.ppcf128"}
+  {Expr::Op::Copysignppcf128,"llvm.copysign.ppcf128"},
+
+  {Expr::Op::Sin,"sin"},
+  {Expr::Op::Cos,"cos"},
+  {Expr::Op::Tan,"tan"},
+  {Expr::Op::Log,"log"},
+  {Expr::Op::Log10f,"log10f"},
+  {Expr::Op::Log2f,"log2f"},
+  {Expr::Op::Sqrt,"sqrt"},
+  {Expr::Op::Pow,"pow",},
+  {Expr::Op::Exp,"exp"},
+  {Expr::Op::Expf, "expf"}
   
 }; 
 
