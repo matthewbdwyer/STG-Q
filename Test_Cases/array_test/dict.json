@@ -1,9 +1,12 @@
 {
 	"S": {
-	    "distribution": "UNIFORM_INT",
+	    "distribution": "UNIFORM_REAL",
 	    "range": {
 	       "min": "-100000",
 	       "max": "100000"
+	    },
+	    "parameters":{
+	    	"mean":0.5
 	    }
 	}
 }

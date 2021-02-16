@@ -1,0 +1,12 @@
+{
+	"X": {
+	    "distribution": "GEOMETRIC",
+	    "range": {
+	       "min": "0",
+	       "max": "25"
+	    },
+	    "parameters": {
+	    	"p": 0.5
+	    }
+	}
+}

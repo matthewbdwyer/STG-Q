@@ -1,0 +1,13 @@
+{
+	"X": {
+	    "distribution": "BINOMIAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    	"num_trials": 10,
+	    	"p": 0.5
+	    }
+	}
+}

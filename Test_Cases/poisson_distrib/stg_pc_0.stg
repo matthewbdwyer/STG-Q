@@ -1,0 +1,7 @@
+[
+X : i32
+]
+
+//Test: failed.
+
+(sle X (i32 5))

@@ -107,21 +107,24 @@ void ConstraintTypeChecker::endVisit(UnaryExpr * element) {
     element->setType(result1);
   }
 
-  else if(Expr::Op::Sinf32 <= op && op <= Expr::Op::Ceilppcf128){ //Added by Rishab for Unary Intrinsics
-    std::string operator_string = constraint->op2str(op);
-    int operator_width = stoi(operator_string.substr(operator_string.length()-2));
+  else if(Expr::Op::Sinf32 <= op && op <= Expr::Op::Sqrt){ //Added by Rishab for Unary Intrinsics   Ceilppcf128)
+    // std::string operator_string = constraint->op2str(op);
+    // std::cout<< "operator string: "<< operator_string <<"\n";
+    // int operator_width = stoi(operator_string.substr(operator_string.length()-2));
 
-    if(operator_width == 28)
-      operator_width = 128;
+    // if(operator_width == 28)
+    //   operator_width = 128;
 
-    if (!(result1->getBase() == Type::Base::Float && 
-          result1->getWidth() == operator_width)) { 
+     // std::cout<<"Comming here: sinf32  ->  "<<constraint->type2str(element->getType())<<"\n";
+
+    if (!(result1->getBase() == Type::Base::Float)) {    //  && result1->getWidth() == operator_width 
       cerr << "Type Error: Operator "+constraint->op2str(op);
       cerr << " has operand of type "+constraint->type2str(result1);
       cerr << "\n";
       result = false;
     }
-    element->setType(result1);
+    // element->setType(constraint->str2type(constraint->type2str(element->getType())));
+    element->setType(element->getType());
   }
 
   else {
@@ -209,16 +212,16 @@ void ConstraintTypeChecker::endVisit(BinaryExpr * element) {
     }
     element->setType(result1);
   }
-  else if(Expr::Op::Powf32 <= op && op <= Expr::Op::Copysignppcf128){  //Added by Rishab for Binary Intrinsics
-    std::string operator_string = constraint->op2str(op);
-    int operator_width = stoi(operator_string.substr(operator_string.length()-2));
+  else if(Expr::Op::Powf32 <= op && op <= Expr::Op::Pow){  //Added by Rishab for Binary Intrinsics    Copysignppcf128
+    // std::string operator_string = constraint->op2str(op);
+    // int operator_width = stoi(operator_string.substr(operator_string.length()-2));
 
-    if(operator_width == 28)
-      operator_width = 128;
+    // if(operator_width == 28)
+    //   operator_width = 128;
 
     if (!(result1->getBase() == Type::Base::Float && 
           result2->getBase() == Type::Base::Float &&
-          result1->getWidth() == operator_width && result2->getWidth() == operator_width)) { 
+          result1->getWidth() == result2->getWidth())) {  // result1->getWidth() == operator_width && result2->getWidth() == operator_width
       cerr << "Type Error: Operator "+constraint->op2str(op);
       cerr << " has operands of type "+constraint->type2str(result1);
       cerr << " and "+constraint->type2str(result2);

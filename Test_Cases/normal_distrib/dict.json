@@ -1,0 +1,13 @@
+{
+	"X": {
+	    "distribution": "NORMAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    	"mean": 5,
+	    	"sd": 1.5
+	    }
+	}
+}

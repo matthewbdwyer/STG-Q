@@ -6,7 +6,7 @@ cd $(dirname $(readlink -f "$0"))
 # set the tolerance (%) by which the computed STG score in a test
 # can deviate from the expected score
 #
-tolerance=0.01
+tolerance=0.05
 
 test_dir="$(dirname $(readlink -f "$0"))"
 

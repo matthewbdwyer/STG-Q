@@ -1,0 +1,12 @@
+[
+S0 : double,
+S1 : double
+
+]
+
+//Test: passed
+
+(land
+  (ogt (pow double S0 S1) (pow double S0 (sitofp double (i32 2))))
+  (ogt (pow double S0 S1) (double 0.500000))
+)

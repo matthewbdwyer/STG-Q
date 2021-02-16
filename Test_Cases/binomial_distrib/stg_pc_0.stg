@@ -1,0 +1,7 @@
+[
+X : i32
+]
+
+//Test: failed. Number of heads=5
+
+(sle X (i32 5))

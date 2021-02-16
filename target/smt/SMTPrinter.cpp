@@ -1,14 +1,15 @@
 #include "SMTPrinter.h"
 #include <jsoncpp/json/json.h>
+#include <unordered_set>
 
 using namespace Constraint;
 
-std::map<std::string, std::string> dictionary;
-int id = 1;
+std::unordered_set <std::string> dict_set; 
+bool no_var = true;
 std::map<std::string, std::string> mapping = {
 
 {"fneg", ""},
-{"fptosi", "(to_int"},
+{"fptosi", "(to_int "},
 
 {"trunc", ""},
 {"zext", ""},
@@ -16,7 +17,7 @@ std::map<std::string, std::string> mapping = {
 {"fptrunc", ""},
 {"fpext", ""},
 
-{"sitofp", "(to_real"},
+{"sitofp", "(to_real "},
 {"add", "(+ "},
 {"sub", "(- "},
 {"mul", "(* "},
@@ -29,14 +30,14 @@ std::map<std::string, std::string> mapping = {
 {"frem", "(% "},
 
 {"eq", "(= "},
-{"ne", "(!= "},
+{"ne", "(not(= "},
 {"slt", "(< "},
 {"sle", "(<= "},
 {"sgt", "(> "},
 {"sge", "(>= "},
 {"oeq", "(= "},
-{"one", "(!= "},
-{"fune", "(!= "},      // Newly added
+{"one", "(not(= "},
+{"fune", "(not(= "},      // Newly added
 {"olt", "(< "},
 {"ole", "(<= "},
 {"ogt", "(> "},
@@ -59,10 +60,10 @@ std::map<std::string, std::string> mapping = {
 {"llvm.cos.f80", "(cos "},
 {"llvm.cos.f128", "(cos "},
 
-{"llvm.exp.f32", "(pow EXP "},
-{"llvm.exp.f64", "(pow EXP "},
-{"llvm.exp.f80", "(pow EXP "},
-{"llvm.exp.f128", "(pow EXP "},
+{"llvm.exp.f32", "(^ EXP "},
+{"llvm.exp.f64", "(^ EXP "},
+{"llvm.exp.f80", "(^ EXP "},
+{"llvm.exp.f128", "(^ EXP "},
 
 {"llvm.log.f32", "(log "},
 {"llvm.log.f64", "(log "},
@@ -74,15 +75,15 @@ std::map<std::string, std::string> mapping = {
 {"llvm.log10.f80", "(log10 "},
 {"llvm.log10.f128", "(log10 "},
 
-{"llvm.sqrt.f32", "(sqrt "},
-{"llvm.sqrt.f64", "(sqrt "},
-{"llvm.sqrt.f80", "(sqrt "},
-{"llvm.sqrt.f128", "(sqrt "},
+{"llvm.sqrt.f32", "(^ "},
+{"llvm.sqrt.f64", "(^ "},
+{"llvm.sqrt.f80", "(^ "},
+{"llvm.sqrt.f128", "(^ "},
 
-{"llvm.exp2.f32", "(pow 2.0 "},
-{"llvm.exp2.f64", "(pow 2.0 "},
-{"llvm.exp2.f80", "(pow 2.0 "},
-{"llvm.exp2.f128", "(pow 2.0 "},
+{"llvm.exp2.f32", "(^ 2.0 "},
+{"llvm.exp2.f64", "(^ 2.0 "},
+{"llvm.exp2.f80", "(^ 2.0 "},
+{"llvm.exp2.f128", "(^ 2.0 "},
 
 //New functions added for testing
 
@@ -103,10 +104,10 @@ std::map<std::string, std::string> mapping = {
 
 //Intrinsics BINARY
 
-{"llvm.pow.f32", "(pow "},
-{"llvm.pow.f64", "(pow "},
-{"llvm.pow.f80", "(pow "},
-{"llvm.pow.f128", "(pow "},
+{"llvm.pow.f32", "(^ "},
+{"llvm.pow.f64", "(^ "},
+{"llvm.pow.f80", "(^ "},
+{"llvm.pow.f128", "(^ "},
 
 {"llvm.minnum.f32", "(min "},
 {"llvm.minnum.f64", "(min "},
@@ -178,16 +179,16 @@ void SMTPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
   if(distribution == "UNIFORM_INT" || distribution == "UNIFORM_REAL"){
     
     if(c->symbolType(var) == "i1")
-      os << "(declare-const id_"<< id << " Bool)";
+      os << "(declare-const "<< var << " Bool)";
 
     else if(c->symbolType(var)[0] == 'i'){
-      os<< "(set-info :domain \"id_" << id <<" UniformInt "<< min<<" "<<max<<"\")\n";
-      os << "(declare-const id_"<< id << " Int)\n";
+      os<< "(set-info :domain \"" << var <<" UniformInt "<< min<<" "<<max<<"\")\n";
+      os << "(declare-const "<< var << " Int)\n";
     }
 
     else if(c->symbolType(var) == "float" || c->symbolType(var) == "double"){
-      os<< "(set-info :domain \"id_" << id <<" UniformReal "<< min<<" "<<max<<"\")\n";
-      os << "(declare-const id_"<< id << " Real)\n";
+      os<< "(set-info :domain \"" << var <<" UniformReal "<< min<<" "<<max<<"\")\n";
+      os << "(declare-const "<< var << " Real)\n";
     }
 
     else{
@@ -217,30 +218,33 @@ void SMTPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *d
   indentLevel++;
   for (auto &n : c->symbols) {
     parseDict(dict, c, n);
-    dictionary[n] = "id_" + std::to_string(id);
+    dict_set.insert(n);
     // os << "\n";
-    id++;
   }
 
   indentLevel--;
   os << "\n";
 
-  os << "(assert ";
+  os << "(assert  (and ";
 
   c->getExpr()->accept(this); 
   os << visitResults.back();
   visitResults.pop_back();
 
-  os << ")\n";
+  if(no_var)
+    os << " (= 1 0)))\n";
+  else
+    os << " (= 1 1)))\n";
+
   os.flush();
 }
 
 void SMTPrinter::endVisit(Symbol * element) {
-  if(dictionary.find(element->getName()) != dictionary.end()){
-    std::string name = dictionary[element->getName()];
-    //int id_no = stoi(name.substr(8, name.length()-9));
-    // seen[name] = 1;
+
+  if(dict_set.find(element->getName()) != dict_set.end()){
+    std::string name = element->getName();
     visitResults.push_back(name);
+    no_var = false;
   }
   else
     visitResults.push_back("\nELEMENT NOT FOUND IN DICTIONARY --> " + element->getName() + "\n");
@@ -295,46 +299,12 @@ void SMTPrinter::endVisit(UnaryExpr * element) {
 
   if(op == "fneg")
     result += "-" + result1 + ")";
-
-  // else if(op.find("llvm.ceil") != std::string::npos){
-  // 	// result = "BOR(BAND(DGT(" + result1 + ", DCONST(0)), DGT(ASDOUBLE(ASINT(ADD(" + result1 + ", DCONST(0.9999999999999)"
-  // 	result += "ASINT(ADD(" + result1 + ", MUL(ASDOUBLE(DGT(" + result1 + ", DCONST(0))), DCONST(0.9999999999999)))))";
-  // }
-
-  // else if(op.find("llvm.floor") != std::string::npos){
-  // 	result += "ASINT(SUB(" + result1 + ", MUL(ASDOUBLE(DLT(" + result1+ ", DCONST(0))), DCONST(0.9999999999999)))))";
-  // }
-
-  // else if(op.find("llvm.fabs") != std::string::npos){
-  // 	result += "MUL(" + result1 + ", MUL(ASDOUBLE(DLT(" + result1 + ", DCONST(0.0))) , DCONST(-1.0))), MUL(" + result1 + ", ASDOUBLE(DGT(" + result1 + ", DCONST(0.0)))))";
-  // }
-  
-  // else if(result == ""){
-
-  //   if(op == "trunc" && theConstraint->type2str(element->getType()) == "i1"){
-  //     //os<<"\nResult1 --> "<<result1<<"\n";
-  //     if(result1 == "ICONST(0)" || result1 == "IEQ(ICONST(1), ICONST(0))")
-  //       result = "IEQ(ICONST(1), ICONST(0))";
-  //     else
-  //       result = "IEQ(ICONST(1), ICONST(1))";
-  //   }
-
-  //   else if(op == "zext" && theConstraint->type2str(element->getType())[0] == 'i'){
-  //     std::cerr<<"FOund zext...\t"<<result1<<"\n";
-  //     if(result1 == "ICONST(0)" || result1 == "IEQ(ICONST(1), ICONST(0))")
-  //       result = "ICONST(0)";
-  //     else if(result1 == "ICONST(1)" || result1 == "IEQ(ICONST(1), ICONST(1))")
-  //       result = "ICONST(1)";
-  //     else
-  //       result = "ASINT(" + result1 + ")";
-  //   }
-
-  //   else
-  //   result = result1;
-  // }
-
-  else
+  else if(op.find("sqrt") != -1)
+    result += result1 + " 0.5)";
+  else if(mapping[op] != "")
     result += result1 + ")";
+  else
+    result += result1;
 
   visitResults.push_back(result);
 }       
@@ -365,6 +335,9 @@ void SMTPrinter::endVisit(BinaryExpr * element) {
     std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
     result += result2 + ")";
   }
+
+  else if(op == "ne" || op == "fune" || op == "one")
+    result += result1 + " " + result2 + "))";
 
   else
   	result += result1 + " " + result2 + ")";

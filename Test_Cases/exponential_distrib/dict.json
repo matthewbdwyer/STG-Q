@@ -1,0 +1,12 @@
+{
+	"X": {
+	    "distribution": "EXPONENTIAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    	"mean": 2
+	    }
+	}
+}
