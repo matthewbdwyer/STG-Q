@@ -16,8 +16,8 @@ fi
 
 if [ -d "$STGQ_BIN" ]; then
 	cd $STGQ_BIN
-	rm stg*
-	rm Quantify.sh
-	rm comb
-	rm res
+	rm -f stg*
+	rm -f Quantify.sh
+	rm -f comb
+	rm -f res
 fi
