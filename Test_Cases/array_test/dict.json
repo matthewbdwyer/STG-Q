@@ -1,6 +1,6 @@
 {
 	"S": {
-	    "distribution": "UNIFORM_REAL",
+	    "distribution": "UNIFORM_INT",
 	    "range": {
 	       "min": "-100000",
 	       "max": "100000"

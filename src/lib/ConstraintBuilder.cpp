@@ -123,6 +123,7 @@ Any ConstraintBuilder::visitUnIntrExpr(ConstraintGrammarParser::UnIntrExprContex
   visit(ctx->expr());
   auto type = theConstraint->str2type(ctx->TYPE()->getText());
   visitedExpr = theConstraint->create(visitedExpr, op, type);
+
   return "";
 }
 
@@ -131,7 +132,7 @@ Any ConstraintBuilder::visitBinIntrExpr(ConstraintGrammarParser::BinIntrExprCont
   auto op = theConstraint->str2op(ctx->BININTRFUN()->getText());
   auto type = theConstraint->str2type(ctx->TYPE()->getText());
 
-  std::cout<<"OP:" << op<< "\nType: "<<type<<"\n";
+  // std::cout<<"OP:" << op<< "\nType: "<<type->getWidth()<<"\n";
 
   visit(ctx->expr(0));
   std::shared_ptr<Constraint::Expr> c1 = visitedExpr;

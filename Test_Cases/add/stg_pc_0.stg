@@ -1,12 +1,12 @@
 [
-X : i32, 
-Y : i32 = 5
+X : float, 
+Y : float = 5
 ]
 
 //Test: failed
 
 (land
-  (lnot(eq X Y))
-  (lnot(sgt X Y))
+  (lnot(oeq X Y))
+  (lnot(ogt X Y))
 )
 

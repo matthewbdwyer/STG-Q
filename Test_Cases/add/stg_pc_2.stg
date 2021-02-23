@@ -1,9 +1,9 @@
 [
-X : i32 = 50,
-Y : i32 = 50
+X : float = 50,
+Y : float = 50
 ]
 
 //Test: passed
 
-(eq X Y)
+(oeq X Y)
 

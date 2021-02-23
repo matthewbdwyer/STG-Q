@@ -35,10 +35,6 @@ std::map<std::string, std::string> mapping = {
 {"sle", "(bvsle "},
 {"sgt", "(bvsgt "},
 {"sge", "(bvsge "},
-{"ult", "(bvult "},
-{"ugt", "(bvugt "},
-{"ule", "(bvule "},
-{"uge", "(bvuge "},
 {"oeq", "(fp.eq "},
 {"one", "(not(fp.eq "},
 {"fune", "(not(fp.eq "},      // CHECK
@@ -244,15 +240,21 @@ void BVPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *di
     dict_set.insert(n);
   }
 
+  os <<" OKKKK 1";
   indentLevel--;
-  os << "\n";
+  os <<" OKKKK 1";
+  // os << "\n";
   os << "(assert  (and ";
 
   c->getExpr()->accept(this); 
 
+  os<<" OKKKK 2";
   os << visitResults.back();
 
+  // os<<" OKKKK 3";
   visitResults.pop_back();
+
+  // os<<" OKKKK 4";
 
   if(no_var)
     os << " (= 1 0)))\n";
@@ -284,20 +286,20 @@ void BVPrinter::endVisit(IntConstant * element) {
     result = "false";
 
   else
-    result = "((_ int2bv " + std::to_string(element->getType()->getWidth()) + ") " + std::to_string(element->getValue()) + ")";
+    result = "(_ bv" + std::to_string(element->getValue()) + " " + std::to_string(element->getType()->getWidth()) + ")"; 
 
   visitResults.push_back(result);
 }
 
 void BVPrinter::endVisit(FloatConstant * element) {
 
-  std::string result = "((_ to_fp 8 24) RNE " + std::to_string(element->getValue()) + ")"; 
+  std::string result = std::to_string(element->getValue()); 
   visitResults.push_back(result);
 }
 
 void BVPrinter::endVisit(DoubleConstant * element) {
 
-  std::string result = "((_ to_fp 11 53) RNE " + std::to_string(element->getValue()) + ")"; 
+  std::string result = std::to_string(element->getValue()); 
   visitResults.push_back(result);
 }
 
@@ -310,21 +312,11 @@ void BVPrinter::endVisit(UnaryExpr * element) {
   
   // std::string width = std::to_string(element->getType()->getWidth());
   std::string width = "32";
-  std::string t = "32";
-
-  // std::string result_width = std::stoi((visitResults.back())->getWidth()); 
-  std::string result_width = "128";
-
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
-
-  if(op == "sitofp" || op == "fptosi" || op == "sext" || op == "trunc"){
-    t = element->getConstraint()->type2str(element->getType());
-    width = (t == "float" ? "32" : "64");
-  }
 
   if(mapping.find(op) != mapping.end())
     result += mapping[op];
@@ -342,23 +334,13 @@ void BVPrinter::endVisit(UnaryExpr * element) {
     result += "(= " + width + " 32) " + "((_ to_fp 8 24) " + result1 + ") " + "((_ to_fp 11 53) " + result1 + "))";
   else if(op == "fptosi")
     result += "((_ fp.to_sbv " + width + ") RNE " + result1 + ")"; //"(= " + width + " 32) " + "( (_ fp.to_sbv 32) RNE " + result1 + ") ( (_ fp.to_sbv 64) RNE " + result1 + ")";
-  else if(op == "trunc" || op == "sext"){
-    width = (t.substr(1));
-    result += "((_ int2bv " + width + ") ((_ bv2int " + result_width + ") " + result1 + "))";
-  }
-  else if(op == "fptrunc")
-    result += "((_ to_fp 8 24) RNE (fp.to_real " + result1 + "))"; //(width == "32" ? "((_ to_fp 8 24) RNE (fp.to_real " + result1 + "))" : "((_ to_fp 11 53) RNE (fp.to_real " + result1 + "))");
-  else if(op == "fpext")
-    result += "((_ to_fp 11 53) RNE (fp.to_real " + result1 + "))";
   else if(mapping[op] != "")
     result += result1 + ")";
   else
     result += result1;
 
   visitResults.push_back(result);
-}  
-
-
+}       
 
 bool BVPrinter::visit(BinaryExpr * element) {
   indentLevel++;
@@ -367,7 +349,8 @@ bool BVPrinter::visit(BinaryExpr * element) {
 
 void BVPrinter::endVisit(BinaryExpr * element) {
 
-  std::string width = "";
+  std::string width = std::to_string(element->getType()->getWidth());
+  // std::string width = "32";
   std::string result2 = visitResults.back();
   visitResults.pop_back();
   std::string result1 = visitResults.back();
@@ -383,11 +366,6 @@ void BVPrinter::endVisit(BinaryExpr * element) {
     return;
   }
 
-  if(Expr::Op::Powf32 <= element->getOp() && element->getOp() <= Expr::Op::Pow){
-    std::string t = element->getConstraint()->type2str(element->getType());
-    width = (t == "float" ? "32" : "64");
-  }
-
   if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext"){
     std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
     result += result2 + ")";
@@ -400,13 +378,11 @@ void BVPrinter::endVisit(BinaryExpr * element) {
     result += "(= " + width + " 32) " + "((_ to_fp 8 24) RNE (^ (fp.to_real " + result1 + ") (fp.to_real " + result2 + ") )) " + "((_ to_fp 11 53) RNE (^ (fp.to_real " + result1 + ") (fp.to_real " + result2 + ") )))";
 
   else
-    result += result1 + " " + result2 + ")";
+  	result += result1 + " " + result2 + ")";
 
   visitResults.push_back(result);
-
 }                     
 
 std::string BVPrinter::indent() const {
   return std::string(indentLevel*indentSize, ' ');
 }
-

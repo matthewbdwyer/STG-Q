@@ -284,6 +284,8 @@ bool SMTPrinter::visit(UnaryExpr * element) {
 }
 
 void SMTPrinter::endVisit(UnaryExpr * element) {
+
+    os << "\n yeah came here endvisit Unary!! \n";
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
@@ -316,6 +318,8 @@ bool SMTPrinter::visit(BinaryExpr * element) {
 
 void SMTPrinter::endVisit(BinaryExpr * element) {
 
+  
+  os << "\n yeah came here endvisit!! \n";
   std::string result2 = visitResults.back();
   visitResults.pop_back();
   std::string result1 = visitResults.back();

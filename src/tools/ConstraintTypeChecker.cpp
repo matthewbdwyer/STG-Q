@@ -115,6 +115,8 @@ void ConstraintTypeChecker::endVisit(UnaryExpr * element) {
     // if(operator_width == 28)
     //   operator_width = 128;
 
+    // (Sin double x)
+
      // std::cout<<"Comming here: sinf32  ->  "<<constraint->type2str(element->getType())<<"\n";
 
     if (!(result1->getBase() == Type::Base::Float)) {    //  && result1->getWidth() == operator_width 
