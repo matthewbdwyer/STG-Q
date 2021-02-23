@@ -9,7 +9,7 @@ if [ -z "$STGQ_HOME" ]; then
 fi
 
 if [ ! -d "$STGQ_LIB" ]; then
-	STGQ_LIB="$STGQ_HOME"/lib
+	export STGQ_LIB="$STGQ_HOME"/lib
 	if [ ! -d "STGQ_LIB" ]; then
 		mkdir "$STGQ_LIB"
 	fi

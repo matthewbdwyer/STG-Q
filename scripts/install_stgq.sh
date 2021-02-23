@@ -9,7 +9,7 @@ if [ -z "$STGQ_HOME" ]; then
 fi
 
 if [ ! -d "$STGQ_LIB" ]; then
-	STGQ_LIB="$STGQ_HOME"/lib
+	export STGQ_LIB="$STGQ_HOME"/lib
 	if [ ! -d "STGQ_LIB" ]; then
 		mkdir "$STGQ_LIB"
 	fi
@@ -23,7 +23,7 @@ cd $STGQ_HOME
 if [ ! -d build ]; then
 	mkdir build
 fi
-cd build
+cd $STGQ_HOME/build
 cmake ..
 make
 make install

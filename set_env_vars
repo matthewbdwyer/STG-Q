@@ -1,10 +1,14 @@
 #
 # Infer STGQ_HOME and set all other environment variables
 #
-export STGQ_HOME=$(pwd)
+
+if [ -z "$STGQ_HOME" ]; then
+	export STGQ_HOME=$(pwd)
+fi
 
 export STGQ_LIB=$STGQ_HOME/lib
 export STGQ_BIN=$STGQ_HOME/bin
+
 export QCORAL_HOME=$STGQ_HOME/qcoral
 
 export PATH=$PATH:$STGQ_BIN

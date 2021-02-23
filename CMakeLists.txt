@@ -56,6 +56,5 @@ include_directories(include)
 add_subdirectory(target)
 
 #add_subdirectory(test)
-
 #target_link_libraries(stg2qc stg --coverage)
 
