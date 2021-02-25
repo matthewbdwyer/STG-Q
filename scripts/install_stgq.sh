@@ -16,6 +16,56 @@ if [ ! -d "$STGQ_LIB" ]; then
 
 fi
 
+# download antlr4
+if [ ! -f "$STGQ_LIB/antlr-4.8-complete.jar" ]; then
+	cd $STGQ_LIB
+	wget https://www.antlr.org/download/antlr-4.8-complete.jar
+	cd -
+fi
+
+# download realpaver
+echo "========================"
+echo "Installing realpaver     "
+echo "========================"
+REALPAVER="$STGQ_HOME/realpaver-0.4/bin/realpaver"
+if [ ! -x "$REALPAVER" ]; then
+	wget http://pagesperso.lina.univ-nantes.fr/~granvilliers-l/realpaver/src/realpaver-0.4.tar.gz
+	tar -xzf realpaver*.tar.gz
+	cd realpaver-0.4
+	./configure
+	make
+fi
+
+# download qcoral
+echo "========================"
+echo "Installing qcoral        "
+echo "========================"
+cd $STGQ_HOME
+if [ ! -d qcoral ]; then
+	wget https://s3-us-west-2.amazonaws.com/qcoral/qcoral-fse-replication.tar.xz
+	tar xf qcoral-fse-replication.tar.xz
+fi
+
+echo "========================="
+echo "Point qcoral to realpaver"
+echo "========================="
+cd $STGQ_HOME
+if [ -x "$REALPAVER" ]; then
+	grep mateus qcoral/scripts/variables
+	if [ $? -eq 0 ]; then
+		echo Need to adjust realpaver path in qcoral/scripts/variables ...
+		echo "Before"
+		grep REALPAVER qcoral/scripts/variables
+		sed -i "s/mateus\/tools/$(whoami)\/STG-Q/g" qcoral/scripts/variables
+		echo "After"
+		grep REALPAVER qcoral/scripts/variables
+
+	fi
+else
+	echo Error: realpaver executable not found
+	exit 1
+fi
+
 echo "========================"
 echo "Ready to now build STG-Q"
 echo "========================"
@@ -23,7 +73,7 @@ cd $STGQ_HOME
 if [ ! -d build ]; then
 	mkdir build
 fi
-cd $STGQ_HOME/build
+cd build
 cmake ..
 make
 make install
