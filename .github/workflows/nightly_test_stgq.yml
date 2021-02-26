@@ -7,7 +7,7 @@ name: Nightly
 
 on:
   schedule:
-    - cron: '0 30 * * *'
+    - cron: '30 6 * * *' # time is UTC
 
 jobs:
   STGQ-tests:
