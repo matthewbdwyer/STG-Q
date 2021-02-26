@@ -60,7 +60,7 @@ echo "============================================"
 echo "Point qcoral to realpaver: $REALPAVER"
 echo "============================================"
 if [ -x "$REALPAVER" ]; then
-	grep mateus $QCORAL_HOME/scripts/variables
+	grep mateus $QCORAL_HOME/qcoral/scripts/variables
 	if [ $? -eq 0 ]; then
 		echo Need to adjust realpaver path in qcoral/scripts/variables ...
 		echo "Before"
@@ -75,16 +75,25 @@ else
 	exit 1
 fi
 
-echo "========================"
-echo "Ready to now build STG-Q"
-echo "========================"
-cd $STGQ_HOME
 
-if [ ! -d build ]; then
-	mkdir build
+# Setup build directory
+if [ -z "$STGQ_BUILD" ]; then
+	STGQ_BUILD=$STGQ_HOME/build
+else
+	if [ ! -d $STGQ_BUILD ]; then
+		mkdir -p $STGQ_BUILD
+	fi
 fi
-cd build
-cmake ..
+if [ ! -d $STGQ_BUILD ]; then
+	mkdir $STGQ_BUILD
+fi
+
+echo "=========================================="
+echo "Ready to now build STG-Q from $STGQ_BUILD"
+echo "=========================================="
+
+cd $STGQ_BUILD
+cmake $STGQ_HOME
 make
 make install
 

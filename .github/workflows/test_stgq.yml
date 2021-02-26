@@ -19,6 +19,7 @@ jobs:
         run: |
           export QCORAL_HOME=/tmp/stgq/qcoral
           export REALPAVER_HOME=/tmp/stgq/realpaver
+          export STGQ_BUILD=/tmp/stgq/build
           . set_env_vars
           scripts/install_stgq.sh
           
@@ -27,5 +28,6 @@ jobs:
         run: |
           export QCORAL_HOME=/tmp/stgq/qcoral
           export REALPAVER_HOME=/tmp/stgq/realpaver
+          export STGQ_BUILD=/tmp/stgq/build
           . set_env_vars
           scripts/run_tests.sh
