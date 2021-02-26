@@ -14,12 +14,6 @@ jobs:
       - name: Checkout STG-Q
         uses: actions/checkout@v2
 
-      # Cleanup umbrella
-      - name: Cleanup
-        run: |
-          . set_env_vars
-          scripts/distclean.sh
-          
       # Re-install STG
       - name: Install STGQ
         run: |
