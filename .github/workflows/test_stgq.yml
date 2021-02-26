@@ -17,13 +17,15 @@ jobs:
       # Re-install STG
       - name: Install STGQ
         run: |
-          export QCORAL_HOME=/tmp/qcoral
+          export QCORAL_HOME=/tmp/stgq/qcoral
+          export REALPAVER_HOME=/tmp/stgq/realpaver
           . set_env_vars
           scripts/install_stgq.sh
           
       # Run STG-Q tests
       - name: Run STG-Q tests
         run: |
-          export QCORAL_HOME=/tmp/qcoral
+          export QCORAL_HOME=/tmp/stgq/qcoral
+          export REALPAVER_HOME=/tmp/stgq/realpaver
           . set_env_vars
           scripts/run_tests.sh

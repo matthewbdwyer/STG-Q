@@ -11,13 +11,17 @@ fi
 if [ ! -d "$STGQ_LIB" ]; then
 	export STGQ_LIB="$STGQ_HOME"/lib
 	if [ ! -d "STGQ_LIB" ]; then
-		mkdir "$STGQ_LIB"
+		mkdir -p "$STGQ_LIB"
 	fi
 
 fi
 
-if [ ! -d "$REALPAVER_HOME" ]; then
+if [ -z "$REALPAVER_HOME" ]; then
 	REALPAVER_HOME=$STGQ_HOME/scripts/
+fi
+
+if [ ! -d "$REALPAVER_HOME" ]; then
+	mkdir -p $REALPAVER_HOME
 fi
 
 # download antlr4
