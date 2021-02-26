@@ -1,0 +1,39 @@
+# 
+# STGQ nightly tests
+# 
+# These tests will re-install qcoral and antlr
+#
+name: "Nightly STGQ tests"
+  on:
+   schedule:
+     - cron: "0 30 * * *"
+
+jobs:
+  STGQ-tests:
+    runs-on: [self-hosted, linux]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout STG-Q
+        uses: actions/checkout@v2
+
+      # Cleanup umbrella
+      # We may want to do this only once nightly
+      # to avoid re-installation of qcoral and the anltr jar file
+      - name: Cleanup
+        run: |
+          . set_env_vars
+          scripts/distclean.sh
+          
+      # Re-install STG
+      - name: Install STGQ
+        run: |
+          . set_env_vars
+          scripts/install_stgq.sh
+          
+      # Run STG-Q tests
+      - name: Run STG-Q tests
+        run: |
+          . set_env_vars
+          scripts/run_tests.sh
