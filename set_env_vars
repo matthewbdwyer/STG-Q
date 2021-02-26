@@ -6,9 +6,14 @@ if [ -z "$STGQ_HOME" ]; then
 	export STGQ_HOME=$(pwd)
 fi
 
-export STGQ_LIB=$STGQ_HOME/lib
+if [ -z "$STGQ_LIB" ]; then  
+	export STGQ_LIB=$STGQ_HOME/lib
+fi
+
 export STGQ_BIN=$STGQ_HOME/bin
 
-export QCORAL_HOME=$STGQ_HOME/qcoral
+if [ -z "$QCORAL_HOME" ]; then
+	export QCORAL_HOME=$STGQ_HOME/qcoral
+fi
 
 export PATH=$PATH:$STGQ_BIN

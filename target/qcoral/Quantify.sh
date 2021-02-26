@@ -1,6 +1,6 @@
 #!/bin/bash
 # qcoral_path=${2:-/home/rishab/Music/qcoral}
-qcoral_path=$STGQ_HOME/qcoral
+qcoral_path=$QCORAL_HOME/qcoral
 printf "\nNOTE: Intermediate files will be stored in /tmp/QCounter\n";
 if [ ! -d /tmp/QCounter ]
 	then
