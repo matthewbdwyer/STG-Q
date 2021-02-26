@@ -1,0 +1,39 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on: push
+
+  # Allows you to run this workflow manually from the Actions tab
+  #  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  STGQ-tests:
+    # The type of runner that the job will run on
+    runs-on: [self-hosted, linux]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout STG-Q
+        uses: actions/checkout@v2
+
+      # Cleanup umbrella
+      - name: Cleanup
+        run: |
+          . scripts/set_env_vars
+          scripts/distclean.sh
+          
+      # Re-install STG
+      - name: Install STGQ
+        run: |
+          . scripts/set_env_vars
+          scripts/install_stgq.sh
+          
+      # Run STG-Q tests
+      - name: Run STG-Q tests
+        run: |
+          . scripts/set_env_vars
+          scripts/run_tests.sh
