@@ -27,7 +27,7 @@ fi
 echo "========================"
 echo "Installing realpaver     "
 echo "========================"
-REALPAVER="$STGQ_HOME/realpaver-0.4/bin/realpaver"
+REALPAVER="$STGQ_HOME/scripts/realpaver-0.4/bin/realpaver"
 if [ ! -x "$REALPAVER" ]; then
 	wget http://pagesperso.lina.univ-nantes.fr/~granvilliers-l/realpaver/src/realpaver-0.4.tar.gz
 	tar -xzf realpaver*.tar.gz
