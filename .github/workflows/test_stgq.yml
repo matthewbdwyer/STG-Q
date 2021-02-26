@@ -17,17 +17,17 @@ jobs:
       # Cleanup umbrella
       - name: Cleanup
         run: |
-          . scripts/set_env_vars
+          . set_env_vars
           scripts/distclean.sh
           
       # Re-install STG
       - name: Install STGQ
         run: |
-          . scripts/set_env_vars
+          . set_env_vars
           scripts/install_stgq.sh
           
       # Run STG-Q tests
       - name: Run STG-Q tests
         run: |
-          . scripts/set_env_vars
+          . set_env_vars
           scripts/run_tests.sh
