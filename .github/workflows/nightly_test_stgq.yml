@@ -25,7 +25,6 @@ jobs:
         run: |
           . set_env_vars
           scripts/distclean.sh
-          rm -fr /tmp/stgq || true
           
       # Re-install STG
       - name: Install STGQ
