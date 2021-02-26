@@ -3,7 +3,7 @@
 # 
 # These tests will re-install qcoral and antlr
 #
-name: "Nightly STGQ tests"
+name: "Nightly"
   on:
    schedule:
      - cron: "0 30 * * *"
