@@ -39,20 +39,20 @@ fi
 
 files=$folder_path/*
 
-cd $STGQ_HOME/build/src/tools 																	#Changed this
+#cd $STGQ_HOME/build/src/tools 																	#Changed this
 declare -i nof=0
 for file in $files
 do
   if [[ "$file" == *".stg" ]]; then
 	nof+=1
-	./stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
+	stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
   fi
 
 done
 
 
 cd $OLDPWD
-cd $STGQ_HOME/build/target/qcoral
+#cd $STGQ_HOME/build/target/qcoral
 files=/tmp/QCounter/stg/*
 
 nof=0
@@ -60,9 +60,9 @@ for file in $files
 do
 	nof+=1
 	if [[ "$dictionary_path" == "None" ]];then
-		./stg2qc "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/qc/${nof}.qcoral"
+		stg2qc "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/qc/${nof}.qcoral"
 	else
-		./stg2qc "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/qc/${nof}.qcoral"
+		stg2qc "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/qc/${nof}.qcoral"
 	fi
 done
 
@@ -75,7 +75,7 @@ do
 	arr+=' '
 done
 
-./comb $arr
+comb $arr
 cd $OLDPWD
 pw=$pwd
 cd $qcoral_path
