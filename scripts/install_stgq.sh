@@ -27,7 +27,7 @@ fi
 echo "========================"
 echo "Installing realpaver     "
 echo "========================"
-REALPAVER="$STGQ_HOME/scripts/realpaver-0.4/bin/realpaver"
+REALPAVER="$STGQ_HOME/realpaver-0.4/bin/realpaver"
 if [ ! -x "$REALPAVER" ]; then
 	wget http://pagesperso.lina.univ-nantes.fr/~granvilliers-l/realpaver/src/realpaver-0.4.tar.gz
 	tar -xzf realpaver*.tar.gz
@@ -49,16 +49,15 @@ fi
 echo "========================="
 echo "Point qcoral to realpaver"
 echo "========================="
-cd $STGQ_HOME
 if [ -x "$REALPAVER" ]; then
-	grep mateus qcoral/scripts/variables
+	grep mateus $QCORAL_HOME/qcoral/scripts/variables
 	if [ $? -eq 0 ]; then
 		echo Need to adjust realpaver path in qcoral/scripts/variables ...
 		echo "Before"
-		grep REALPAVER qcoral/scripts/variables
-		sed -i "s/mateus\/tools/$(whoami)\/STG-Q/g" qcoral/scripts/variables
+		grep REALPAVER $QCORAL_HOME/qcoral/scripts/variables
+		sed -i "s/mateus\/tools/$(whoami)\/STG-Q/g" $QCORAL_HOME/qcoral/scripts/variables
 		echo "After"
-		grep REALPAVER qcoral/scripts/variables
+		grep REALPAVER $QCORAL_HOME/qcoral/scripts/variables
 
 	fi
 else
@@ -69,7 +68,6 @@ fi
 echo "========================"
 echo "Ready to now build STG-Q"
 echo "========================"
-cd $STGQ_HOME
 if [ ! -d build ]; then
 	mkdir build
 fi
