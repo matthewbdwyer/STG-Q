@@ -59,22 +59,26 @@ fi
 echo "============================================"
 echo "Point qcoral to realpaver: $REALPAVER"
 echo "============================================"
+echo Debug real paver install
 if [ -x "$REALPAVER" ]; then
-	grep mateus $QCORAL_HOME/qcoral/scripts/variables
-	if [ $? -eq 0 ]; then
-		echo Need to adjust realpaver path in qcoral/scripts/variables ...
-		echo "Before"
-		grep REALPAVER $QCORAL_HOME/qcoral/scripts/variables
-		sed -i "s/mateus\/tools/$(whoami)\/STG-Q/g" $QCORAL_HOME/qcoral/scripts/variables
-		echo "After"
-		grep REALPAVER $QCORAL_HOME/qcoral/scripts/variables
-
+	qcoral_vars="$QCORAL_HOME/qcoral/scripts/variables"
+	if [ ! -f "$qcoral_vars" ]; then
+		echo "Error: qcoral variable file not found: $qcoral_vars"
+		exit 1
 	fi
+
+	# overwrite the environment variable REALPAVER in the file
+	tmp=$(mktemp)
+	grep -v REALPAVER $qcoral_vars > $tmp
+	echo "REALPAVER=\"${REALPAVER}\"" >> $tmp
+	mv $tmp $qcoral_vars
+
+	echo "New qcoral variable file: "
+	cat $qcoral_vars
 else
 	echo Error: realpaver executable not found
 	exit 1
 fi
-
 
 # Setup build directory
 if [ -z "$STGQ_BUILD" ]; then

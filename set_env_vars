@@ -10,8 +10,10 @@ if [ -z "$STGQ_LIB" ]; then
 	export STGQ_LIB=$STGQ_HOME/lib
 fi
 
+# Bin directory for STGQ tools
 export STGQ_BIN=$STGQ_HOME/bin
 
+# Installation directory for qcoral
 if [ -z "$QCORAL_HOME" ]; then
 	export QCORAL_HOME=$STGQ_HOME/qcoral
 fi
