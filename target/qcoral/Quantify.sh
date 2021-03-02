@@ -14,8 +14,6 @@ if [ ! -d /tmp/QCounter ]
 		mkdir /tmp/QCounter/stg
 fi
 
-# g++ -o comb QC_Combine.cpp
-# g++ -o res QC_Result.cpp
 #Coverage
 # gcov stgpp.cpp.gcno
 # lcov --capture --directory . --output-file PN.info
@@ -30,11 +28,19 @@ rm -rf /tmp/QCounter/stg/*
 no_out+=1
 
 folder_path=$(readlink -f $1)
-dictionary_path=""
+num_samples=0
+
+
 if [ $2 ]; then
 	dictionary_path=$(readlink -f $2)
 else
 	dictionary_path="None"
+fi
+
+if [ $3 ]; then
+	num_samples=$3
+else
+	num_samples=5000000
 fi
 
 files=$folder_path/*
@@ -79,7 +85,7 @@ comb $arr
 cd $OLDPWD
 pw=$pwd
 cd $qcoral_path
-./run_qcoral.sh --mcIterativeImprovement --mcProportionalBoxSampleAllocation --mcSeed 123456 --mcMaxSamples 5000000 --mcInitialPartitionBudget 50000 --mcTargetVariance 1E-20 --mcSamplesPerIncrement 10000 "/tmp/QCounter/comb.qcoral" > "/tmp/QCounter/out/Result_${no_out}.out"
+./run_qcoral.sh --mcIterativeImprovement --mcProportionalBoxSampleAllocation --mcSeed 123456 --mcMaxSamples $num_samples --mcInitialPartitionBudget 50000 --mcTargetVariance 1E-20 --mcSamplesPerIncrement 10000 "/tmp/QCounter/comb.qcoral" > "/tmp/QCounter/out/Result_${no_out}.out"
 
 tail -1 "/tmp/QCounter/out/Result_${no_out}.out"
 printf "\n"

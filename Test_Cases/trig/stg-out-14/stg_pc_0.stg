@@ -1,8 +1,0 @@
-[
-x : double
-]
-
-//Test: passed
-
-(olt (llvm.sin.f64 double x) (llvm.cos.f64 double x))
-
