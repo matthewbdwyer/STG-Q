@@ -1,5 +1,5 @@
 {
-	"A": {
+	"S0": {
 	    "distribution": "UNIFORM_REAL",
 	    "range": {
 	       "min": "-20",
@@ -7,7 +7,7 @@
 	    }
 	},
 
-	"M_A": {
+	"S1": {
 	    "distribution": "UNIFORM_REAL",
 	    "range": {
 	       "min": "-20",

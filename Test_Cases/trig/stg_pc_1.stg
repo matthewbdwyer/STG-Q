@@ -1,0 +1,8 @@
+[
+x : double
+]
+
+//Test: passed
+
+(olt (sin double x) (cos double x))
+
