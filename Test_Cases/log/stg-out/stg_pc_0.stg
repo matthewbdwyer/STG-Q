@@ -1,8 +1,0 @@
-[
-log_x : double
-]
-
-//Test: passed
-
-(ogt (llvm.log.f64 double log_x) (double 0))
-
