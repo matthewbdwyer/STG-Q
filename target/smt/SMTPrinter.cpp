@@ -52,13 +52,16 @@ std::map<std::string, std::string> mapping = {
 
 {"llvm.sin.f32", "(sin "},
 {"llvm.sin.f64", "(sin "},
-{"llvm.sin.f80", "(sin "},
-{"llvm.sin.f128", "(sin "},
+// {"llvm.sin.f80", "(sin "},
+// {"llvm.sin.f128", "(sin "},
 
 {"llvm.cos.f32", "(cos "},
 {"llvm.cos.f64", "(cos "},
-{"llvm.cos.f80", "(cos "},
-{"llvm.cos.f128", "(cos "},
+// {"llvm.cos.f80", "(cos "},
+// {"llvm.cos.f128", "(cos "},
+
+{"llvm.tan.f32", "(tan "},
+{"llvm.tan.f64", "(tan "},
 
 {"llvm.exp.f32", "(^ EXP "},
 {"llvm.exp.f64", "(^ EXP "},
@@ -285,7 +288,6 @@ bool SMTPrinter::visit(UnaryExpr * element) {
 
 void SMTPrinter::endVisit(UnaryExpr * element) {
 
-    os << "\n yeah came here endvisit Unary!! \n";
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
@@ -318,8 +320,6 @@ bool SMTPrinter::visit(BinaryExpr * element) {
 
 void SMTPrinter::endVisit(BinaryExpr * element) {
 
-  
-  os << "\n yeah came here endvisit!! \n";
   std::string result2 = visitResults.back();
   visitResults.pop_back();
   std::string result1 = visitResults.back();
@@ -344,7 +344,7 @@ void SMTPrinter::endVisit(BinaryExpr * element) {
     result += result1 + " " + result2 + "))";
 
   else
-  	result += result1 + " " + result2 + ")";
+    result += result1 + " " + result2 + ")";
 
   visitResults.push_back(result);
 }                     

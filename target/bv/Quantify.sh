@@ -1,6 +1,6 @@
 #!/bin/bash
 # qcoral_path=${2:-/home/rishab/Music/qcoral}
-qcoral_path=$STGQ_HOME/qcoral
+qcoral_path=$QCORAL_HOME/qcoral
 
 printf "\nNOTE: Intermediate files will be stored in /tmp/QCounter\n";
 if [ ! -d /tmp/QCounter ]
@@ -35,7 +35,7 @@ fi
 # printf "Folder name: $folder \n"
 files=$folder_path/*
 
-cd $STGQ_HOME/build/src/tools    																	#Changed this
+# cd $STGQ_HOME/build/src/tools    																	#Changed this
 declare -i nof=0
 for file in $files
 do
@@ -49,7 +49,7 @@ done
 # Converting stg file to smt, then checking for uniqueness using sha512. If such smt file is already generated, delete the current smt file.
 
 cd $OLDPWD
-cd $STGQ_HOME/build/target/bv     															
+# cd $STGQ_HOME/build/target/bv     															
 files=/tmp/QCounter/stg/*
 
 nof=0
@@ -121,34 +121,6 @@ do
 	done
 done
 
-
-#-------------------------------
-# files=/tmp/QCounter/qc/*
-# arr=""
-# for file in $files
-# do
-# 	arr+="/tmp/QCounter/qc/$(basename $file)"
-# 	arr+=' '
-# done
-
-# cd $OLDPWD
-# ./comb $arr
-# pw=$pwd
-# cd $qcoral_path
-# ./run_qcoral.sh --mcIterativeImprovement --mcProportionalBoxSampleAllocation --mcSeed 123456 --mcMaxSamples 5000000 --mcInitialPartitionBudget 50000 --mcTargetVariance 1E-20 --mcSamplesPerIncrement 10000 "/tmp/QCounter/comb.qcoral" > "/tmp/QCounter/out/Result_${no_out}.out"
-
-# tail -1 "/tmp/QCounter/out/Result_${no_out}.out"
-# printf "\n"
-# cd $OLDPWD
-#-------------------------------
-
-# files=/tmp/QCounter/out/*
-
-# for file in $files
-# do
-# 	tail -1 "/tmp/QCounter/out/$(basename $file)"
-# 	printf "\n"
-# done
 
 printf "\n"
 # ./res > "/tmp/QCounter/Final_result.out"
