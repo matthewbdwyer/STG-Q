@@ -1,17 +1,17 @@
 {
-	"A": {
+	"S0": {
 	    "distribution": "UNIFORM_REAL",
 	    "range": {
-	       "min": "-20",
-	       "max": "20"
+	       "min": "-1000",
+	       "max": "1000"
 	    }
 	},
 
-	"M_A": {
+	"S1": {
 	    "distribution": "UNIFORM_REAL",
 	    "range": {
-	       "min": "-20",
-	       "max": "20"
+	       "min": "-1000",
+	       "max": "1000"
 	    }
 	}
 }

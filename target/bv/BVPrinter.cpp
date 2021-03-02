@@ -54,13 +54,13 @@ std::map<std::string, std::string> mapping = {
 
 //Intrinsics UNARY
 
-// {"llvm.sin.f32", "(sin "},
-// {"llvm.sin.f64", "(sin "},
+{"llvm.sin.f32", "(ite  "},
+{"llvm.sin.f64", "(ite  "},
 // {"llvm.sin.f80", "(sin "},
 // {"llvm.sin.f128", "(sin "},
 
-// {"llvm.cos.f32", "(cos "},
-// {"llvm.cos.f64", "(cos "},
+{"llvm.cos.f32", "(ite "},
+{"llvm.cos.f64", "(ite "},
 // {"llvm.cos.f80", "(cos "},
 // {"llvm.cos.f128", "(cos "},
 
@@ -84,8 +84,8 @@ std::map<std::string, std::string> mapping = {
 // {"llvm.sqrt.f80", "(^ "},
 // {"llvm.sqrt.f128", "(^ "},
 
-// {"llvm.exp2.f32", "(^ ((_ to_fp 8 24) RNE 1.0 1) "},
-// {"llvm.exp2.f64", "(^ ((_ to_fp 11 53) RNE 1.0 1) "},
+{"llvm.exp2.f32", "(^ ((_ to_fp 8 24) RNE 1.0 1) "},
+{"llvm.exp2.f64", "(^ ((_ to_fp 11 53) RNE 1.0 1) "},
 // {"llvm.exp2.f80", "(^ ((_ to_fp 12 68) RNE 1.0 1) "}, 
 // {"llvm.exp2.f128", "(^ ((_ to_fp 15 113) RNE 1.0 1) "},
 
@@ -133,12 +133,11 @@ std::map<std::string, std::string> mapping = {
 {"llvm.maximum.f80", "(fp.max"},
 {"llvm.maximum.f128", "(fp.max"},
 
-{"sin","SIN_("},
-{"cos","COS_("},
-{"tan","TAN_("},
-{"log","LOG_("},
-{"log10f","LOG10_("},
-// {"log2f",Expr::Op::Log2f},
+{"sin","(ite  "},
+{"cos","(ite "},
+{"tan","(ite "},  //(tan (fp.to_real 
+// {"log","LOG_("},
+// {"log10f","LOG10_("},
 {"sqrt","(fp.sqrt RNE "},
 
 {"pow","(ite "},  // 2 cases 1 for float and second for double
@@ -321,7 +320,7 @@ void BVPrinter::endVisit(UnaryExpr * element) {
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
 
-  if(op == "sitofp" || op == "fptosi" || op == "sext" || op == "trunc"){
+  if(op == "sitofp" || op == "fptosi" || op == "sext" || op == "trunc" || op == "sin" || op == "cos" || op == "tan"){
     t = element->getConstraint()->type2str(element->getType());
     width = (t == "float" ? "32" : "64");
   }
@@ -332,6 +331,9 @@ void BVPrinter::endVisit(UnaryExpr * element) {
     std::cerr << "\nUnary key not found..." << op <<"\n";
     return;
   }
+
+  if(op == "llvm.sin.f32" || op == "llvm.sin.f64" || op == "llvm.cos.f32" || op == "llvm.cos.f64" || op == "llvm.tan.f32" || op == "llvm.tan.f64")
+    op = op.substr(5,3);
 
 
   if(op.find("llvm.floor") != -1)
@@ -350,6 +352,9 @@ void BVPrinter::endVisit(UnaryExpr * element) {
     result += "((_ to_fp 8 24) RNE (fp.to_real " + result1 + "))"; //(width == "32" ? "((_ to_fp 8 24) RNE (fp.to_real " + result1 + "))" : "((_ to_fp 11 53) RNE (fp.to_real " + result1 + "))");
   else if(op == "fpext")
     result += "((_ to_fp 11 53) RNE (fp.to_real " + result1 + "))";
+  else if(op == "sin" || op == "cos" || op == "tan"){
+    result += "(= " + width + " 32) " + "((_ to_fp 8 24) RNE (" + op + " (fp.to_real " + result1 + "))) " + "((_ to_fp 11 53) RNE (" + op + " (fp.to_real " + result1 + "))))";  //+ result1 + "))))";
+  }
   else if(mapping[op] != "")
     result += result1 + ")";
   else
