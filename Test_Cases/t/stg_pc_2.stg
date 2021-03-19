@@ -1,12 +1,9 @@
 [
-S0 : double,
-S1 : double
-
+A : i32,
+B : i32,
+C : i32
 ]
 
 //Test: passed
 
-(land
-  (ogt (pow double S0 S1) (pow double S0 (sitofp double (i32 2))))
-  (ogt (pow double S0 S1) (double 0.500000))
-)
+(ult B A) 
