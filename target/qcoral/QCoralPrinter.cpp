@@ -565,28 +565,28 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
   }
 
   else if(op == "ult")
-    result += "BOR(BAND(IGT("+result1+", ICONST(0)), BAND(IGT("+result2+", ICONST(0)), ILT("+result1+", "+result2+"))),\
-      BOR(BAND(ILT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), ILT("+result1+", "+result2+"))),\
-        BOR(BAND(IGT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), ILT("+result1+", MUL("+result2+", ICONST(-1))))),\
-        BAND(ILT("+result1+", ICONST(0)), BAND(IGT("+result2+", ICONST(0)), ILT(MUL("+result1+", ICONST(-1)), "+result2+"))))))";
+    result += "BOR(BAND(IGE("+result1+", ICONST(0)), BAND(IGE("+result2+", ICONST(0)), ILT("+result1+", "+result2+"))),\
+      BOR(BAND(ILT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), IGT("+result1+", "+result2+"))),\
+        BOR(BAND(IGE("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), ILT("+result1+", MUL("+result2+", ICONST(-1))))),\
+        BAND(ILT("+result1+", ICONST(0)), BAND(IGE("+result2+", ICONST(0)), ILT(MUL("+result1+", ICONST(-1)), "+result2+"))))))";
 
   else if(op == "fult")
-      result += "BOR(BAND(DGT("+result1+", DCONST(0)), BAND(DGT("+result2+", DCONST(0)), DLT("+result1+", "+result2+"))),\
-      BOR(BAND(DLT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DLT("+result1+", "+result2+"))),\
-        BOR(BAND(DGT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DLT("+result1+", MUL("+result2+", DCONST(-1))))),\
-        BAND(DLT("+result1+", DCONST(0)), BAND(DGT("+result2+", DCONST(0)), DLT(MUL("+result1+", DCONST(-1)), "+result2+"))))))";
+      result += "BOR(BAND(DGE("+result1+", DCONST(0)), BAND(DGE("+result2+", DCONST(0)), DLT("+result1+", "+result2+"))),\
+      BOR(BAND(DLT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DGT("+result1+", "+result2+"))),\
+        BOR(BAND(DGE("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DLT("+result1+", MUL("+result2+", DCONST(-1))))),\
+        BAND(DLT("+result1+", DCONST(0)), BAND(DGE("+result2+", DCONST(0)), DLT(MUL("+result1+", DCONST(-1)), "+result2+"))))))";
 
   else if(op == "ugt")
-    result += "BOR(BAND(IGT("+result1+", ICONST(0)), BAND(IGT("+result2+", ICONST(0)), IGT("+result1+", "+result2+"))),\
-      BOR(BAND(ILT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), IGT("+result1+", "+result2+"))),\
-        BOR(BAND(IGT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), IGT("+result1+", MUL("+result2+", ICONST(-1))))),\
-        BAND(ILT("+result1+", ICONST(0)), BAND(IGT("+result2+", ICONST(0)), IGT(MUL("+result1+", ICONST(-1)), "+result2+"))))))";
+    result += "BOR(BAND(IGE("+result1+", ICONST(0)), BAND(IGE("+result2+", ICONST(0)), IGT("+result1+", "+result2+"))),\
+      BOR(BAND(ILT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), ILT("+result1+", "+result2+"))),\
+        BOR(BAND(IGE("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), IGT("+result1+", MUL("+result2+", ICONST(-1))))),\
+        BAND(ILT("+result1+", ICONST(0)), BAND(IGE("+result2+", ICONST(0)), IGT(MUL("+result1+", ICONST(-1)), "+result2+"))))))";
   
   else if(op == "fugt")
-      result += "BOR(BAND(DGT("+result1+", DCONST(0)), BAND(DGT("+result2+", DCONST(0)), DGT("+result1+", "+result2+"))),\
-      BOR(BAND(DLT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DGT("+result1+", "+result2+"))),\
-        BOR(BAND(DGT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DGT("+result1+", MUL("+result2+", DCONST(-1))))),\
-        BAND(DLT("+result1+", DCONST(0)), BAND(DGT("+result2+", DCONST(0)), DGT(MUL("+result1+", DCONST(-1)), "+result2+"))))))"; 
+      result += "BOR(BAND(DGE("+result1+", DCONST(0)), BAND(DGE("+result2+", DCONST(0)), DGT("+result1+", "+result2+"))),\
+      BOR(BAND(DLT("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DLT("+result1+", "+result2+"))),\
+        BOR(BAND(DGE("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DGT("+result1+", MUL("+result2+", DCONST(-1))))),\
+        BAND(DLT("+result1+", DCONST(0)), BAND(DGE("+result2+", DCONST(0)), DGT(MUL("+result1+", DCONST(-1)), "+result2+"))))))"; 
 
   else if(op == "srem")
   	result += "ASDOUBLE(" + result1 + "), " + "ASDOUBLE(" + result2 + ")))";
