@@ -82,7 +82,7 @@ done < <(ls "/tmp/QCounter/fxp")
 
 for (( i=0; i<${#files[@]}; i++ ))
 do 
-	python3 "$pysmt_path/pysmt/pysmt/conv_fxp_smt.py" "/tmp/QCounter/fxp/$(basename "${files[i]}")" > "/tmp/QCounter/smt/$(basename "${files[i]}")"
+	python3 "$pysmt_path/pysmt/conv_fxp_smt.py" "/tmp/QCounter/fxp/$(basename "${files[i]}")" > "/tmp/QCounter/smt/$(basename "${files[i]}")"
 done
 
 for f in /tmp/QCounter/smt/*; do 

@@ -7,7 +7,7 @@ if [ -z "$STGQ_HOME" ]; then
 fi
 
 if [ -z "$PYSMT" ]; then
-	export PYSMT=$STGQ_HOME/scripts/
+	export PYSMT=$STGQ_HOME/scripts
 fi
 
 
