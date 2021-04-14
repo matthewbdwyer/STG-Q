@@ -6,6 +6,10 @@ if [ -z "$STGQ_HOME" ]; then
 	export STGQ_HOME=$(pwd)
 fi
 
+if [ -z "$PYSMT" ]; then
+	export PYSMT=$STGQ_HOME/scripts
+fi
+
 if [ -z "$STGQ_LIB" ]; then  
 	export STGQ_LIB=$STGQ_HOME/lib
 fi
