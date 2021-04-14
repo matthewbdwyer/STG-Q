@@ -10,15 +10,15 @@ std::unordered_set <std::string> dict_set;
 bool no_var = true;
 std::map<std::string, std::string> mapping = {
 
-// {"fneg", "(fp.neg "},
+{"fneg", "(sfxp.neg saturation "},
 // {"fptosi", ""},    
 // {"sitofp", "(ite "},   
 
-// {"trunc", ""},
-// {"zext", ""},
-// {"sext", ""},
-// {"fptrunc", ""},
-// {"fpext", ""},
+{"trunc", ""},
+{"zext", ""},
+{"sext", ""},
+{"fptrunc", ""},
+{"fpext", ""},
 
 {"add", "(sfxp.add saturation "},
 {"sub", "(sfxp.sub saturation "},
@@ -37,10 +37,12 @@ std::map<std::string, std::string> mapping = {
 {"sle", "(sfxp.leq "},
 {"sgt", "(sfxp.gt "},
 {"sge", "(sfxp.geq "},
-// {"ult", "(bvult "},
-// {"ugt", "(bvugt "},
-// {"ule", "(bvule "},
-// {"uge", "(bvuge "},
+
+{"ult", "(ufxp.lt "},
+{"ugt", "(ufxp.gt "},
+{"ule", "(ufxp.leq "},
+{"uge", "(ufxp.geq "},
+
 {"oeq", "(= "},
 {"one", "(not(= "},
 // {"fune", "(not(fp.eq "},      // CHECK
@@ -115,15 +117,15 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
       os << "(declare-fun "<< var << " () (_ SFXP 32 0))\n";
     }
 
-    else if(c->symbolType(var) == "float"){
+    else if(c->symbolType(var) == "float" || c->symbolType(var) == "double"){
       os << "(set-info :domain \"" << var <<" UniformReal "<< min <<" "<< max<<"\")\n";
       os << "(declare-fun "<< var << " () (_ SFXP 32 5))\n";
     }
 
-    else if(c->symbolType(var) == "double"){
-      os << "(set-info :domain \"" << var <<" UniformReal "<< min <<" "<< max<<"\")\n";
-      os << "(declare-fun "<< var << " () (_ SFXP 64 10))\n";
-    }
+    // else if(c->symbolType(var) == "double"){
+    //   os << "(set-info :domain \"" << var <<" UniformReal "<< min <<" "<< max<<"\")\n";
+    //   os << "(declare-fun "<< var << " () (_ SFXP 64 10))\n";
+    // }
 
     else{
       std::cerr<<"Invalid TYPE!!  --> " << c->symbolType(var);
@@ -223,13 +225,20 @@ void FXPPrinter::endVisit(FloatConstant * element) {
 
 void FXPPrinter::endVisit(DoubleConstant * element) {
 
-  const int precision = 10;
+  const int precision = 5;
 
-  std::string number = (std::bitset<64-precision>(int(element->getValue()))).to_string();
+  std::string number = (std::bitset<32-precision>(int(element->getValue()))).to_string();
   std::string decimal = (std::bitset<precision>(int((element->getValue() - int(element->getValue())) * pow(2,precision)))).to_string();
 
   std::string result = "((_ sfxp " + std::to_string(precision) + ") #b" + number + decimal + ")"; 
   visitResults.push_back(result);
+  // const int precision = 10;
+
+  // std::string number = (std::bitset<64-precision>(int(element->getValue()))).to_string();
+  // std::string decimal = (std::bitset<precision>(int((element->getValue() - int(element->getValue())) * pow(2,precision)))).to_string();
+
+  // std::string result = "((_ sfxp " + std::to_string(precision) + ") #b" + number + decimal + ")"; 
+  // visitResults.push_back(result);
 }
 
 bool FXPPrinter::visit(UnaryExpr * element) {
@@ -244,7 +253,7 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
   std::string t = "32";
 
   // std::string result_width = std::stoi((visitResults.back())->getWidth()); 
-  std::string result_width = "128";
+  // std::string result_width = "128";
 
   std::string result1 = visitResults.back();
   visitResults.pop_back();
@@ -252,10 +261,10 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
 
-  if(op == "sitofp" || op == "fptosi" || op == "sext" || op == "trunc" || op == "sin" || op == "cos" || op == "tan"){
-    t = element->getConstraint()->type2str(element->getType());
-    width = (t == "float" ? "32" : "64");
-  }
+  // if(op == "sitofp" || op == "fptosi" || op == "sext" || op == "trunc" || op == "sin" || op == "cos" || op == "tan"){
+  //   t = element->getConstraint()->type2str(element->getType());
+  //   width = (t == "float" ? "32" : "64");
+  // }
 
   if(mapping.find(op) != mapping.end())
     result += mapping[op];
@@ -264,8 +273,8 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
     return;
   }
 
-  if(op == "llvm.sin.f32" || op == "llvm.sin.f64" || op == "llvm.cos.f32" || op == "llvm.cos.f64" || op == "llvm.tan.f32" || op == "llvm.tan.f64")
-    op = op.substr(5,3);
+  // if(op == "llvm.sin.f32" || op == "llvm.sin.f64" || op == "llvm.cos.f32" || op == "llvm.cos.f64" || op == "llvm.tan.f32" || op == "llvm.tan.f64")
+  //   op = op.substr(5,3);
 
 
   // if(op.find("llvm.floor") != -1)
@@ -276,10 +285,20 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
   //   result += "(= " + width + " 32) " + "((_ to_fp 8 24) " + result1 + ") " + "((_ to_fp 11 53) " + result1 + "))";
   // else if(op == "fptosi")
   //   result += "((_ fp.to_sbv " + width + ") RNE " + result1 + ")"; //"(= " + width + " 32) " + "( (_ fp.to_sbv 32) RNE " + result1 + ") ( (_ fp.to_sbv 64) RNE " + result1 + ")";
-  if(op == "trunc" || op == "sext"){
-    width = (t.substr(1));
-    result += "((_ int2bv " + width + ") ((_ bv2int " + result_width + ") " + result1 + "))";
+  
+  if(op == "trunc"){
+    // width = (t.substr(1));
+    t = element->getConstraint()->type2str(element->getType());
+
+   	if(t == "i1")
+   		result += "(sfxp.gt " + result1 + " ((_ sfxp 0) #x00000000))";
+
+   	else
+   		result += result1;
+   	// else
+   	// 	std::cout<<"\nTrunc operator not supported for "<<t<<"\n";
   }
+
   else if(mapping[op] != "")
     result += result1 + ")";
   else
@@ -325,6 +344,16 @@ void FXPPrinter::endVisit(BinaryExpr * element) {
 
   else if(op == "ne" || op == "fune" || op == "one")
     result += result1 + " " + result2 + "))";
+
+  
+  // else if(op == "ult"){
+  //   std::string t = element->getConstraint()->type2str(element->getType());
+  //   width = (t == "float" ? "32" : "64");
+  //   std::string number = (std::bitset<width>(2)).to_string();
+
+  // 	result += "(sfxp.div saturation roundDown (sfxp.mul saturation roundDown " + result1 + " " + number + ")" + " " + number + ")" +
+  // 				"(sfxp.div saturation roundDown (sfxp.mul saturation roundDown " + result2 + " " + number + ")" + " " + number + "))" ;
+  // }
 
   // else if(op == "pow")
   //   result += "(= " + width + " 32) " + "((_ to_fp 8 24) RNE (^ (fp.to_real " + result1 + ") (fp.to_real " + result2 + ") )) " + "((_ to_fp 11 53) RNE (^ (fp.to_real " + result1 + ") (fp.to_real " + result2 + ") )))";

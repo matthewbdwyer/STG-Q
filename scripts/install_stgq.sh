@@ -80,6 +80,15 @@ else
 	exit 1
 fi
 
+# download qcoral
+echo "============================================"
+echo "Downloading pysmt: $PYSMT       "
+echo "============================================"
+
+if [ ! -d "$PYSMT" ]; then
+	git clone https://github.com/soarlab/pysmt.git
+fi
+
 # Setup build directory
 if [ -z "$STGQ_BUILD" ]; then
 	STGQ_BUILD=$STGQ_HOME/build

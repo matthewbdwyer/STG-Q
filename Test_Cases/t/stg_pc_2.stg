@@ -6,4 +6,7 @@ C : i32
 
 //Test: passed
 
-(ult B A) 
+(land 
+	(trunc i1 (zext i8 (zext i64 A) ))
+	(sgt A B)
+)

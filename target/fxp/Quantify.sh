@@ -1,7 +1,8 @@
 #!/bin/bash
 # qcoral_path=${2:-/home/rishab/Music/qcoral}
 qcoral_path=$QCORAL_HOME/qcoral
-pysmt_path=/home/rishab/Downloads/pysmt/pysmt
+# pysmt_path=/home/rishab/Downloads/pysmt/pysmt
+pysmt_path=$PYSMT
 
 printf "\nNOTE: Intermediate files will be stored in /tmp/QCounter\n";
 if [ ! -d /tmp/QCounter ]
@@ -69,7 +70,6 @@ done
 
 
 
-
 cd $OLDPWD
 files=()
 i=0
@@ -82,14 +82,16 @@ done < <(ls "/tmp/QCounter/fxp")
 
 for (( i=0; i<${#files[@]}; i++ ))
 do 
-	python3 "$pysmt_path/rish.py" "/tmp/QCounter/fxp/$(basename "${files[i]}")" > "/tmp/QCounter/smt/$(basename "${files[i]}")"
+	python3 "$pysmt_path/pysmt/pysmt/conv_fxp_smt.py" "/tmp/QCounter/fxp/$(basename "${files[i]}")" > "/tmp/QCounter/smt/$(basename "${files[i]}")"
 done
 
 for f in /tmp/QCounter/smt/*; do 
     mv -- "$f" "${f%.fxp}.smt"
 done
 
-cp -r /tmp/QCounter/smt "/home/rishab/Documents/fxp/$(basename $folder_path)"
+# cp -r /tmp/QCounter/smt "/home/rishab/Documents/fxp/$(basename $folder_path)"
+
+cp -r /tmp/QCounter/smt "$folder_path/bv"
 
 printf "\n"
 
