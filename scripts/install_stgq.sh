@@ -84,11 +84,14 @@ fi
 echo "============================================"
 echo "Downloading pysmt: $PYSMT       "
 echo "============================================"
+cd $PYSMT
+git clone https://github.com/soarlab/pysmt.git
 
-if [ ! -d "$PYSMT/pysmt" ]; then
-	git clone https://github.com/soarlab/pysmt.git
-	cp $STGQ_HOME/target/fxp/conv_fxp_smt.py "$PYSMT/pysmt"
-fi
+# if [ ! -d "$PYSMT/pysmt" ]; then
+
+# 	git clone https://github.com/soarlab/pysmt.git
+# 	cp $STGQ_HOME/target/fxp/conv_fxp_smt.py "$PYSMT/pysmt"
+# fi
 
 # Setup build directory
 if [ -z "$STGQ_BUILD" ]; then
