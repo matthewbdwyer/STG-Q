@@ -68,9 +68,12 @@ do
 	 
 done
 
-
+# echo "HELLOOOOOOOOOO"
 
 cd $OLDPWD
+
+python3 combine.py > /tmp/QCounter/fxp/comb.fxp
+
 files=()
 i=0
 
@@ -88,6 +91,7 @@ done
 for f in /tmp/QCounter/smt/*; do 
     mv -- "$f" "${f%.fxp}.smt"
 done
+
 
 # cp -r /tmp/QCounter/smt "/home/rishab/Documents/fxp/$(basename $folder_path)"
 

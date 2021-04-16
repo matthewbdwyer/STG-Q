@@ -23,18 +23,28 @@ F = conv.convert(f)
 i = 0
 
 for line in QUERY.splitlines():
-	# print(line)
 	if "set-info" in line and "domain" in line:
+		print(line.replace("UniformReal", "UniformInt"))
 
-		var_ind = line.index("domain") + 8
-		space_ind = line.index(" ", var_ind)
-		new_command = line[:var_ind] + "FV" + str(i) + line[space_ind:]
-		
-		print(new_command)
-		i += 1
+
+sm = conv.symbol_map
+inv_sm = {v:k for k, v in sm.items()}
+
+for old_n, new_n in conv.symbol_map.items():
+    print("(declare-fun {} {})".format(old_n.to_smtlib(), new_n._content.payload[1].as_smtlib(funstyle=True)))
 
 for x in F.get_free_variables():
-    print("(declare-fun {} {})".format(x.to_smtlib(), x._content.payload[1].as_smtlib(funstyle=True)))
+    if x not in inv_sm.keys():
+        print("(declare-fun {} {})".format(x.to_smtlib(), x._content.payload[1].as_smtlib(funstyle=True)))
 
-print("(assert {})".format(F.to_smtlib()))
+
+final_formula = F.to_smtlib()
+
+for x in F.get_free_variables():
+    if x in inv_sm.keys():
+        old_n = inv_sm[x]
+        final_formula = final_formula.replace(x.to_smtlib(), old_n.to_smtlib())
+
+
+print("(assert ", final_formula, ")")
 print("(check-sat)")

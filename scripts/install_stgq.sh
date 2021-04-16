@@ -86,6 +86,8 @@ echo "Downloading pysmt: $PYSMT       "
 echo "============================================"
 cd $PYSMT
 git clone https://github.com/soarlab/pysmt.git
+cd pysmt
+git checkout symbol_mapping
 cp $STGQ_HOME/target/fxp/conv_fxp_smt.py "$PYSMT/pysmt"
 
 # if [ ! -d "$PYSMT/pysmt" ]; then
