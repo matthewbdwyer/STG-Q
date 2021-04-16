@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_BUILD_TYPE Debug)
 
 # Adding coverage
-add_compile_options(--coverage -O0)
+# add_compile_options(--coverage -O0)
 
 #set(LDFLAGS "${LDFLAGS} --coverage")
 #set(CXXFLAGS "${CXXFLAGS} --coverage")
