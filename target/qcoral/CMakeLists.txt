@@ -7,9 +7,9 @@ add_executable(res QC_Result.cpp)
 target_include_directories(stg2qc PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 #target_link_libraries(stg2qc stg)
-target_link_libraries(stg2qc stg --coverage -ljsoncpp)
-target_link_libraries(comb stg --coverage)
-target_link_libraries(res stg --coverage)
+target_link_libraries(stg2qc stg -ljsoncpp)
+target_link_libraries(comb stg)
+target_link_libraries(res stg)
 
 install (TARGETS stg2qc DESTINATION $ENV{STGQ_BIN})
 install (TARGETS comb DESTINATION $ENV{STGQ_BIN})
