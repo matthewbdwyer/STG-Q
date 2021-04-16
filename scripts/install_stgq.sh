@@ -111,9 +111,10 @@ fi
 echo "=========================================="
 echo "Ready to now build STG-Q from $STGQ_BUILD"
 echo "=========================================="
-
+ 
 cd $STGQ_BUILD
 cmake $STGQ_HOME
 make
 make install
 
+cp $STGQ_HOME/target/qcoral/Quantify.sh $STGQ_HOME/bin
