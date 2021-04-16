@@ -1,12 +1,12 @@
 [
-A : i32,
-B : i32,
-C : i32
+S0 : double,
+S1 : double
+
 ]
 
 //Test: passed
 
-(land 
-	(trunc i1 (zext i8 (zext i64 A) ))
-	(sgt A B)
+(land
+  (ogt (pow double S0 S1) (pow double S0 (sitofp double (i32 2))))
+  (ogt (pow double S0 S1) (double 0.500000))
 )
