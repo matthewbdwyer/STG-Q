@@ -1,0 +1,8 @@
+[
+x : double
+]
+
+//Test: passed
+
+(olt (atan2 double x (double 1)) (double 0))
+

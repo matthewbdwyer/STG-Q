@@ -7,7 +7,9 @@
 using namespace Constraint;
 
 std::unordered_set <std::string> dict_set; 
-bool no_var = true;
+bool no_var = true; // For checking if any variable is present in the constraint
+
+// Mapping from stg functions to fxp functions.
 std::map<std::string, std::string> mapping = {
 
 {"fneg", "(sfxp.neg saturation "},
@@ -45,7 +47,7 @@ std::map<std::string, std::string> mapping = {
 
 {"oeq", "(= "},
 {"one", "(not(= "},
-// {"fune", "(not(fp.eq "},      // CHECK
+// {"fune", "(not(fp.eq "},
 {"olt", "(sfxp.lt "},
 {"ole", "(sfxp.leq "},
 {"ogt", "(sfxp.gt "},
@@ -60,6 +62,7 @@ std::map<std::string, std::string> mapping = {
 };
 
 
+// Function for parsing dictionary for a specific variable.
 void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constraints> c, std::string var) {
 
   Json::Value root;
@@ -69,6 +72,7 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
   Json::Value data = root[var];
 
+  // Checking if data for the variable is available in the dictionary. If not then exit.
   if(data.isNull()){
     std::cerr<<"No data available for: "<< var<<"\n";
     return;
@@ -76,6 +80,7 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
   std::string distribution = data["distribution"].asString();
   
+  // Checking if the distribution data is available for the variable. If not then default to Uniform Distribution.
   if(distribution.empty()){
     std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_INT)"<<"\n";
     distribution = "UNIFORM_INT";
@@ -83,6 +88,7 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
   Json::Value range = data["range"];
 
+  // CHecking if the range/max/min values are available for the variable. If not then exit.
   if(range.isNull()){
     std::cerr<<"No Range available for: "<< var<<"\n";
     return;
@@ -104,16 +110,17 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
     return;
   }
 
+  // Printing the fxp version of the dictionary for the Uniform distribution.
+
   if(distribution == "UNIFORM_INT" || distribution == "UNIFORM_REAL"){
     
     if(c->symbolType(var) == "i1")
     	os << "(declare-fun "<< var << " () (_ SFXP 1 0))\n";
-      // os << "(declare-fun " << var << " () (_ BitVec " << 1 << "))\n";
 
+    // An integer variable is a signed fixed point with 0 bits for fraction part.
     else if(c->symbolType(var)[0] == 'i'){
       int width = stoi(c->symbolType(var).substr(1));
       os << "(set-info :domain \"" << var <<" UniformInt "<< min << " " << max <<"\")\n";
-      // os << "(declare-fun " << var << " () (_ BitVec " << width << "))\n";
       os << "(declare-fun "<< var << " () (_ SFXP 32 0))\n";
     }
 
@@ -145,13 +152,9 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
 void FXPPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
   theConstraint = c;
-  // os << "(set-option :print-success false)\n";
-  // mvn package assembly:single
-  // os << "(set-logic AUFLIRA)\n";
-  // os << "(set-option :seed 121314)\n(set-option :partitioning true)\n(set-option :non-linear-counter \"qcoral\")\n";
-  // os << "(declare-const EXP Real)\n(assert (= EXP 2.71828182846))\n";
-
   indentLevel++;
+
+  // For every symbol parse it in the dictionary
   for (auto &n : c->symbols) {
     parseDict(dict, c, n);
     dict_set.insert(n);
@@ -167,6 +170,8 @@ void FXPPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *d
 
   visitResults.pop_back();
 
+  // In case if no variable is present in the constraint, then there is no addition in the volume. So make the final assertion as a false statement such that it won't effect the volume.
+  // In case if one of the variable is present then make a true assertion denoting that this constraint might help in counting the volume.
   if(no_var)
     os << " false ))\n";
   else
@@ -193,19 +198,11 @@ void FXPPrinter::endVisit(IntConstant * element) {
   if(element->getType()->getWidth() == 1 && element->getValue() == 1)           // BCONST(true)
     result = "true";
 
-  else if(element->getType()->getWidth() == 1 && element->getValue() == 0)          // BCONST(false)
+  else if(element->getType()->getWidth() == 1 && element->getValue() == 0)      // BCONST(false)
     result = "false";
 
   else{
-    // result = "((_ int2bv " + std::to_string(element->getType()->getWidth()) + ") " + std::to_string(element->getValue()) + ")";
-    // std::stringstream stream;
-    // stream << std::hex << (int(element->getValue()));
-
-    // int bit_width = stream.str().length();
-    // string zeros = std::string(8-bit_width, '0');
-
     std::string number = std::bitset<32>(int(element->getValue())).to_string();
-
     result = "((_ sfxp 0) #b" + number + ")";
   }
 
@@ -232,13 +229,6 @@ void FXPPrinter::endVisit(DoubleConstant * element) {
 
   std::string result = "((_ sfxp " + std::to_string(precision) + ") #b" + number + decimal + ")"; 
   visitResults.push_back(result);
-  // const int precision = 10;
-
-  // std::string number = (std::bitset<64-precision>(int(element->getValue()))).to_string();
-  // std::string decimal = (std::bitset<precision>(int((element->getValue() - int(element->getValue())) * pow(2,precision)))).to_string();
-
-  // std::string result = "((_ sfxp " + std::to_string(precision) + ") #b" + number + decimal + ")"; 
-  // visitResults.push_back(result);
 }
 
 bool FXPPrinter::visit(UnaryExpr * element) {
@@ -255,9 +245,11 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
   // std::string result_width = std::stoi((visitResults.back())->getWidth()); 
   // std::string result_width = "128";
 
+  // Get the operand
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
+  // Get the operator
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
 
@@ -286,6 +278,7 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
   // else if(op == "fptosi")
   //   result += "((_ fp.to_sbv " + width + ") RNE " + result1 + ")"; //"(= " + width + " 32) " + "( (_ fp.to_sbv 32) RNE " + result1 + ") ( (_ fp.to_sbv 64) RNE " + result1 + ")";
   
+  // Making trunc as identity for now. 
   if(op == "trunc"){
     // width = (t.substr(1));
     t = element->getConstraint()->type2str(element->getType());
@@ -295,8 +288,6 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
 
    	else
    		result += result1;
-   	// else
-   	// 	std::cout<<"\nTrunc operator not supported for "<<t<<"\n";
   }
 
   else if(mapping[op] != "")
@@ -344,16 +335,6 @@ void FXPPrinter::endVisit(BinaryExpr * element) {
 
   else if(op == "ne" || op == "fune" || op == "one")
     result += result1 + " " + result2 + "))";
-
-  
-  // else if(op == "ult"){
-  //   std::string t = element->getConstraint()->type2str(element->getType());
-  //   width = (t == "float" ? "32" : "64");
-  //   std::string number = (std::bitset<width>(2)).to_string();
-
-  // 	result += "(sfxp.div saturation roundDown (sfxp.mul saturation roundDown " + result1 + " " + number + ")" + " " + number + ")" +
-  // 				"(sfxp.div saturation roundDown (sfxp.mul saturation roundDown " + result2 + " " + number + ")" + " " + number + "))" ;
-  // }
 
   // else if(op == "pow")
   //   result += "(= " + width + " 32) " + "((_ to_fp 8 24) RNE (^ (fp.to_real " + result1 + ") (fp.to_real " + result2 + ") )) " + "((_ to_fp 11 53) RNE (^ (fp.to_real " + result1 + ") (fp.to_real " + result2 + ") )))";

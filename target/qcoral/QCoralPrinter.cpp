@@ -4,19 +4,22 @@
 using namespace Constraint;
 
 std::map<std::string, std::string> dictionary;
-std::map<std::string, int> seen;              // For checking if the id occurs in constraint or not
+std::map<std::string, int> seen;              // For checking if the variable occurs in the constraint or not
 int id = 1;
 bool no_var = true;  // For checking if any variable is present in the constraint
+
+// Mapping from stg functions to qcoral functions.
+
 std::map<std::string, std::string> mapping = {
 
 {"fneg", "MUL("},
 {"fptosi", "ASINT("},
 
-{"trunc", ""},        // Previously it was ASINT(
-{"zext", ""},       // ""
-{"sext", ""},       // ""
-{"fptrunc", ""},      // Previously it was ASDOUBLE(
-{"fpext", ""},        // ""
+{"trunc", ""},       
+{"zext", ""},       
+{"sext", ""},       
+{"fptrunc", ""},      
+{"fpext", ""},        
 
 {"sitofp", "ASDOUBLE("},
 {"add", "ADD("},
@@ -38,7 +41,7 @@ std::map<std::string, std::string> mapping = {
 {"sge", "IGE("},
 {"oeq", "DEQ("},
 {"one", "DNE("},
-{"fune", "DNE("},      // Newly added
+{"fune", "DNE("}, 
 {"olt", "DLT("},
 {"ole", "DLE("},
 {"ogt", "DGT("},
@@ -140,9 +143,9 @@ std::map<std::string, std::string> mapping = {
 {"sin","SIN_("},
 {"cos","COS_("},
 {"tan","TAN_("},
+{"atan2", "ATAN2_("},
 {"log","LOG_("},
 {"log10f","LOG10_("},
-// {"log2f",Expr::Op::Log2f},
 {"sqrt","SQRT_("},
 {"pow","POW_("},
 {"exp","EXP_("},
@@ -150,6 +153,8 @@ std::map<std::string, std::string> mapping = {
 
 };
 
+
+// Function for parsing dictionary for a specific variable.
 void QCoralPrinter::parseDict(const char *dict, std::string var, std::string type) {
 
   Json::Value root;
@@ -159,6 +164,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
 
   Json::Value data = root[var];
 
+  // Checking if data for the variable is available in the dictionary. If not then exit.
   if(data.isNull()){
     std::cerr<<"No data available for: "<< var<<"\n";
     return;
@@ -166,6 +172,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
 
   std::string distribution = data["distribution"].asString();
   
+  // Checking if the distribution data is available for the variable. If not then default to Uniform Distribution.
   if(distribution.empty()){
     if(type == "float" || type == "double"){
       std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
@@ -181,6 +188,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
   Json::Value range = data["range"];
   std::string max, min;
 
+  // CHecking if the range data is available for the variable. If not then default to ranges defined by the type.
   if(range.isNull()){
     if(type == "float" || type == "double"){
       std::cerr<<"No Range available for: "<< var<<". Setting default range (-1,000,000 to 1,000,000)\n";
@@ -237,6 +245,8 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
     }
 
   }
+
+  // Printing the Qcoral version of the dictionary depending on the distribution.
 
   if(distribution == "UNIFORM_INT" || distribution == "UNIFORM_REAL")
     os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
@@ -305,127 +315,124 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
 void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
   
   theConstraint = c;
+  // Initially printing the dictionary
   os << ":Variables:\n";
   indentLevel++;
 
   int num = c->symbols.size();
-  // os << "symbol size: "<<c->getExpr()<<"\n";
-  // if(num == 0){
-  //   std::cout<<"No variable!";
-  //   os << "1 UNIFORM_REAL -100 100\n";
-  //   os << "DGT(DVAR(ID_1),DVAR(ID_1))\n";
-  // }
 
-  // else{
+  for (auto &n : c->symbols) {
+    num--;
 
-    for (auto &n : c->symbols) {
-      num--;
+    // If dictionary is given then parse the dictionary else default everything to Uniform distribution and appropriate ranges governed by the type.
+    if(dict != NULL)
+      parseDict(dict, n, c->symbolType(n));
 
-      if(dict != NULL)
-        parseDict(dict, n, c->symbolType(n));
+    else{
 
-      else{
+      std::string distribution, max, min;
 
-        std::string distribution, max, min;
-
-        if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
-          std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
-          distribution = "UNIFORM_REAL";
-          std::cerr<<"No Range available for: "<< n <<". Setting default range (-1,000,000 to 1,000,000)\n";
-          min = "-1000000";
-          max = "1000000";
-        }
-
-        else{
-          std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_INT)"<<"\n";
-          distribution = "UNIFORM_INT";
-        }
-
-        if(c->symbolType(n) == "i8"){
-          std::cerr<<"No Range available for: "<< n<<". Setting default range (-128 to 127)\n";
-          min = "-128";
-          max = "127";
-        }
-
-        else if(c->symbolType(n) == "i16"){
-          std::cerr<<"No Range available for: "<< n <<". Setting default range (-32,768 to 32,767)\n";
-          min = "-32768";
-          max = "32767";
-        }
-
-        else if(c->symbolType(n) == "i32"){
-          std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
-          min = "-1000000";
-          max = "1000000";
-        }
-
-        else if(c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
-          std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
-          min = "-1000000";
-          max = "1000000";
-        }
-
-        else if(c->symbolType(n) != "float" && c->symbolType(n) != "double"){
-          std::cerr<<"Invalid data type!! "<<n<<"\n";
-          return;
-        }
-
-        os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
-
-      }
-
-      // Now saving variables in a dictionary for lookup
-      if(c->symbolType(n)[0] == 'i'){
-        if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
-          dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
-        }
-        else{
-          os << "Invalid Integer type. Exiting!!\n";
-          exit(0);
-        }
-      }
-
-      else if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
-        dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
+      if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
+        std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
+        distribution = "UNIFORM_REAL";
+        std::cerr<<"No Range available for: "<< n <<". Setting default range (-1,000,000 to 1,000,000)\n";
+        min = "-1000000";
+        max = "1000000";
       }
 
       else{
-        os << "Invalid data type. Exiting!!\n";
+        std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_INT)"<<"\n";
+        distribution = "UNIFORM_INT";
+      }
+
+      if(c->symbolType(n) == "i8"){
+        std::cerr<<"No Range available for: "<< n<<". Setting default range (-128 to 127)\n";
+        min = "-128";
+        max = "127";
+      }
+
+      else if(c->symbolType(n) == "i16"){
+        std::cerr<<"No Range available for: "<< n <<". Setting default range (-32,768 to 32,767)\n";
+        min = "-32768";
+        max = "32767";
+      }
+
+      else if(c->symbolType(n) == "i32"){
+        std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+        min = "-1000000";
+        max = "1000000";
+      }
+
+      else if(c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
+        std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+        min = "-1000000";
+        max = "1000000";
+      }
+
+      else if(c->symbolType(n) != "float" && c->symbolType(n) != "double"){
+        std::cerr<<"Invalid data type!! "<<n<<"\n";
         return;
       }
 
-      seen[dictionary[n]] = 0;
-      id++;
+      os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
+
     }
 
-    indentLevel--;
-    os << "\n";
-
-    os << ":Constraints:\n";
-    os << "BAND(";
-    
-    for(auto it: seen){
-      if(it.second == 0){
-        if(it.first[0] == 'D')
-          os<<"BAND(DEQ("<<it.first<<","<<it.first<<"), ";
-        else
-          os<<"BAND(IEQ("<<it.first<<","<<it.first<<"), ";
-      }    
+    // Now saving variables in a dictionary for fast lookup
+    if(c->symbolType(n)[0] == 'i'){
+      if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
+        dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
+      }
+      else{
+        os << "Invalid Integer type. Exiting!!\n";
+        exit(0);
+      }
     }
 
-    c->getExpr()->accept(this); 
-    os << visitResults.back();
-    visitResults.pop_back();
+    else if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
+      dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
+    }
 
-    for(auto it: seen)
-      os<<")";
+    else{
+      os << "Invalid data type. Exiting!!\n";
+      return;
+    }
 
-    if(no_var)
-      os<<", IEQ(ICONST(1), ICONST(0)))";
-    else
-      os<<", IEQ(ICONST(1), ICONST(1)))";
+    // Initially setting variable is not seen 
+    seen[dictionary[n]] = 0;
+    id++;
+  }
 
-  // }
+  indentLevel--;
+  os << "\n";
+
+  os << ":Constraints:\n";
+  os << "BAND(";
+
+
+  // For every variable in seen make a trivial equality that the variable equals itself.
+  for(auto it: seen){
+    if(it.second == 0){
+      if(it.first[0] == 'D')
+        os<<"BAND(DEQ("<<it.first<<","<<it.first<<"), ";
+      else
+        os<<"BAND(IEQ("<<it.first<<","<<it.first<<"), ";
+    }    
+  }
+
+  c->getExpr()->accept(this); 
+  os << visitResults.back();
+  visitResults.pop_back();
+
+  for(auto it: seen)
+    os<<")";
+
+  // In case if no variable is present in the constraint, then there is no addition in the volume. So make the final assertion as a false statement such that it won't effect the volume.
+  // In case if one of the variable is present then make a true assertion denoting that this constraint might help in counting the volume.
+  if(no_var)
+    os<<", IEQ(ICONST(1), ICONST(0)))";
+  else
+    os<<", IEQ(ICONST(1), ICONST(1)))";
 
   os << "\n";
   os.flush();
@@ -450,7 +457,7 @@ void QCoralPrinter::endVisit(IntConstant * element) {
   if(element->getType()->getWidth() == 1 && element->getValue() == 1)           // BCONST(true)
     result = "IEQ(ICONST(1), ICONST(1))";
 
-  else if(element->getType()->getWidth() == 1 && element->getValue() == 0)          // BCONST(false)
+  else if(element->getType()->getWidth() == 1 && element->getValue() == 0)       // BCONST(false)
     result = "IEQ(ICONST(1), ICONST(0))";
 
   else
@@ -477,12 +484,16 @@ bool QCoralPrinter::visit(UnaryExpr * element) {
 }
 
 void QCoralPrinter::endVisit(UnaryExpr * element) {
+
+  // Getting the input to the unary expression
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
+  // Getting the unary operator
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
 
+  // Check if the mapping is present
   if(mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
@@ -490,9 +501,12 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
     return;
   }
 
+
+  // Conversion for fneg. Multiplying by -1.
   if(op == "fneg")
     result += result1 + ", DCONST(-1))";
 
+  // ceil, floor and abs are not supported.
   else if(op.find("llvm.ceil") != std::string::npos){
   	// result = "BOR(BAND(DGT(" + result1 + ", DCONST(0)), DGT(ASDOUBLE(ASINT(ADD(" + result1 + ", DCONST(0.9999999999999)"
   	result += "ASINT(ADD(" + result1 + ", MUL(ASDOUBLE(DGT(" + result1 + ", DCONST(0))), DCONST(0.9999999999999)))))";
@@ -508,14 +522,19 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
   
   else if(result == ""){
 
+    // Conversion for truncating to bools. Only constant value can be supported and nothing else.
     if(op == "trunc" && theConstraint->type2str(element->getType()) == "i1"){
-      //os<<"\nResult1 --> "<<result1<<"\n";
       if(result1 == "ICONST(0)" || result1 == "IEQ(ICONST(1), ICONST(0))")
         result = "IEQ(ICONST(1), ICONST(0))";
-      else
+      else if (result1 == "ICONST(1)" || result1 == "IEQ(ICONST(1), ICONST(1))")
         result = "IEQ(ICONST(1), ICONST(1))";
+      else
+      {
+        std::cerr << "\n Trunc operation on" << result1 <<" is not supported \n";
+      }
     }
 
+    // Conversion for extending of integers. Only constant booleans can be extended.
     else if(op == "zext" && theConstraint->type2str(element->getType())[0] == 'i'){
       // std::cerr<<"FOund zext...\t"<<result1<<"\n";
       if(result1 == "ICONST(0)" || result1 == "IEQ(ICONST(1), ICONST(0))")
@@ -543,11 +562,13 @@ bool QCoralPrinter::visit(BinaryExpr * element) {
 
 void QCoralPrinter::endVisit(BinaryExpr * element) {
 
+  // Getting the operands
   std::string result2 = visitResults.back();
   visitResults.pop_back();
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
+  // Getting the operator
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
 
@@ -555,7 +576,6 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
     result += mapping[op];
   else{
     std::cerr << "\n Binary key not found..." << op <<"\n";
-    // result += "\nBinary key not found... Exiting!!\n";
     return;
   }
 
@@ -564,6 +584,8 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
     result += result2 + ")";
   }
 
+
+  // Conversion for unsigned less than/greater than for floats and ints
   else if(op == "ult")
     result += "BOR(BAND(IGE("+result1+", ICONST(0)), BAND(IGE("+result2+", ICONST(0)), ILT("+result1+", "+result2+"))),\
       BOR(BAND(ILT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), IGT("+result1+", "+result2+"))),\
@@ -588,6 +610,7 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
         BOR(BAND(DGE("+result1+", DCONST(0)), BAND(DLT("+result2+", DCONST(0)), DGT("+result1+", MUL("+result2+", DCONST(-1))))),\
         BAND(DLT("+result1+", DCONST(0)), BAND(DGE("+result2+", DCONST(0)), DGT(MUL("+result1+", DCONST(-1)), "+result2+"))))))"; 
 
+  // Conversion for signed remainder division. For more info look at the mapping for srem.
   else if(op == "srem")
   	result += "ASDOUBLE(" + result1 + "), " + "ASDOUBLE(" + result2 + ")))";
 

@@ -68,7 +68,7 @@ public:
 
    //added by SBH for binary llvm intrinsics (Reordered by Rishab)
 
-   Powf32, Powif32, Fmaf32, Minnumf32, Maxnumf32, Minimumf32, Maximumf32, Copysignf32, atan2f32,
+   Powf32, Powif32, Fmaf32, Minnumf32, Maxnumf32, Minimumf32, Maximumf32, Copysignf32, atan2f32, atan2,
    Powf64, Powif64, Fmaf64, Minnumf64, Maxnumf64, Minimumf64, Maximumf64, Copysignf64,
    Powf80, Powif80, Fmaf80, Minnumf80, Maxnumf80, Minimumf80, Maximumf80, Copysignf80,
    Powf128, Powif128, Fmaf128, Minnumf128, Maxnumf128, Minimumf128, Maximumf128, Copysignf128,
