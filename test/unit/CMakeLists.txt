@@ -8,5 +8,5 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/src/lib)
 include_directories(${CMAKE_SOURCE_DIR}/src/tools)
 
-add_subdirectory(qcoral)
+add_subdirectory(qc)
 add_subdirectory(fxp)

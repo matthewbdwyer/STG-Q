@@ -1,0 +1,229 @@
+{
+	"X_bin": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "0",
+	       "max": "1"
+	    }
+	},
+
+	"X_double": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_float": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"Y_float": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_int": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"Y_int": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_no_range": {
+	    "distribution": "UNIFORM_REAL"
+	},
+
+	"X_no_range_i8": {
+	    "distribution": "UNIFORM_INT"
+	},
+
+	"X_no_range_i16": {
+	    "distribution": "UNIFORM_INT"
+	},
+
+	"X_no_range_i32": {
+	    "distribution": "UNIFORM_INT"
+	},
+
+	"X_no_range_i64": {
+	    "distribution": "UNIFORM_INT"
+	},
+
+	"X_no_max": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "-100000"
+	    }
+	},
+
+	"X_no_min": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "max": "100000"
+	    }
+	},
+
+	"X_no_distrib": {
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_no_distrib_float": {
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_no_distrib_float": {
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_geo": {
+	    "distribution": "GEOMETRIC",
+	    "range": {
+	       "min": "0",
+	       "max": "25"
+	    },
+	    "parameters": {
+	    	"p": 0.5
+	    }
+	},
+
+	"X_geo_no_probab": {
+	    "distribution": "GEOMETRIC",
+	    "range": {
+	       "min": "0",
+	       "max": "25"
+	    },
+	    "parameters": {
+	   
+	    }
+	},
+
+
+	"X_exp_dis": {
+	    "distribution": "EXPONENTIAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    	"mean": 2
+	    }
+	},
+
+	"X_exp_dis_no_mean": {
+	    "distribution": "EXPONENTIAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    }
+	},
+
+	"X_bin_dis": {
+	    "distribution": "BINOMIAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    	"num_trials": 10,
+	    	"p": 0.5
+	    }
+	},
+
+	"X_bin_dis_insuff_params": {
+	    "distribution": "BINOMIAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    	"num_trials": 10
+	    }
+	},
+
+	"X_norm_dis": {
+	    "distribution": "NORMAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    	"mean": 5,
+	    	"sd": 1.5
+	    }
+	},
+
+	"X_norm_dis_insuff_params": {
+	    "distribution": "NORMAL",
+	    "range": {
+	       "min": "0",
+	       "max": "10"
+	    },
+	    "parameters": {
+	    	"sd": 1.5
+	    }
+	},
+
+	"X_poi_dis": {
+	    "distribution": "POISSON",
+	    "range": {
+	       "min": "0",
+	       "max": "25"
+	    },
+	    "parameters": {
+	    	"lambda": 0.5
+	    }
+	},
+
+	"X_poi_dis_no_lam": {
+	    "distribution": "POISSON",
+	    "range": {
+	       "min": "0",
+	       "max": "25"
+	    },
+	    "parameters": {
+	 
+	    }
+	},
+
+	"X_beta_distrib": {
+	    "distribution": "BETA",
+	    "range": {
+	       "min": "0",
+	       "max": "25"
+	    },
+	    "parameters": {
+	 		"alpha": "0.1",
+	 		"beta": "2"
+	    }
+	}
+
+}
