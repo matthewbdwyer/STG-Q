@@ -45,6 +45,11 @@ std::map<std::string, std::string> mapping = {
 {"ule", "(ufxp.leq "},
 {"uge", "(ufxp.geq "},
 
+{"fult", "(ufxp.lt "},
+{"fugt", "(ufxp.gt "},
+{"fule", "(ufxp.leq "},
+{"fuge", "(ufxp.geq "},
+
 {"oeq", "(= "},
 {"one", "(not(= "},
 // {"fune", "(not(fp.eq "},
@@ -74,40 +79,44 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
   // Checking if data for the variable is available in the dictionary. If not then exit.
   if(data.isNull()){
-    std::cerr<<"No data available for: "<< var<<"\n";
-    return;
+    throw ("No data available for: " + var);
+    // return;
   }
 
   std::string distribution = data["distribution"].asString();
   
   // Checking if the distribution data is available for the variable. If not then default to Uniform Distribution.
   if(distribution.empty()){
-    std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_INT)"<<"\n";
-    distribution = "UNIFORM_INT";
+    std::cerr<<"No distribution set for: "<< var <<"\n";
+
+    if(c->symbolType(var)[0] == 'i'){
+      std::cerr<<"Setting default distribution (UNIFORM_INT)"<<"\n";
+      distribution = "UNIFORM_INT";
+    }
+
+    else{
+      std::cerr<<"Setting default distribution (UNIFORM_REAL)"<<"\n";
+      distribution = "UNIFORM_REAL";
+    }
   }
 
   Json::Value range = data["range"];
 
   // CHecking if the range/max/min values are available for the variable. If not then exit.
   if(range.isNull()){
-    std::cerr<<"No Range available for: "<< var<<"\n";
-    return;
+    throw ("No Range available for: " + var);
   }
 
   std::string max = range["max"].asString();
 
-  if(max.empty())
-  {
-    std::cerr<<"No Max value available for: "<< var<<"\n";
-    return;
+  if(max.empty()){
+    throw ("No Max value available for: " + var);
   }
 
   std::string min = range["min"].asString();
 
-  if(min.empty())
-  {
-    std::cerr<<"No min value available for: "<< var<<"\n";
-    return;
+  if(min.empty()){
+    throw ("No min value available for: " + var);
   }
 
   // Printing the fxp version of the dictionary for the Uniform distribution.
@@ -135,15 +144,13 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
     // }
 
     else{
-      std::cerr<<"Invalid TYPE!!  --> " << c->symbolType(var);
-      return;
+      throw ("This should never happen. Invalid TYPE!!  --> " + c->symbolType(var));
     }
 
   }
 
   else{
-    std::cerr<<"Only Uniform distribution currently available in BV for: "<< var<<"\n";
-    return;
+    throw ("Only Uniform distribution currently available in BV for: " + var);
   }
 
 }
@@ -153,29 +160,38 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 void FXPPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
   theConstraint = c;
   indentLevel++;
+  no_var = true;
 
-  // For every symbol parse it in the dictionary
-  for (auto &n : c->symbols) {
-    parseDict(dict, c, n);
-    dict_set.insert(n);
-  }
+  try{
+    // For every symbol parse it in the dictionary
+    for (auto &n : c->symbols) {
+      parseDict(dict, c, n);
+      dict_set.insert(n);
+    }
 
-  indentLevel--;
-  os << "\n";
-  os << "(assert  (and ";
+    indentLevel--;
+    os << "\n";
+    os << "(assert  (and ";
 
-  c->getExpr()->accept(this); 
+    c->getExpr()->accept(this); 
 
-  os << visitResults.back();
+    os << visitResults.back();
 
-  visitResults.pop_back();
+    visitResults.pop_back();
 
   // In case if no variable is present in the constraint, then there is no addition in the volume. So make the final assertion as a false statement such that it won't effect the volume.
   // In case if one of the variable is present then make a true assertion denoting that this constraint might help in counting the volume.
-  if(no_var)
-    os << " false ))\n";
-  else
-    os << " true ))\n";
+    if(no_var)
+      os << " false ))\n";
+    else
+      os << " true ))\n";
+  }
+
+  catch(std::string s){
+    os << "Error: "<< s <<"\n";
+    std::cerr << "FxpPrinter Error: "<< s <<"\n";
+  }
+
 
   os.flush();
 }
@@ -185,10 +201,11 @@ void FXPPrinter::endVisit(Symbol * element) {
   if(dict_set.find(element->getName()) != dict_set.end()){
     std::string name = element->getName();
     visitResults.push_back(name);
+    // std::cout<<"THis is the variable: "<< name << "\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n";
     no_var = false;
   }
   else
-    visitResults.push_back("\nELEMENT NOT FOUND IN DICTIONARY --> " + element->getName() + "\n");
+    throw ("This should never happen. ELEMENT NOT FOUND IN DICTIONARY -->" + element->getName());
 }
 
 void FXPPrinter::endVisit(IntConstant * element) {
@@ -261,8 +278,7 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
   if(mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    std::cerr << "\nUnary key not found..." << op <<"\n";
-    return;
+    throw ("This should never happen... ");
   }
 
   // if(op == "llvm.sin.f32" || op == "llvm.sin.f64" || op == "llvm.cos.f32" || op == "llvm.cos.f64" || op == "llvm.tan.f32" || op == "llvm.tan.f64")
@@ -319,21 +335,20 @@ void FXPPrinter::endVisit(BinaryExpr * element) {
   if( mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    std::cerr << "\n Binary key not found..." << op <<"\n";
-    return;
+    throw ("This should never happen... ");
   }
 
-  if(Expr::Op::Powf32 <= element->getOp() && element->getOp() <= Expr::Op::Pow){
-    std::string t = element->getConstraint()->type2str(element->getType());
-    width = (t == "float" ? "32" : "64");
-  }
+  // if(Expr::Op::Powf32 <= element->getOp() && element->getOp() <= Expr::Op::Pow){
+  //   std::string t = element->getConstraint()->type2str(element->getType());
+  //   width = (t == "float" ? "32" : "64");
+  // }
 
-  if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext"){
-    std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
-    result += result2 + ")";
-  }
+  // if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext"){
+  //   std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
+  //   result += result2 + ")";
+  // }
 
-  else if(op == "ne" || op == "fune" || op == "one")
+  if(op == "ne" || op == "fune" || op == "one")
     result += result1 + " " + result2 + "))";
 
   // else if(op == "pow")

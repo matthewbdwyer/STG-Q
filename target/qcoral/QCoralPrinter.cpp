@@ -166,8 +166,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
 
   // Checking if data for the variable is available in the dictionary. If not then exit.
   if(data.isNull()){
-    std::cerr<<"No data available for: "<< var<<"\n";
-    return;
+    throw ("No data available for: " + var);
   }
 
   std::string distribution = data["distribution"].asString();
@@ -221,8 +220,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
     }
 
     else{
-      std::cerr<<"Invalid data type!! "<<var<<"\n";
-      return;
+      throw ("\n This should never happen.. Invalid data type!! "+ var + "\n");
     }
   }
 
@@ -230,18 +228,14 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
 
     max = range["max"].asString();
 
-    if(max.empty())
-    {
-      std::cerr<<"No Max value available for: "<< var<<"\n";
-      return;
+    if(max.empty()){
+      throw ("No Max value available for: " + var);
     }
 
     min = range["min"].asString();
 
-    if(min.empty())
-    {
-      std::cerr<<"No min value available for: "<< var<<"\n";
-      return;
+    if(min.empty()){
+      throw ("No min value available for: " + var);
     }
 
   }
@@ -257,8 +251,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
     if(distribution == "GEOMETRIC"){
       std::string p = parameters["p"].asString();
       if(p.empty()){
-        std::cerr<<"No probability given for: "<< var<<"\n";
-        return;
+        throw ("No probability given for: " + var + "\n");
       }
       os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< p<<"\n";
     }
@@ -266,8 +259,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
     else if(distribution == "POISSON"){
       std::string lambda = parameters["lambda"].asString();
       if(lambda.empty()){
-        std::cerr<<"No lambda given for: "<< var<<"\n";
-        return;
+        throw ("No lambda given for: " + var + "\n");
       }
       os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< lambda<<"\n";
     }
@@ -275,8 +267,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
     else if(distribution == "EXPONENTIAL"){
       std::string mean = parameters["mean"].asString();
       if(mean.empty()){
-        std::cerr<<"No mean given for: "<< var<<"\n";
-        return;
+        throw ("No mean given for: " + var + "\n");
       }
       os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< mean<<"\n";
     }
@@ -286,8 +277,7 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
       std::string p = parameters["p"].asString();
 
       if(num_trials.empty() || p.empty()){
-        std::cerr<<"Insufficient parameters given for: "<< var<<". A binomial variable requires num_trials and probability.\n";
-        return;
+        throw ("Insufficient parameters given for: " + var + ". A binomial variable requires num_trials and probability.\n");
       }
       os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< num_trials<<" "<<p<<"\n";
     }
@@ -297,15 +287,13 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
       std::string sd = parameters["sd"].asString();
 
       if(mean.empty() || sd.empty()){
-        std::cerr<<"Insufficient parameters given for: "<< var<<". A normal variable requires mean and standard deviation.\n";
-        return;
+        throw ("Insufficient parameters given for: " + var + ". A normal variable requires mean and standard deviation.\n");
       }
       os<<id<<" "<< distribution<< " "<< min << " "<< max<< " "<< mean<<" "<<sd<<"\n";
     }
 
     else{
-      std::cerr<<"Invalid distribution for: "<< var<<"\n";
-      return;
+      throw ("Invalid distribution for: " + var + "\n");
     }
   }
 
@@ -315,124 +303,134 @@ void QCoralPrinter::parseDict(const char *dict, std::string var, std::string typ
 void QCoralPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
   
   theConstraint = c;
+  no_var = true; 
   // Initially printing the dictionary
   os << ":Variables:\n";
   indentLevel++;
 
   int num = c->symbols.size();
 
-  for (auto &n : c->symbols) {
-    num--;
+  try{
 
-    // If dictionary is given then parse the dictionary else default everything to Uniform distribution and appropriate ranges governed by the type.
-    if(dict != NULL)
-      parseDict(dict, n, c->symbolType(n));
+    for (auto &n : c->symbols) {
+      num--;
 
-    else{
+      // If dictionary is given then parse the dictionary else default everything to Uniform distribution and appropriate ranges governed by the type.
+      if(dict != NULL)
+        parseDict(dict, n, c->symbolType(n));
 
-      std::string distribution, max, min;
+      else{
 
-      if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
-        std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
-        distribution = "UNIFORM_REAL";
-        std::cerr<<"No Range available for: "<< n <<". Setting default range (-1,000,000 to 1,000,000)\n";
-        min = "-1000000";
-        max = "1000000";
+        std::string distribution, max, min;
+
+        if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
+          std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_REAL)"<<"\n";
+          distribution = "UNIFORM_REAL";
+          std::cerr<<"No Range available for: "<< n <<". Setting default range (-1,000,000 to 1,000,000)\n";
+          min = "-1000000";
+          max = "1000000";
+        }
+
+        else{
+          std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_INT)"<<"\n";
+          distribution = "UNIFORM_INT";
+        }
+
+        if(c->symbolType(n) == "i8"){
+          os << ";; No Range available for: "<< n<<". Setting default range (-128 to 127)\n";
+          min = "-128";
+          max = "127";
+        }
+
+        else if(c->symbolType(n) == "i16"){
+          os << ";; No Range available for: "<< n <<". Setting default range (-32,768 to 32,767)\n";
+          std::cerr<<"No Range available for: "<< n <<". Setting default range (-32,768 to 32,767)\n";
+          min = "-32768";
+          max = "32767";
+        }
+
+        else if(c->symbolType(n) == "i32"){
+          os << ";; No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+          std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+          min = "-1000000";
+          max = "1000000";
+        }
+
+        else if(c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
+          os << ";; No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+          std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
+          min = "-1000000";
+          max = "1000000";
+        }
+
+        else if(c->symbolType(n) != "float" && c->symbolType(n) != "double"){
+          throw ("\n This should never happen. Invalid data type!! " + n + "\n");
+        }
+
+        os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
+
+      }
+
+      // Now saving variables in a dictionary for fast lookup
+      if(c->symbolType(n)[0] == 'i'){
+        if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
+          dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
+        }
+        else{
+          throw ("This should never happen. Invalid Integer type!!\n");
+        }
+      }
+
+      else if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
+        dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
       }
 
       else{
-        std::cerr<<"No distribution set for: "<< n <<". Setting default distribution (UNIFORM_INT)"<<"\n";
-        distribution = "UNIFORM_INT";
+        throw ("This should never happen. Invalid data type.\n");
       }
 
-      if(c->symbolType(n) == "i8"){
-        std::cerr<<"No Range available for: "<< n<<". Setting default range (-128 to 127)\n";
-        min = "-128";
-        max = "127";
-      }
-
-      else if(c->symbolType(n) == "i16"){
-        std::cerr<<"No Range available for: "<< n <<". Setting default range (-32,768 to 32,767)\n";
-        min = "-32768";
-        max = "32767";
-      }
-
-      else if(c->symbolType(n) == "i32"){
-        std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
-        min = "-1000000";
-        max = "1000000";
-      }
-
-      else if(c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
-        std::cerr<<"No Range available for: "<< n<<". Setting default range (-1,000,000 to 1,000,000)\n";
-        min = "-1000000";
-        max = "1000000";
-      }
-
-      else if(c->symbolType(n) != "float" && c->symbolType(n) != "double"){
-        std::cerr<<"Invalid data type!! "<<n<<"\n";
-        return;
-      }
-
-      os<<id<<" "<< distribution<< " "<< min << " "<< max<< "\n";
-
+      // Initially setting variable is not seen 
+      seen[dictionary[n]] = 0;
+      id++;
     }
 
-    // Now saving variables in a dictionary for fast lookup
-    if(c->symbolType(n)[0] == 'i'){
-      if(c->symbolType(n) == "i1" || c->symbolType(n) == "i8" || c->symbolType(n) == "i16" || c->symbolType(n) == "i32" || c->symbolType(n) == "i64" || c->symbolType(n) == "long"){
-        dictionary[n] = "IVAR(id_" + std::to_string(id)+")";
-      }
-      else{
-        os << "Invalid Integer type. Exiting!!\n";
-        exit(0);
-      }
+    indentLevel--;
+    os << "\n";
+
+    os << ":Constraints:\n";
+    os << "BAND(";
+
+
+    // For every variable in seen make a trivial equality that the variable equals itself.
+    for(auto it: seen){
+      if(it.second == 0){
+        if(it.first[0] == 'D')
+          os<<"BAND(DEQ("<<it.first<<","<<it.first<<"), ";
+        else
+          os<<"BAND(IEQ("<<it.first<<","<<it.first<<"), ";
+      }    
     }
 
-    else if(c->symbolType(n) == "float" || c->symbolType(n) == "double"){
-      dictionary[n] = "DVAR(id_" + std::to_string(id)+")";
-    }
+    c->getExpr()->accept(this); 
+    os << visitResults.back();
+    visitResults.pop_back();
 
-    else{
-      os << "Invalid data type. Exiting!!\n";
-      return;
-    }
+    for(auto it: seen)
+      os<<")";
 
-    // Initially setting variable is not seen 
-    seen[dictionary[n]] = 0;
-    id++;
+    // In case if no variable is present in the constraint, then there is no addition in the volume. So make the final assertion as a false statement such that it won't effect the volume.
+    // In case if one of the variable is present then make a true assertion denoting that this constraint might help in counting the volume.
+    if(no_var)
+      os<<", IEQ(ICONST(1), ICONST(0)))";
+    else
+      os<<", IEQ(ICONST(1), ICONST(1)))";
+
   }
 
-  indentLevel--;
-  os << "\n";
-
-  os << ":Constraints:\n";
-  os << "BAND(";
-
-
-  // For every variable in seen make a trivial equality that the variable equals itself.
-  for(auto it: seen){
-    if(it.second == 0){
-      if(it.first[0] == 'D')
-        os<<"BAND(DEQ("<<it.first<<","<<it.first<<"), ";
-      else
-        os<<"BAND(IEQ("<<it.first<<","<<it.first<<"), ";
-    }    
+  catch(std::string s){
+    os << "Error: "<< s <<"\n";
+    std::cerr << "QCoralPrinter Error: "<< s <<"\n";
   }
-
-  c->getExpr()->accept(this); 
-  os << visitResults.back();
-  visitResults.pop_back();
-
-  for(auto it: seen)
-    os<<")";
-
-  // In case if no variable is present in the constraint, then there is no addition in the volume. So make the final assertion as a false statement such that it won't effect the volume.
-  // In case if one of the variable is present then make a true assertion denoting that this constraint might help in counting the volume.
-  if(no_var)
-    os<<", IEQ(ICONST(1), ICONST(0)))";
-  else
-    os<<", IEQ(ICONST(1), ICONST(1)))";
 
   os << "\n";
   os.flush();
@@ -447,7 +445,7 @@ void QCoralPrinter::endVisit(Symbol * element) {
     visitResults.push_back(name);
   }
   else
-    visitResults.push_back("\nELEMENT NOT FOUND IN DICTIONARY --> " + element->getName() + "\n");
+    throw ("\nThis should never happen. ELEMENT NOT FOUND IN DICTIONARY --> " + element->getName() + "\n");
 }
 
 void QCoralPrinter::endVisit(IntConstant * element) {
@@ -497,8 +495,7 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
   if(mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    std::cerr << "\nUnary key not found..." << op <<"\n";
-    return;
+    throw ("\n This should never happen. Unary key not found..." + op);
   }
 
 
@@ -507,18 +504,18 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
     result += result1 + ", DCONST(-1))";
 
   // ceil, floor and abs are not supported.
-  else if(op.find("llvm.ceil") != std::string::npos){
-  	// result = "BOR(BAND(DGT(" + result1 + ", DCONST(0)), DGT(ASDOUBLE(ASINT(ADD(" + result1 + ", DCONST(0.9999999999999)"
-  	result += "ASINT(ADD(" + result1 + ", MUL(ASDOUBLE(DGT(" + result1 + ", DCONST(0))), DCONST(0.9999999999999)))))";
-  }
+  // else if(op.find("llvm.ceil") != std::string::npos){
+  // 	// result = "BOR(BAND(DGT(" + result1 + ", DCONST(0)), DGT(ASDOUBLE(ASINT(ADD(" + result1 + ", DCONST(0.9999999999999)"
+  // 	result += "ASINT(ADD(" + result1 + ", MUL(ASDOUBLE(DGT(" + result1 + ", DCONST(0))), DCONST(0.9999999999999)))))";
+  // }
 
-  else if(op.find("llvm.floor") != std::string::npos){
-  	result += "ASINT(SUB(" + result1 + ", MUL(ASDOUBLE(DLT(" + result1+ ", DCONST(0))), DCONST(0.9999999999999)))))";
-  }
+  // else if(op.find("llvm.floor") != std::string::npos){
+  // 	result += "ASINT(SUB(" + result1 + ", MUL(ASDOUBLE(DLT(" + result1+ ", DCONST(0))), DCONST(0.9999999999999)))))";
+  // }
 
-  else if(op.find("llvm.fabs") != std::string::npos){
-  	result += "MUL(" + result1 + ", MUL(ASDOUBLE(DLT(" + result1 + ", DCONST(0.0))) , DCONST(-1.0))), MUL(" + result1 + ", ASDOUBLE(DGT(" + result1 + ", DCONST(0.0)))))";
-  }
+  // else if(op.find("llvm.fabs") != std::string::npos){
+  // 	result += "MUL(" + result1 + ", MUL(ASDOUBLE(DLT(" + result1 + ", DCONST(0.0))) , DCONST(-1.0))), MUL(" + result1 + ", ASDOUBLE(DGT(" + result1 + ", DCONST(0.0)))))";
+  // }
   
   else if(result == ""){
 
@@ -528,9 +525,8 @@ void QCoralPrinter::endVisit(UnaryExpr * element) {
         result = "IEQ(ICONST(1), ICONST(0))";
       else if (result1 == "ICONST(1)" || result1 == "IEQ(ICONST(1), ICONST(1))")
         result = "IEQ(ICONST(1), ICONST(1))";
-      else
-      {
-        std::cerr << "\n Trunc operation on" << result1 <<" is not supported \n";
+      else{
+        throw ("\n Trunc operation on " + result1 + " is not supported \n");
       }
     }
 
@@ -575,18 +571,17 @@ void QCoralPrinter::endVisit(BinaryExpr * element) {
   if( mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    std::cerr << "\n Binary key not found..." << op <<"\n";
-    return;
+    throw ("\n This should never happen. Binary key not found..." + op);
   }
 
-  if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext"){
-    std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
-    result += result2 + ")";
-  }
+  // if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext"){
+  //   std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
+  //   result += result2 + ")";
+  // }
 
 
   // Conversion for unsigned less than/greater than for floats and ints
-  else if(op == "ult")
+  if(op == "ult")
     result += "BOR(BAND(IGE("+result1+", ICONST(0)), BAND(IGE("+result2+", ICONST(0)), ILT("+result1+", "+result2+"))),\
       BOR(BAND(ILT("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), IGT("+result1+", "+result2+"))),\
         BOR(BAND(IGE("+result1+", ICONST(0)), BAND(ILT("+result2+", ICONST(0)), ILT("+result1+", MUL("+result2+", ICONST(-1))))),\

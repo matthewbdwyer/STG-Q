@@ -95,6 +95,7 @@ done
 
 # cp -r /tmp/QCounter/smt "/home/rishab/Documents/fxp/$(basename $folder_path)"
 
+rm -rf "$folder_path/bv"
 cp -r /tmp/QCounter/smt "$folder_path/bv"
 
 printf "\n"

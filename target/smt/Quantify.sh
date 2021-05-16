@@ -122,7 +122,11 @@ do
 done
 
 
-printf "\n"
+python3 combine.py > /tmp/QCounter/smt/comb.smt
 # ./res > "/tmp/QCounter/Final_result.out"
 
 # tail -1 /tmp/QCounter/Final_result.out
+
+rm -rf "$folder_path/smt"
+cp -r /tmp/QCounter/smt "$folder_path/smt"
+printf "\n"

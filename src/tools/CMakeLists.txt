@@ -11,7 +11,7 @@ target_include_directories(stgpp PRIVATE
 
 llvm_map_components_to_libnames(llvm_libs Support)
 
-target_link_libraries(stgpp stg ${llvm_libs} --coverage)
+target_link_libraries(stgpp stg ${llvm_libs} coverage_config)
 
 install (TARGETS stgpp DESTINATION $ENV{STGQ_BIN})
 install (PROGRAMS stgred.sh DESTINATION $ENV{STGQ_BIN})

@@ -1,0 +1,92 @@
+{
+	"X_bin": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "0",
+	       "max": "1"
+	    }
+	},
+
+	"X_double": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_float": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"Y_float": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_int": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"Y_int": {
+	    "distribution": "UNIFORM_INT",
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_no_range": {
+	    "distribution": "UNIFORM_REAL"
+	},
+
+	"X_no_max": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "min": "-100000"
+	    }
+	},
+
+	"X_no_min": {
+	    "distribution": "UNIFORM_REAL",
+	    "range": {
+	       "max": "100000"
+	    }
+	},
+
+	"X_no_distrib": {
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_no_distrib_float": {
+	    "range": {
+	       "min": "-100000",
+	       "max": "100000"
+	    }
+	},
+
+	"X_geo": {
+	    "distribution": "GEOMETRIC",
+	    "range": {
+	       "min": "0",
+	       "max": "25"
+	    },
+	    "parameters": {
+	    	"p": 0.5
+	    }
+	}
+}

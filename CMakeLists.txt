@@ -38,6 +38,26 @@ set(ANTLR_EXECUTABLE $ENV{STGQ_LIB}/antlr-4.8-complete.jar)
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
+######## Code Coverage rules ###########
+add_library(coverage_config INTERFACE)
+
+option (CODE_COVERAGE "Enable coverage reporting." ON)
+if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  message(STATUS "Building with coverage reporting enabled")
+  # Add required flags (GCC & LLVM/Clang)
+  target_compile_options(coverage_config INTERFACE
+    -O0        # no optimization
+    -g         # generate debug info
+    --coverage # sets all required flags
+  )
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
+    target_link_options(coverage_config INTERFACE --coverage)
+  else()
+    target_link_libraries(coverage_config INTERFACE --coverage)
+  endif()
+endif()
+
+
 ######## LLVM rules ###########
 
 # Executables use LLVM commandline parsing support
@@ -55,6 +75,7 @@ include_directories(include)
 # STG quantifier targets
 add_subdirectory(target)
 
-#add_subdirectory(test)
+#enable_testing()
+add_subdirectory(test)
 #target_link_libraries(stg2qc stg --coverage)
 

@@ -16,4 +16,4 @@ target_include_directories(stg PRIVATE
             ${ANTLR_STG_OUTPUT_DIR} 
             ${CMAKE_SOURCE_DIR}/include)
 
-target_link_libraries(stg antlr4_static -ljsoncpp)
+target_link_libraries(stg antlr4_static -ljsoncpp coverage_config)
