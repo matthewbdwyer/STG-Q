@@ -1,3 +1,6 @@
+
+# Combining multiple smt2 files into a single file for quantification.
+
 import os,glob
 folder_path = '/tmp/QCounter/smt'
 

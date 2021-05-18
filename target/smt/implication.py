@@ -1,3 +1,6 @@
+
+# Program for checking if any one of the files implies the other one.
+
 from z3 import *
 import argparse
 

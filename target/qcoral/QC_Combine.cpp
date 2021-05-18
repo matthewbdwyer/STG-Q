@@ -4,7 +4,15 @@
 #include <string>
 
 using namespace std;
-//
+
+/*! \fn main
+* \brief Generate a single comb.qcoral file from multiple qcoral files.
+*
+* Apply a disjuction (OR) in multiple path conditions.
+* \param argc the number of files passed.
+* \param argv pointer array which points to the location of all the individual qcoral files. 
+* \return the combined file (comb.qcoral) in which the quantification is performed.
+ */
 int main(int argc, char** argv){
 
 	string line, last_line;
@@ -58,8 +66,6 @@ int main(int argc, char** argv){
 	}
 
 	comb = comb + cons + append;
-
-	//cout<<comb<<"\n";
 
 	ofstream out("/tmp/QCounter/comb.qcoral");
 

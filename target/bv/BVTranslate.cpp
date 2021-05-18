@@ -7,6 +7,12 @@
 
 using namespace std;
 
+/*! \fn main
+   *  \brief The main funtion which calls others for the translation of stg files to smt2 bit-vec files.
+   *
+   * \param argc the number arguments given for conversion. 
+   * \param argv the pointer array which points to the constraint file (.stg file) and the dictionary file.
+*/  
 int main(int argc, const char *argv[]) {
   std::ifstream filestream;
   std::istream& stream = (argc == 1) ? cin : filestream;

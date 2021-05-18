@@ -6,10 +6,16 @@
 
 using namespace Constraint;
 
+/*
+ * Globals for communicating the information between the functions.
+*/
+
 std::unordered_set <std::string> dict_set; 
 bool no_var = true; // For checking if any variable is present in the constraint
 
-// Mapping from stg functions to fxp functions.
+/*
+ * Mapping from stg functions to fxp functions.
+*/
 std::map<std::string, std::string> mapping = {
 
 {"fneg", "(sfxp.neg saturation "},

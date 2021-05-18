@@ -4,8 +4,17 @@
 
 using namespace Constraint;
 
+/*
+ * Globals for communicating the information between the functions.
+*/
+
 std::unordered_set <std::string> dict_set; 
 bool no_var = true;
+
+/*
+ * Mapping from stg functions to smt2 functions.
+*/ 
+
 std::map<std::string, std::string> mapping = {
 
 {"fneg", ""},

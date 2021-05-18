@@ -4,7 +4,11 @@
 #include <dirent.h>
 
 using namespace std;
-//
+
+/*! \fn main
+   *  \brief Comparing the expected result with the quantified result.
+*/ 
+
 int main(int argc, char** argv){
 
 	DIR *dir;

@@ -7,14 +7,32 @@
 #include <vector>
 #include <fstream>
 
+/*! \class QCoralPrinter
+ *  \brief A collection of routines implementing the conversion of path conditions (.stg files) into qcoral files.
+*/
+
 class QCoralPrinter: public ConstraintVisitor {
 public:
   QCoralPrinter() : os(std::cout), indentSize(2) {}
   QCoralPrinter(std::ostream &os, int indentSize ) : 
       os(os), indentSize(indentSize) {}
 
+  /*! \fn print
+   *  \brief Print program in a standard form to cout.
+   *
+   * \param constraint the root of an AST for a path condition (.stg file).
+   * \param dict the location of the dictionary file.
+  */
+
   void print(std::shared_ptr<Constraint::Constraints> constraint, const char *dict);
 
+  /*! \fn parseDict
+   *  \brief Hepler function for print function for parsing the dictionary file.
+   *
+   * \param dict the location of the dictionary file.
+   * \param var the variable to look for in the dictionary file.
+   * \param type the type of variable in the stg file.
+  */
   void parseDict(const char *dict, std::string var, std::string type);
 
   /* 

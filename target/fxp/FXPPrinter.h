@@ -7,14 +7,30 @@
 #include <vector>
 #include <fstream>
 
+/*! \class FXPPrinter
+ *  \brief A collection of routines implementing the conversion of path conditions (.stg files) into fixed point smt files.
+*/
+
 class FXPPrinter: public ConstraintVisitor {
 public:
   FXPPrinter() : os(std::cout), indentSize(2) {}
   FXPPrinter(std::ostream &os, int indentSize ) : 
       os(os), indentSize(indentSize) {}
 
+  /*! \fn print
+   *  \brief Print program in a standard form to cout.
+   *
+   * \param constraint the root of an AST for a path condition (.stg file).
+   * \param dict the location of the dictionary file.
+  */
   void print(std::shared_ptr<Constraint::Constraints> constraint, const char *dict);
-
+  
+  /*! \fn parseDict
+   *  \brief Hepler function for print function for parsing the dictionary file.
+   *
+   * \param dict the location of the dictionary file.
+   * \param var the variable to look for in the dictionary file.
+  */
   void parseDict(const char *dict, std::shared_ptr<Constraint::Constraints> constraint, std::string var);
 
   /* 

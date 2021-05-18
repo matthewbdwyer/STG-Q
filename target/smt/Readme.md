@@ -1,8 +1,10 @@
-### QC_Quantify is for testing all the unit test cases. It gives you the output on how many of them passed.
-### Quantify is for testing one particular unit test case.
+
+### implication.py is for checking if any one of the files implies the other one.
+
+### combine.py is for combining multiple smt2 files into a single file for quantification.
+
+### Quantify.sh is for converting one particular test case (in stg format) to smt2 format (int/reals).
 
 ### USAGE:
 
-./QC_Quantify.sh **test_folder_path** **qCORAL_path**
-
-./Quantify.sh **unit_test_path** **qCORAL_path**
+./Quantify.sh **test_folder_path** **dictionary_path**

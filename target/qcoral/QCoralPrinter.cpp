@@ -3,12 +3,18 @@
 
 using namespace Constraint;
 
+/*
+ * Globals for communicating the information between the functions.
+*/
+
 std::map<std::string, std::string> dictionary;
-std::map<std::string, int> seen;              // For checking if the variable occurs in the constraint or not
+std::map<std::string, int> seen;              // For checking if the variable occurs in the constraint or not.
 int id = 1;
 bool no_var = true;  // For checking if any variable is present in the constraint
 
-// Mapping from stg functions to qcoral functions.
+/*
+ * Mapping from stg functions to qcoral functions.
+*/ 
 
 std::map<std::string, std::string> mapping = {
 
