@@ -7,10 +7,17 @@ using namespace Constraint;
  * Globals for communicating the information between the functions.
 */
 
-std::map<std::string, std::string> dictionary;
-std::map<std::string, int> seen;              // For checking if the variable occurs in the constraint or not.
+//! For checking if the variable occurs in the constraint or not.
+std::map<std::string, int> seen;    
+
+//! Qcoral requires id numbers instead of variable names. So, X -> id_1, Y -> id_2 etc.          
 int id = 1;
-bool no_var = true;  // For checking if any variable is present in the constraint
+
+//! Mapping from variable name to id numbers.
+std::map<std::string, std::string> dictionary;
+
+//! For checking if any variable is present in the constraint
+bool no_var = true;
 
 /*
  * Mapping from stg functions to qcoral functions.
@@ -160,7 +167,7 @@ std::map<std::string, std::string> mapping = {
 };
 
 
-// Function for parsing dictionary for a specific variable.
+//! Function for parsing dictionary for a specific variable.
 void QCoralPrinter::parseDict(const char *dict, std::string var, std::string type) {
 
   Json::Value root;

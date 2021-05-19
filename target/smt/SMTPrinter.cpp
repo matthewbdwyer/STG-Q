@@ -8,7 +8,10 @@ using namespace Constraint;
  * Globals for communicating the information between the functions.
 */
 
+//! Set of variables present in the constraint files (stg) for quick lookup.
 std::unordered_set <std::string> dict_set; 
+
+//! For checking if any variable is present in the constraint
 bool no_var = true;
 
 /*
@@ -46,7 +49,7 @@ std::map<std::string, std::string> mapping = {
 {"sge", "(>= "},
 {"oeq", "(= "},
 {"one", "(not(= "},
-{"fune", "(not(= "},      // Newly added
+{"fune", "(not(= "},
 {"olt", "(< "},
 {"ole", "(<= "},
 {"ogt", "(> "},
@@ -91,6 +94,7 @@ std::map<std::string, std::string> mapping = {
 {"llvm.sqrt.f64", "(^ "},
 {"llvm.sqrt.f80", "(^ "},
 {"llvm.sqrt.f128", "(^ "},
+{"sqrt", "(^ "},
 
 {"llvm.exp2.f32", "(^ 2.0 "},
 {"llvm.exp2.f64", "(^ 2.0 "},
@@ -120,6 +124,7 @@ std::map<std::string, std::string> mapping = {
 {"llvm.pow.f64", "(^ "},
 {"llvm.pow.f80", "(^ "},
 {"llvm.pow.f128", "(^ "},
+{"pow", "(^ "},
 
 {"llvm.minnum.f32", "(min "},
 {"llvm.minnum.f64", "(min "},
@@ -143,7 +148,7 @@ std::map<std::string, std::string> mapping = {
 
 };
 
-
+//! Function for parsing dictionary for a specific variable.
 void SMTPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constraints> c, std::string var) {
 
   Json::Value root;
@@ -153,39 +158,45 @@ void SMTPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
   Json::Value data = root[var];
 
+  // Checking if data for the variable is available in the dictionary. If not then exit.
   if(data.isNull()){
-    std::cerr<<"No data available for: "<< var<<"\n";
-    return;
+    throw ("No data available for: " + var);
   }
 
   std::string distribution = data["distribution"].asString();
   
+  // Checking if the distribution data is available for the variable. If not then default to Uniform Distribution.
   if(distribution.empty()){
-    std::cerr<<"No distribution set for: "<< var <<". Setting default distribution (UNIFORM_INT)"<<"\n";
-    distribution = "UNIFORM_INT";
+    std::cerr<<"No distribution set for: "<< var <<"\n";
+
+    if(c->symbolType(var)[0] == 'i'){
+      std::cerr<<"Setting default distribution (UNIFORM_INT)"<<"\n";
+      distribution = "UNIFORM_INT";
+    }
+
+    else{
+      std::cerr<<"Setting default distribution (UNIFORM_REAL)"<<"\n";
+      distribution = "UNIFORM_REAL";
+    }
   }
 
   Json::Value range = data["range"];
 
+  // Checking if the range/max/min values are available for the variable. If not then exit.
   if(range.isNull()){
-    std::cerr<<"No Range available for: "<< var<<"\n";
-    return;
+    throw ("No Range available for: " + var);
   }
 
   std::string max = range["max"].asString();
 
-  if(max.empty())
-  {
-    std::cerr<<"No Max value available for: "<< var<<"\n";
-    return;
+  if(max.empty()){
+    throw ("No Max value available for: " + var);
   }
 
   std::string min = range["min"].asString();
 
-  if(min.empty())
-  {
-    std::cerr<<"No min value available for: "<< var<<"\n";
-    return;
+  if(min.empty()){
+    throw ("No min value available for: " + var);
   }
 
   if(distribution == "UNIFORM_INT" || distribution == "UNIFORM_REAL"){
@@ -204,15 +215,13 @@ void SMTPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
     }
 
     else{
-      std::cerr<<"Invalid TYPE!!  --> " << c->symbolType(var);
-      return;
+      throw ("This should never happen. Invalid TYPE!!  --> " + c->symbolType(var));
     }
 
   }
 
   else{
-    std::cerr<<"Only Uniform distribution currently available in SMT for: "<< var<<"\n";
-    return;
+    throw ("Only Uniform distribution currently available in SMT for: " + var);
   }
 
 }
@@ -221,6 +230,7 @@ void SMTPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
 void SMTPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *dict) {
   theConstraint = c;
+  no_var = true;
   // os << "(set-option :print-success false)\n";
   // mvn package assembly:single
   // os << "(set-logic AUFLIRA)\n";
@@ -228,25 +238,35 @@ void SMTPrinter::print(std::shared_ptr<Constraint::Constraints> c, const char *d
   os << "(declare-const EXP Real)\n(assert (= EXP 2.71828182846))\n";
 
   indentLevel++;
-  for (auto &n : c->symbols) {
-    parseDict(dict, c, n);
-    dict_set.insert(n);
-    // os << "\n";
+
+  try{
+    // For every symbol parse it in the dictionary
+    for (auto &n : c->symbols) {
+      parseDict(dict, c, n);
+      dict_set.insert(n);
+    }
+
+    indentLevel--;
+    os << "\n";
+
+    os << "(assert  (and ";
+
+    c->getExpr()->accept(this); 
+    os << visitResults.back();
+    visitResults.pop_back();
+
+    // In case if no variable is present in the constraint, then there is no addition in the volume. So make the final assertion as a false statement such that it won't effect the volume.
+    // In case if one of the variable is present then make a true assertion denoting that this constraint might help in counting the volume.
+    if(no_var)
+      os << " (= 1 0)))\n";
+    else
+      os << " (= 1 1)))\n";
   }
 
-  indentLevel--;
-  os << "\n";
-
-  os << "(assert  (and ";
-
-  c->getExpr()->accept(this); 
-  os << visitResults.back();
-  visitResults.pop_back();
-
-  if(no_var)
-    os << " (= 1 0)))\n";
-  else
-    os << " (= 1 1)))\n";
+  catch(std::string s){
+    os << "Error: "<< s <<"\n";
+    std::cerr << "SMTPrinter Error: "<< s <<"\n";
+  }
 
   os.flush();
 }
@@ -259,7 +279,7 @@ void SMTPrinter::endVisit(Symbol * element) {
     no_var = false;
   }
   else
-    visitResults.push_back("\nELEMENT NOT FOUND IN DICTIONARY --> " + element->getName() + "\n");
+    throw ("This should never happen. ELEMENT NOT FOUND IN DICTIONARY -->" + element->getName());
 }
 
 void SMTPrinter::endVisit(IntConstant * element) {
@@ -297,17 +317,18 @@ bool SMTPrinter::visit(UnaryExpr * element) {
 
 void SMTPrinter::endVisit(UnaryExpr * element) {
 
+  // Get the operand
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
+  // Get the operator
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
 
   if(mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    std::cerr << "\nUnary key not found..." << op <<"\n";
-    return;
+    throw ("This should never happen... Unary key not found! ");
   }
 
   if(op == "fneg")
@@ -329,27 +350,28 @@ bool SMTPrinter::visit(BinaryExpr * element) {
 
 void SMTPrinter::endVisit(BinaryExpr * element) {
 
+  // Get the operands
   std::string result2 = visitResults.back();
   visitResults.pop_back();
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
+  // Get the operator
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
 
   if( mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    std::cerr << "\n Binary key not found..." << op <<"\n";
-    return;
+    throw ("This should never happen... Binary key not found! ");
   }
 
-  if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext"){
-    std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
-    result += result2 + ")";
-  }
+  // if(op == "trunc" || op == "zext" || op == "sext" || op == "fptrunc" || op == "fpext"){
+  //   std::cerr<<" zext came here trunc, zext, sext, fptrunc & fpext in binary expression. This should not happen\n";
+  //   result += result2 + ")";
+  // }
 
-  else if(op == "ne" || op == "fune" || op == "one")
+  if(op == "ne" || op == "fune" || op == "one")
     result += result1 + " " + result2 + "))";
 
   else

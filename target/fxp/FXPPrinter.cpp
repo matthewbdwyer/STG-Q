@@ -10,8 +10,14 @@ using namespace Constraint;
  * Globals for communicating the information between the functions.
 */
 
+//! Set of variables present in the constraint files (stg) for quick lookup.
 std::unordered_set <std::string> dict_set; 
-bool no_var = true; // For checking if any variable is present in the constraint
+
+//! The number of bits used for decimal part of a float/double. By default set to 5.
+const int precision = 5;
+
+//! For checking if any variable is present in the constraint   
+bool no_var = true; 
 
 /*
  * Mapping from stg functions to fxp functions.
@@ -73,7 +79,7 @@ std::map<std::string, std::string> mapping = {
 };
 
 
-// Function for parsing dictionary for a specific variable.
+//! Function for parsing dictionary for a specific variable.
 void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constraints> c, std::string var) {
 
   Json::Value root;
@@ -86,7 +92,6 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
   // Checking if data for the variable is available in the dictionary. If not then exit.
   if(data.isNull()){
     throw ("No data available for: " + var);
-    // return;
   }
 
   std::string distribution = data["distribution"].asString();
@@ -108,7 +113,7 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
   Json::Value range = data["range"];
 
-  // CHecking if the range/max/min values are available for the variable. If not then exit.
+  // Checking if the range/max/min values are available for the variable. If not then exit.
   if(range.isNull()){
     throw ("No Range available for: " + var);
   }
@@ -141,7 +146,7 @@ void FXPPrinter::parseDict(const char *dict, std::shared_ptr<Constraint::Constra
 
     else if(c->symbolType(var) == "float" || c->symbolType(var) == "double"){
       os << "(set-info :domain \"" << var <<" UniformReal "<< min <<" "<< max<<"\")\n";
-      os << "(declare-fun "<< var << " () (_ SFXP 32 5))\n";
+      os << "(declare-fun "<< var << " () (_ SFXP 32 "<<precision<<"))\n";
     }
 
     // else if(c->symbolType(var) == "double"){
@@ -207,7 +212,6 @@ void FXPPrinter::endVisit(Symbol * element) {
   if(dict_set.find(element->getName()) != dict_set.end()){
     std::string name = element->getName();
     visitResults.push_back(name);
-    // std::cout<<"THis is the variable: "<< name << "\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n";
     no_var = false;
   }
   else
@@ -234,8 +238,6 @@ void FXPPrinter::endVisit(IntConstant * element) {
 
 void FXPPrinter::endVisit(FloatConstant * element) {
 
-  const int precision = 5;
-
   std::string number = (std::bitset<32-precision>(int(element->getValue()))).to_string();
   std::string decimal = (std::bitset<precision>(int((element->getValue() - int(element->getValue())) * pow(2,precision)))).to_string();
 
@@ -244,8 +246,6 @@ void FXPPrinter::endVisit(FloatConstant * element) {
 }
 
 void FXPPrinter::endVisit(DoubleConstant * element) {
-
-  const int precision = 5;
 
   std::string number = (std::bitset<32-precision>(int(element->getValue()))).to_string();
   std::string decimal = (std::bitset<precision>(int((element->getValue() - int(element->getValue())) * pow(2,precision)))).to_string();
@@ -284,7 +284,7 @@ void FXPPrinter::endVisit(UnaryExpr * element) {
   if(mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    throw ("This should never happen... ");
+    throw ("This should never happen... Unary key not found! ");
   }
 
   // if(op == "llvm.sin.f32" || op == "llvm.sin.f64" || op == "llvm.cos.f32" || op == "llvm.cos.f64" || op == "llvm.tan.f32" || op == "llvm.tan.f64")
@@ -329,19 +329,21 @@ bool FXPPrinter::visit(BinaryExpr * element) {
 
 void FXPPrinter::endVisit(BinaryExpr * element) {
 
+  // Get the operands
   std::string width = "";
   std::string result2 = visitResults.back();
   visitResults.pop_back();
   std::string result1 = visitResults.back();
   visitResults.pop_back();
 
+  // Get the operator
   std::string op = theConstraint->op2str(element->getOp());
   std::string result = "";
 
   if( mapping.find(op) != mapping.end())
     result += mapping[op];
   else{
-    throw ("This should never happen... ");
+    throw ("This should never happen... Binary key not found! ");
   }
 
   // if(Expr::Op::Powf32 <= element->getOp() && element->getOp() <= Expr::Op::Pow){

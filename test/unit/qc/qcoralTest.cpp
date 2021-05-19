@@ -29,7 +29,7 @@ std::string helper_dict(std::stringstream &stream){
     REQUIRE_NOTHROW(ast = Constraint::parse(stream));
     
     std::string stgq_home_path = std::string(std::getenv("STGQ_HOME"));
-    std::string dict_path = stgq_home_path+"/test/unit/qcoral/dict.json";
+    std::string dict_path = stgq_home_path+"/test/unit/qc/dict.json";
     const char *dict = dict_path.c_str(); 
 
     QCoralPrinter qcp(outputStream, 2);
