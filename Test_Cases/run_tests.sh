@@ -1,14 +1,13 @@
 #!/bin/bash
 
-cd $(dirname $(readlink -f "$0"))
+test_dir=$(dirname $(readlink -f "$0"))
+cd $test_dir
 
 #
 # set the tolerance (%) by which the computed STG score in a test
 # can deviate from the expected score
 #
 tolerance=0.05
-
-test_dir="$(dirname $(readlink -f "$0"))"
 
 exit_code=0
 mean=0

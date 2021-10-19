@@ -1,1 +1,6 @@
+bin
 build
+qcoral
+scripts/*realp*
+.github
+.git

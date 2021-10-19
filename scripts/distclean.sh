@@ -9,10 +9,6 @@ if [ -z "$STGQ_HOME" ]; then
 fi
 
 cd $STGQ_HOME
-if [ -d build ]; then
-	cd build
-	make clean
-fi
 
 if [ -d "$STGQ_BIN" ]; then
 	cd $STGQ_BIN
@@ -20,4 +16,15 @@ if [ -d "$STGQ_BIN" ]; then
 	rm -f Quantify.sh
 	rm -f comb
 	rm -f res
+	cd -
+fi
+
+if [ -d scripts ]; then
+	cd scripts
+	rm -fr *realpaver*
+	cd -
+fi
+
+if [ -d build ]; then
+	rm -fr build/*
 fi
