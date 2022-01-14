@@ -25,9 +25,9 @@ if [ ! -d "$REALPAVER_HOME" ]; then
 fi
 
 # download antlr4
-if [ ! -f "$STGQ_LIB/antlr-4.8-complete.jar" ]; then
+if [ ! -f "$STGQ_LIB/antlr-4.9.2-complete.jar" ]; then
 	cd $STGQ_LIB
-	wget https://www.antlr.org/download/antlr-4.8-complete.jar
+	wget https://www.antlr.org/download/antlr-4.9.2-complete.jar
 fi
 
 # download realpaver
@@ -80,6 +80,22 @@ else
 	exit 1
 fi
 
+# download qcoral
+echo "============================================"
+echo "Downloading pysmt: $PYSMT       "
+echo "============================================"
+cd $PYSMT
+git clone https://github.com/soarlab/pysmt.git
+cd pysmt
+git checkout symbol_mapping
+cp $STGQ_HOME/target/fxp/conv_fxp_smt.py "$PYSMT/pysmt"
+
+# if [ ! -d "$PYSMT/pysmt" ]; then
+
+# 	git clone https://github.com/soarlab/pysmt.git
+# 	cp $STGQ_HOME/target/fxp/conv_fxp_smt.py "$PYSMT/pysmt"
+# fi
+
 # Setup build directory
 if [ -z "$STGQ_BUILD" ]; then
 	STGQ_BUILD=$STGQ_HOME/build
@@ -95,7 +111,7 @@ fi
 echo "=========================================="
 echo "Ready to now build STG-Q from $STGQ_BUILD"
 echo "=========================================="
-
+ 
 cd $STGQ_BUILD
 cmake $STGQ_HOME
 make

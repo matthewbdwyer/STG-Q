@@ -41,7 +41,7 @@ for file in $files
 do
   if [[ "$file" == *".stg" ]]; then
 	nof+=1
-	./stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
+	stgpp "$folder_path/$(basename "$file")" > "/tmp/QCounter/stg/${nof}.stg"
   fi
 
 done
@@ -57,9 +57,9 @@ for file in $files
 do
 	nof+=1
 	if [[ "$dictionary_path" == "None" ]];then
-		./stg2smt "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/smt/${nof}.smt"
+		stg2smt "/tmp/QCounter/stg/$(basename "$file")" > "/tmp/QCounter/smt/${nof}.smt"
 	else
-		./stg2smt "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/smt/${nof}.smt"
+		stg2smt "/tmp/QCounter/stg/$(basename "$file")" "$dictionary_path" > "/tmp/QCounter/smt/${nof}.smt"
 	fi
 	
 	sha_this="$(sha512sum /tmp/QCounter/smt/${nof}.smt| cut -d " " -f 1)"
