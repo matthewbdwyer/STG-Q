@@ -25,9 +25,9 @@ if [ ! -d "$REALPAVER_HOME" ]; then
 fi
 
 # download antlr4
-if [ ! -f "$STGQ_LIB/antlr-4.8-complete.jar" ]; then
+if [ ! -f "$STGQ_LIB/antlr-4.9.2-complete.jar" ]; then
 	cd $STGQ_LIB
-	wget https://www.antlr.org/download/antlr-4.8-complete.jar
+	wget https://www.antlr.org/download/antlr-4.9.2-complete.jar
 fi
 
 # download realpaver
