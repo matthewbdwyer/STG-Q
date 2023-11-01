@@ -5,6 +5,7 @@
 #
 name: Nightly
 
+# disable nightly for now
 #on:
 #  schedule:
 #    - cron: '30 6 * * *' # time is UTC
