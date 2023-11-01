@@ -5,9 +5,9 @@
 #
 name: Nightly
 
-on:
-  schedule:
-    - cron: '30 6 * * *' # time is UTC
+#on:
+#  schedule:
+#    - cron: '30 6 * * *' # time is UTC
 
 jobs:
   STGQ-tests:
